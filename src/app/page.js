@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useAuthStore } from "@/lib/store";
 import { useEffect, useState } from "react";
-import { EnvelopeSimple, Sparkle, Lightning, ShieldCheck } from "@phosphor-icons/react";
+import { EnvelopeSimple, Sparkle, Lightning, ShieldCheck, Keyboard, MagnifyingGlass, Strategy, HandPointing } from "@phosphor-icons/react";
 
 export default function LandingPage() {
   const { user, loading, checkAuth } = useAuthStore();
@@ -46,14 +46,12 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative pt-40 pb-20 px-6 max-w-6xl mx-auto text-center flex flex-col items-center">
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-gradient-to-tr from-purple-200/40 via-blue-100/40 to-pink-100/40 blur-3xl -z-10 rounded-full opacity-70"></div>
-        
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 border border-gray-200 text-xs font-semibold text-gray-600 mb-8 animate-fade-in-up">
           <Sparkle size={14} weight="fill" className="text-purple-500" />
           Powered by Mistral AI
         </div>
         
-        <h1 className="text-6xl md:text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-black to-gray-700 leading-tight mb-6 max-w-4xl animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+        <h1 className="text-6xl md:text-7xl font-bold tracking-tight text-gray-900 leading-tight mb-6 max-w-4xl animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           The fastest email experience ever made.
         </h1>
         
@@ -76,15 +74,14 @@ export default function LandingPage() {
 
       {/* Mock UI Preview */}
       <section className="px-6 max-w-5xl mx-auto pb-32 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-        <div className="rounded-2xl border border-gray-200/60 bg-white/50 backdrop-blur-xl shadow-2xl p-2 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none z-10"></div>
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-2xl p-2 relative overflow-hidden">
           <div className="rounded-xl overflow-hidden border border-gray-100 bg-white flex aspect-[16/10]">
             <div className="w-64 border-r border-gray-100 bg-[#f9f9f8] p-4 flex flex-col gap-4">
-              <div className="h-6 w-24 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-6 w-24 bg-gray-200 rounded"></div>
               <div className="space-y-2 mt-4">
-                <div className="h-8 w-full bg-gray-200/60 rounded-md"></div>
-                <div className="h-8 w-full bg-transparent rounded-md"></div>
-                <div className="h-8 w-full bg-transparent rounded-md"></div>
+                <div className="h-8 w-full bg-gray-200 rounded-md"></div>
+                <div className="h-8 w-full bg-transparent border border-gray-100 rounded-md"></div>
+                <div className="h-8 w-full bg-transparent border border-gray-100 rounded-md"></div>
               </div>
             </div>
             <div className="flex-1 p-6 flex flex-col gap-4 bg-[#fdfdfc]">
@@ -92,37 +89,70 @@ export default function LandingPage() {
                   <div className="h-5 w-40 bg-gray-200 rounded"></div>
                   <div className="h-5 w-16 bg-gray-200 rounded"></div>
                </div>
-               <div className="h-16 w-full bg-gray-100 rounded-lg"></div>
-               <div className="h-16 w-full bg-gray-100 rounded-lg"></div>
-               <div className="h-16 w-full bg-gray-100 rounded-lg"></div>
+               <div className="h-16 w-full bg-[#f9f9f8] border border-gray-100 rounded-lg"></div>
+               <div className="h-16 w-full bg-[#f9f9f8] border border-gray-100 rounded-lg"></div>
+               <div className="h-16 w-full bg-[#f9f9f8] border border-gray-100 rounded-lg"></div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="bg-[#f9f9f8] border-t border-gray-200 py-24">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-12">
-          <div className="flex flex-col items-center text-center">
-            <div className="h-14 w-14 rounded-2xl bg-white border border-gray-200 shadow-sm flex items-center justify-center mb-6 text-black">
-              <Lightning size={28} weight="fill" />
-            </div>
-            <h3 className="text-xl font-semibold mb-3">Blazing Fast</h3>
-            <p className="text-gray-500">Built on modern architecture ensuring every action is instantaneous. Say goodbye to loading spinners.</p>
+      {/* Detailed Features Section */}
+      <section className="bg-white py-24 border-t border-gray-100">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">Everything you need to reach inbox zero.</h2>
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto">Vela is built from the ground up to eliminate the friction of modern email.</p>
           </div>
-          <div className="flex flex-col items-center text-center">
-            <div className="h-14 w-14 rounded-2xl bg-white border border-gray-200 shadow-sm flex items-center justify-center mb-6 text-purple-600">
-              <Sparkle size={28} weight="fill" />
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-16">
+            <div className="flex flex-col">
+              <div className="h-12 w-12 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center mb-5 text-gray-800">
+                <Lightning size={24} weight="bold" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Blazing Fast</h3>
+              <p className="text-gray-500 leading-relaxed">Built on a highly optimized modern stack. Interactions are instantaneous, eliminating loading spinners so you can move as fast as you think.</p>
             </div>
-            <h3 className="text-xl font-semibold mb-3">AI Intelligence</h3>
-            <p className="text-gray-500">Automatically summarize long threads and draft professional replies with the power of Mistral AI.</p>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <div className="h-14 w-14 rounded-2xl bg-white border border-gray-200 shadow-sm flex items-center justify-center mb-6 text-blue-600">
-              <ShieldCheck size={28} weight="fill" />
+
+            <div className="flex flex-col">
+              <div className="h-12 w-12 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center mb-5 text-gray-800">
+                <Sparkle size={24} weight="bold" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Mistral AI Summaries</h3>
+              <p className="text-gray-500 leading-relaxed">Instantly extract the core message from long email threads with one click. Our AI distills paragraphs into actionable bullet points.</p>
             </div>
-            <h3 className="text-xl font-semibold mb-3">Secure & Private</h3>
-            <p className="text-gray-500">Your emails remain yours. We use official Google APIs and enterprise-grade security to protect your inbox.</p>
+
+            <div className="flex flex-col">
+              <div className="h-12 w-12 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center mb-5 text-gray-800">
+                <HandPointing size={24} weight="bold" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Intelligent Drafting</h3>
+              <p className="text-gray-500 leading-relaxed">Tell the AI what you want to say in a few words, and watch it generate a perfectly formatted, professional email response automatically.</p>
+            </div>
+
+            <div className="flex flex-col">
+              <div className="h-12 w-12 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center mb-5 text-gray-800">
+                <Keyboard size={24} weight="bold" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Keyboard First</h3>
+              <p className="text-gray-500 leading-relaxed">Navigate your entire inbox, compose emails, and trigger AI actions without ever touching your mouse. True power-user efficiency.</p>
+            </div>
+
+            <div className="flex flex-col">
+              <div className="h-12 w-12 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center mb-5 text-gray-800">
+                <MagnifyingGlass size={24} weight="bold" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Deep Search</h3>
+              <p className="text-gray-500 leading-relaxed">Find exactly what you are looking for with instantaneous search powered directly by the Gmail API, bringing up results as you type.</p>
+            </div>
+
+            <div className="flex flex-col">
+              <div className="h-12 w-12 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center mb-5 text-gray-800">
+                <ShieldCheck size={24} weight="bold" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Secure by Default</h3>
+              <p className="text-gray-500 leading-relaxed">Your data is secured by Appwrite and Google OAuth. We act as a lightning-fast client for your existing secure Gmail inbox.</p>
+            </div>
           </div>
         </div>
       </section>
