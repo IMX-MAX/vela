@@ -48,7 +48,7 @@ export default function LandingPage() {
       <section className="relative pt-40 pb-20 px-6 max-w-6xl mx-auto text-center flex flex-col items-center">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 border border-gray-200 text-xs font-semibold text-gray-600 mb-8 animate-fade-in-up">
           <Sparkle size={14} weight="fill" className="text-purple-500" />
-          Powered by Mistral AI
+          Powered by Vela Intelligence
         </div>
         
         <h1 className="text-6xl md:text-7xl font-bold tracking-tight text-gray-900 leading-tight mb-6 max-w-4xl animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
@@ -118,7 +118,7 @@ export default function LandingPage() {
               <div className="h-12 w-12 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center mb-5 text-gray-800">
                 <Sparkle size={24} weight="bold" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Mistral AI Summaries</h3>
+              <h3 className="text-xl font-semibold mb-2">Vela Intelligence</h3>
               <p className="text-gray-500 leading-relaxed">Instantly extract the core message from long email threads with one click. Our AI distills paragraphs into actionable bullet points.</p>
             </div>
 

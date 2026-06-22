@@ -1,8 +1,8 @@
 import "./app.css";
 
 export const metadata = {
-  title: "Vela Email",
-  description: "A fast, modern email client powered by Appwrite and Mistral AI",
+  title: "Vela | The fastest email experience",
+  description: "A fast, modern email client powered by Appwrite and Vela Intelligence",
 };
 
 export default function RootLayout({ children }) {
