@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/lib/store";
 import { 
-  Inbox, 
+  Tray, 
   Star, 
   PaperPlaneRight, 
   FileText, 
@@ -40,7 +40,7 @@ export default function InboxLayout({ children }) {
   }
 
   const navItems = [
-    { label: "Inbox", icon: Inbox, href: "/inbox", count: 9364, active: true },
+    { label: "Inbox", icon: Tray, href: "/inbox", count: 9364, active: true },
     { label: "Starred", icon: Star, href: "/inbox?filter=starred" },
     { label: "Sent", icon: PaperPlaneRight, href: "/inbox?filter=sent" },
     { label: "Drafts", icon: FileText, href: "/inbox?filter=drafts" },

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/lib/store";
-import { fetchEmailDetails, parseEmailContent, sendEmail } from "@/lib/gmail";
+import { fetchEmailDetails, sendEmail } from "@/lib/gmail";
+import { parseEmailContent } from "@/lib/emailParser";
 import { summarizeEmailAction, draftReplyAction } from "@/app/actions";
 import { ArrowLeft, Sparkle, PaperPlaneRight, CaretDown } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";

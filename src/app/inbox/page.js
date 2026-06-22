@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { fetchEmails } from "@/lib/gmail";
+import { parseEmailContent } from "@/lib/emailParser";
 import { useAuthStore } from "@/lib/store";
-import { fetchEmails, parseEmailContent } from "@/lib/gmail";
 import { format, isToday } from "date-fns";
 import { Check, Trash, MagnifyingGlass, Command, Link as LinkIcon } from "@phosphor-icons/react";
 import { checkComposioStatus, initiateComposioConnection, getComposioAccessToken } from "@/app/composioActions";
