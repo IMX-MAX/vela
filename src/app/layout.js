@@ -1,22 +1,19 @@
+import "./app.css";
+
 export const metadata = {
-  title: "Appwrite + Next.js",
-  description: "Appwrite starter for Next.js",
+  title: "Vela Email",
+  description: "A fast, modern email client powered by Appwrite and Mistral AI",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/appwrite.svg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:opsz,wght@14..32,100..900&family=Poppins:wght@300;400&display=swap"
-          rel="stylesheet"
-        />
-        <link rel="icon" type="image/svg+xml" href="/appwrite.svg" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
       </head>
-      <body className={"bg-[#FAFAFB] font-[Inter] text-sm text-[#56565C]"}>
+      <body className="bg-[#f2f2f1] text-[#1e1e1e] antialiased h-screen w-screen overflow-hidden font-[Inter] text-[14px]">
         {children}
       </body>
     </html>
