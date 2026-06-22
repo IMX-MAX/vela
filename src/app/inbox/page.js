@@ -78,6 +78,11 @@ export default function InboxPage() {
       window.location.href = res.url;
     } else {
       setLoading(false);
+      if (res.error) {
+        alert(`Composio Error: ${res.error}`);
+      } else {
+        alert("Failed to get Composio redirect URL. Check server logs.");
+      }
     }
   };
 
