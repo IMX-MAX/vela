@@ -15,9 +15,8 @@ export async function initiateComposioConnection(userId) {
     
     // Check if connection already exists
     const accounts = await composio.connectedAccounts.list({ userId });
-    // In newer SDK, list() returns { items: [...] }
     const items = accounts?.items || [];
-    const gmailConnection = items.find(c => c.appName === "GMAIL" && c.status === "ACTIVE");
+    const gmailConnection = items.find(c => c.toolkit?.slug === "gmail" && c.status === "ACTIVE");
     
     if (gmailConnection) {
       return { connected: true };
@@ -34,7 +33,7 @@ export async function initiateComposioConnection(userId) {
     const connection = await composio.connectedAccounts.link(
       userId,
       gmailConfig.id,
-      { redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/inbox` }
+      { callbackUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/inbox` }
     );
 
     return { connected: false, url: connection.redirectUrl };
@@ -49,7 +48,7 @@ export async function checkComposioStatus(userId) {
     const composio = getComposioClient();
     const accounts = await composio.connectedAccounts.list({ userId });
     const items = accounts?.items || [];
-    const gmailConnection = items.find(c => c.appName === "GMAIL" && c.status === "ACTIVE");
+    const gmailConnection = items.find(c => c.toolkit?.slug === "gmail" && c.status === "ACTIVE");
     
     return { connected: !!gmailConnection };
   } catch (error) {
@@ -63,7 +62,7 @@ export async function executeComposioAction(userId, actionName, params = {}) {
     // Assuming executeAction takes connectedAccountId
     const accounts = await composio.connectedAccounts.list({ userId });
     const items = accounts?.items || [];
-    const gmailConnection = items.find(c => c.appName === "GMAIL" && c.status === "ACTIVE");
+    const gmailConnection = items.find(c => c.toolkit?.slug === "gmail" && c.status === "ACTIVE");
     
     if (!gmailConnection) throw new Error("No active GMAIL connection found");
 
@@ -86,7 +85,7 @@ export async function getComposioAccessToken(userId) {
     const composio = getComposioClient();
     const accounts = await composio.connectedAccounts.list({ userId });
     const items = accounts?.items || [];
-    const gmailConnection = items.find(c => c.appName === "GMAIL" && c.status === "ACTIVE");
+    const gmailConnection = items.find(c => c.toolkit?.slug === "gmail" && c.status === "ACTIVE");
     
     if (!gmailConnection) return { accessToken: null, error: "Not connected" };
 
