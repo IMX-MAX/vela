@@ -9,7 +9,7 @@ function getComposioClient() {
   return new Composio({ apiKey: process.env.COMPOSIO_API_KEY });
 }
 
-export async function initiateComposioConnection(userId) {
+export async function initiateComposioConnection(userId, callbackUrl) {
   try {
     const composio = getComposioClient();
     
@@ -30,10 +30,11 @@ export async function initiateComposioConnection(userId) {
       return { error: "Gmail Auth Config not found in Composio dashboard." };
     }
 
+    const redirectUri = callbackUrl || `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/inbox`;
     const connection = await composio.connectedAccounts.link(
       userId,
       gmailConfig.id,
-      { callbackUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/inbox` }
+      { callbackUrl: redirectUri }
     );
 
     return { connected: false, url: connection.redirectUrl };

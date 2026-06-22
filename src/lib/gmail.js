@@ -1,26 +1,65 @@
-export async function fetchEmails(accessToken, maxResults = 20) {
-  const res = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=${maxResults}&q=is:inbox`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  const data = await res.json();
-  if (!data.messages) return [];
+"use server";
+
+import { Composio } from "@composio/core";
+
+async function makeGmailRequest(tokenOrConnectionId, url, options = {}) {
+  if (tokenOrConnectionId.startsWith("ca_")) {
+    const composio = new Composio({ apiKey: process.env.COMPOSIO_API_KEY });
+    
+    // proxy expects parsed JSON object for body
+    let parsedBody = undefined;
+    if (options.body) {
+      try {
+        parsedBody = JSON.parse(options.body);
+      } catch (e) {
+        parsedBody = options.body;
+      }
+    }
+    
+    const response = await composio.client.tools.proxy({
+      endpoint: url,
+      method: options.method || "GET",
+      connected_account_id: tokenOrConnectionId,
+      body: parsedBody,
+    });
+    return response.data;
+  } else {
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        Authorization: `Bearer ${tokenOrConnectionId}`,
+      },
+    });
+    return res.json();
+  }
+}
+
+export async function fetchEmails(tokenOrConnectionId, maxResults = 20, label = "inbox") {
+  const query = label === "starred" ? "is:starred" 
+              : label === "sent" ? "in:sent"
+              : label === "drafts" ? "in:drafts"
+              : label === "trash" ? "in:trash"
+              : label === "spam" ? "in:spam"
+              : "is:inbox";
+
+  const url = `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=${maxResults}&q=${encodeURIComponent(query)}`;
+  const data = await makeGmailRequest(tokenOrConnectionId, url);
+  if (!data || !data.messages) return [];
 
   // Fetch details for each message
   const detailedMessages = await Promise.all(
-    data.messages.map((msg) => fetchEmailDetails(accessToken, msg.id))
+    data.messages.map((msg) => fetchEmailDetails(tokenOrConnectionId, msg.id))
   );
 
   return detailedMessages;
 }
 
-export async function fetchEmailDetails(accessToken, messageId) {
-  const res = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=full`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  return res.json();
+export async function fetchEmailDetails(tokenOrConnectionId, messageId) {
+  return await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=full`);
 }
 
-export async function sendEmail(accessToken, to, subject, body) {
+export async function sendEmail(tokenOrConnectionId, to, subject, body) {
   const rawMessage = [
     `To: ${to}`,
     `Subject: ${subject}`,
@@ -34,15 +73,13 @@ export async function sendEmail(accessToken, to, subject, body) {
     .replace(/\//g, "_")
     .replace(/=+$/, "");
 
-  const res = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+  return await makeGmailRequest(tokenOrConnectionId, "https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ raw: encodedMessage }),
   });
-  return res.json();
 }
 
 export function parseEmailContent(message) {

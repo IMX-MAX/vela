@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import { fetchEmails, parseEmailContent } from "@/lib/gmail";
 import { format, isToday } from "date-fns";
@@ -10,6 +10,8 @@ import { checkComposioStatus, initiateComposioConnection, getComposioAccessToken
 
 export default function InboxPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const filter = searchParams.get("filter") || "inbox";
   const { session, user } = useAuthStore();
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,11 +27,10 @@ export default function InboxPage() {
         const status = await checkComposioStatus(user.$id);
         if (status.connected) {
           const compData = await getComposioAccessToken(user.$id);
-          if (compData.accessToken) {
-            token = compData.accessToken;
+          if (compData.connectionId) {
+            token = compData.connectionId;
           } else {
-            // Failsafe if token isn't directly exposed
-            console.warn("Composio connected but no raw token available. Actions API should be used.");
+            console.warn("Composio connected but no connection ID available.");
           }
         } else {
           setNeedsComposio(true);
@@ -40,7 +41,7 @@ export default function InboxPage() {
 
       if (token) {
         try {
-          const data = await fetchEmails(token, 15);
+          const data = await fetchEmails(token, 15, filter);
           const parsed = data.map((msg) => {
             const parsedContent = parseEmailContent(msg);
             const isUnread = msg.labelIds && msg.labelIds.includes("UNREAD");
@@ -69,11 +70,19 @@ export default function InboxPage() {
     if (session) {
       initInbox();
     }
-  }, [session, user]);
+  }, [session, user, filter]);
 
   const handleConnectComposio = async () => {
     setLoading(true);
-    const res = await initiateComposioConnection(user.$id);
+    const callbackUrl = window.location.origin + "/inbox";
+    const res = await initiateComposioConnection(user.$id, callbackUrl);
+    
+    if (res.connected) {
+      // User is already connected
+      window.location.reload();
+      return;
+    }
+
     if (res.url) {
       window.location.href = res.url;
     } else {
