@@ -13,8 +13,8 @@ function getMistralClient() {
 export async function summarizeEmailAction(emailContent) {
   try {
     const mistral = getMistralClient();
-    const response = await mistral.chat.complete({
-      model: "mistral-medium",
+    const response = await mistral.agents.complete({
+      agentId: "ag_019ef18378507796bf7f3ed43d822ecf",
       messages: [
         {
           role: "user",
@@ -32,8 +32,8 @@ export async function summarizeEmailAction(emailContent) {
 export async function draftReplyAction(emailContent, userPrompt) {
   try {
     const mistral = getMistralClient();
-    const response = await mistral.chat.complete({
-      model: "mistral-medium",
+    const response = await mistral.agents.complete({
+      agentId: "ag_019ef18378507796bf7f3ed43d822ecf",
       messages: [
         {
           role: "user",
