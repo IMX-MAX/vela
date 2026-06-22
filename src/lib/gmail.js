@@ -35,13 +35,17 @@ async function makeGmailRequest(tokenOrConnectionId, url, options = {}) {
   }
 }
 
-export async function fetchEmails(tokenOrConnectionId, maxResults = 20, label = "inbox") {
-  const query = label === "starred" ? "is:starred" 
+export async function fetchEmails(tokenOrConnectionId, maxResults = 20, label = "inbox", searchQuery = null) {
+  let query = label === "starred" ? "is:starred" 
               : label === "sent" ? "in:sent"
               : label === "drafts" ? "in:drafts"
               : label === "trash" ? "in:trash"
               : label === "spam" ? "in:spam"
               : "is:inbox";
+
+  if (searchQuery) {
+    query = searchQuery;
+  }
 
   const url = `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=${maxResults}&q=${encodeURIComponent(query)}`;
   const data = await makeGmailRequest(tokenOrConnectionId, url);

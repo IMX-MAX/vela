@@ -5,6 +5,11 @@ export const useAuthStore = create((set) => ({
   user: null,
   session: null,
   loading: true,
+  isAiSidebarOpen: false,
+  chatHistory: [],
+  toggleAiSidebar: () => set((state) => ({ isAiSidebarOpen: !state.isAiSidebarOpen })),
+  addChatMessage: (message) => set((state) => ({ chatHistory: [...state.chatHistory, message] })),
+  setChatHistory: (history) => set({ chatHistory: history }),
   checkAuth: async () => {
     try {
       const user = await account.get();

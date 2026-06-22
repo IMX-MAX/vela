@@ -25,12 +25,34 @@ export default function EmailDetailPage({ params }) {
   
   const [replyText, setReplyText] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [resolvedToken, setResolvedToken] = useState(null);
+
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [showAiPrompt, setShowAiPrompt] = useState(false);
 
   useEffect(() => {
     async function load() {
-      if (!session?.providerAccessToken) return;
+      let token = session?.providerAccessToken;
+
+      // If no Google OAuth token, check Composio MCP
+      if (!token && user) {
+        const { checkComposioStatus, getComposioAccessToken } = await import("@/app/composioActions");
+        const status = await checkComposioStatus(user.$id);
+        if (status.connected) {
+          const compData = await getComposioAccessToken(user.$id);
+          if (compData.connectionId) {
+            token = compData.connectionId;
+          }
+        }
+      }
+
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const rawMsg = await fetchEmailDetails(session.providerAccessToken, id);
+        const rawMsg = await fetchEmailDetails(token, id);
         const parsed = parseEmailContent(rawMsg);
         
         let senderName = parsed.from;
@@ -47,14 +69,18 @@ export default function EmailDetailPage({ params }) {
           senderEmail: senderEmail || parsed.from,
           rawTo: parsed.from // we reply to the sender
         });
+        
+        setResolvedToken(token);
       } catch (error) {
         console.error("Error fetching email:", error);
       } finally {
         setLoading(false);
       }
     }
-    load();
-  }, [id, session]);
+    if (session) {
+      load();
+    }
+  }, [id, session, user]);
 
   const handleSummarize = async () => {
     if (!email) return;
@@ -67,18 +93,21 @@ export default function EmailDetailPage({ params }) {
   const handleDraftReply = async () => {
     if (!email) return;
     setIsDrafting(true);
-    const result = await draftReplyAction(email.body, "Reply professionally acknowledging receipt.");
+    const promptToUse = aiPrompt.trim() ? aiPrompt : "Reply professionally acknowledging receipt.";
+    const result = await draftReplyAction(email.body, promptToUse);
     setDraft(result);
     setReplyText(result); // auto fill the textarea
     setIsDrafting(false);
+    setShowAiPrompt(false);
+    setAiPrompt("");
   };
 
   const handleSend = async () => {
-    if (!email || !replyText || !session?.providerAccessToken) return;
+    if (!email || !replyText || !resolvedToken) return;
     setIsSending(true);
     try {
       const subject = email.subject.toLowerCase().startsWith("re:") ? email.subject : `Re: ${email.subject}`;
-      await sendEmail(session.providerAccessToken, email.rawTo, subject, replyText);
+      await sendEmail(resolvedToken, email.rawTo, subject, replyText);
       router.push("/inbox");
     } catch (error) {
       console.error("Failed to send", error);
@@ -137,24 +166,51 @@ export default function EmailDetailPage({ params }) {
         </div>
 
         {/* AI Toolbar */}
-        <div className="flex items-center gap-3 mb-8">
-          <button 
-            onClick={handleSummarize}
-            disabled={isSummarizing}
-            className="flex items-center gap-2 text-sm font-medium bg-[#f0f0f0] hover:bg-[#e4e3e0] transition px-4 py-2 rounded-full text-gray-800 disabled:opacity-50"
-          >
-            <Sparkle size={16} className="text-purple-600" weight="fill" />
-            {isSummarizing ? "Summarizing..." : "Summarize"}
-          </button>
+        <div className="flex flex-col gap-3 mb-8">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={handleSummarize}
+              disabled={isSummarizing}
+              className="flex items-center gap-2 text-sm font-medium bg-[#f0f0f0] hover:bg-[#e4e3e0] transition px-4 py-2 rounded-full text-gray-800 disabled:opacity-50"
+            >
+              <Sparkle size={16} className="text-purple-600" weight="fill" />
+              {isSummarizing ? "Summarizing..." : "Summarize"}
+            </button>
+            
+            <button 
+              onClick={() => setShowAiPrompt(!showAiPrompt)}
+              disabled={isDrafting}
+              className="flex items-center gap-2 text-sm font-medium bg-[#f0f0f0] hover:bg-[#e4e3e0] transition px-4 py-2 rounded-full text-gray-800 disabled:opacity-50"
+            >
+              <Sparkle size={16} className="text-blue-600" weight="fill" />
+              {isDrafting ? "Drafting..." : "Reply with AI"}
+            </button>
+          </div>
           
-          <button 
-            onClick={handleDraftReply}
-            disabled={isDrafting}
-            className="flex items-center gap-2 text-sm font-medium bg-[#f0f0f0] hover:bg-[#e4e3e0] transition px-4 py-2 rounded-full text-gray-800 disabled:opacity-50"
-          >
-            <Sparkle size={16} className="text-blue-600" weight="fill" />
-            {isDrafting ? "Drafting..." : "Draft Reply"}
-          </button>
+          {showAiPrompt && (
+            <div className="flex items-center gap-2 mt-2 bg-white border border-[#e4e3e0] rounded-xl p-2 shadow-sm max-w-md">
+              <input
+                type="text"
+                placeholder="e.g. tell him I'll be attending"
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && aiPrompt.trim()) {
+                    handleDraftReply();
+                  }
+                }}
+                className="flex-1 bg-transparent border-none outline-none text-sm px-2 text-gray-800 placeholder-gray-400"
+                autoFocus
+              />
+              <button 
+                onClick={handleDraftReply}
+                disabled={!aiPrompt.trim() || isDrafting}
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-1.5 text-sm font-medium transition disabled:opacity-50"
+              >
+                Draft
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Summary Card */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/lib/store";
@@ -14,12 +14,19 @@ import {
   Trash, 
   Tag, 
   MagnifyingGlass, 
-  PencilSimple
+  PencilSimple,
+  SignOut,
+  Link as LinkIcon
 } from "@phosphor-icons/react";
+import { initiateComposioConnection } from "@/app/composioActions";
+
+import AiSidebar from "./AiSidebar";
 
 export default function InboxLayout({ children }) {
   const router = useRouter();
-  const { user, loading, checkAuth } = useAuthStore();
+  const { user, loading, checkAuth, logout } = useAuthStore();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -30,6 +37,27 @@ export default function InboxLayout({ children }) {
       router.push("/login");
     }
   }, [user, loading, router]);
+
+  const handleSignOut = async () => {
+    await logout();
+    router.push("/login");
+  };
+
+  const handleManageConnections = async () => {
+    setIsConnecting(true);
+    const callbackUrl = window.location.origin + "/inbox";
+    const res = await initiateComposioConnection(user.$id, callbackUrl);
+    
+    if (res.connected) {
+      alert("You are already connected to Composio.");
+      setIsConnecting(false);
+    } else if (res.url) {
+      window.location.href = res.url;
+    } else {
+      setIsConnecting(false);
+      alert("Failed to connect: " + (res.error || "Unknown error"));
+    }
+  };
 
   if (loading || !user) {
     return (
@@ -53,13 +81,40 @@ export default function InboxLayout({ children }) {
     <div className="flex h-screen w-screen overflow-hidden bg-[#e4e3e0]">
       {/* Sidebar */}
       <aside className="w-64 flex-shrink-0 flex flex-col pt-6 pb-4">
-        <div className="px-5 mb-6 flex items-center justify-between text-gray-500">
-          <div className="flex items-center gap-2">
+        <div className="px-5 mb-6 flex items-center justify-between text-gray-500 relative">
+          <div 
+            className="flex items-center gap-2 cursor-pointer hover:bg-[#d0cfcb]/50 px-2 py-1 rounded-md transition"
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+          >
             <div className="h-6 w-6 rounded-full bg-[#d0cfcb] flex items-center justify-center text-xs font-semibold text-gray-700">
               {user.name ? user.name[0].toUpperCase() : "U"}
             </div>
             <span className="icon-cheveron-down text-xs"></span>
           </div>
+          
+          {isProfileOpen && (
+            <div className="absolute top-10 left-5 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden text-sm">
+              <div className="px-4 py-3 border-b border-gray-100">
+                <div className="font-medium text-gray-900 truncate">{user.name}</div>
+                <div className="text-gray-500 text-xs truncate">{user.email}</div>
+              </div>
+              <button 
+                onClick={handleManageConnections}
+                disabled={isConnecting}
+                className="w-full text-left px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition flex items-center gap-2"
+              >
+                <LinkIcon size={16} />
+                {isConnecting ? "Connecting..." : "Manage Connections"}
+              </button>
+              <button 
+                onClick={handleSignOut}
+                className="w-full text-left px-4 py-2.5 text-red-600 hover:bg-red-50 transition flex items-center gap-2"
+              >
+                <SignOut size={16} />
+                Sign out
+              </button>
+            </div>
+          )}
           <div className="flex items-center gap-3">
             <button className="hover:text-gray-800 transition">
               <MagnifyingGlass size={18} weight="bold" />
@@ -86,10 +141,7 @@ export default function InboxLayout({ children }) {
             </Link>
           ))}
           
-          <div className="pt-4 mt-4 px-3 flex items-center justify-between text-[13px] font-medium text-gray-600 cursor-pointer hover:text-gray-900">
-            <span>Labels</span>
-            <span className="icon-cheveron-right text-[10px]"></span>
-          </div>
+
         </nav>
       </aside>
 
@@ -97,6 +149,9 @@ export default function InboxLayout({ children }) {
       <main className="flex-1 overflow-hidden m-2 ml-0 rounded-2xl bg-[#fdfdfc] shadow-sm flex flex-col">
         {children}
       </main>
+
+      {/* AI Sidebar */}
+      <AiSidebar />
     </div>
   );
 }
