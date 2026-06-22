@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/lib/store";
 import { 
@@ -21,6 +21,45 @@ import {
 import { initiateComposioConnection } from "@/app/composioActions";
 
 import AiSidebar from "./AiSidebar";
+
+import { Suspense } from "react";
+
+function SidebarNavigation() {
+  const searchParams = useSearchParams();
+  const currentFilter = searchParams.get("filter") || "inbox";
+
+  const navItems = [
+    { label: "Inbox", icon: Tray, href: "/inbox", count: 9364, active: currentFilter === "inbox" },
+    { label: "Starred", icon: Star, href: "/inbox?filter=starred", active: currentFilter === "starred" },
+    { label: "Sent", icon: PaperPlaneRight, href: "/inbox?filter=sent", active: currentFilter === "sent" },
+    { label: "Drafts", icon: FileText, href: "/inbox?filter=drafts", active: currentFilter === "drafts" },
+    { label: "Done", icon: CheckCircle, href: "/inbox?filter=done", active: currentFilter === "done" },
+    { label: "Spam", icon: WarningOctagon, href: "/inbox?filter=spam", active: currentFilter === "spam" },
+    { label: "Trash", icon: Trash, href: "/inbox?filter=trash", active: currentFilter === "trash" },
+  ];
+
+  return (
+    <nav className="flex-1 space-y-0.5 px-3">
+      {navItems.map((item) => (
+        <Link
+          key={item.label}
+          href={item.href}
+          className={`flex items-center justify-between rounded-lg px-3 py-2 text-[13px] font-medium transition ${
+            item.active 
+              ? "bg-[#d0cfcb] text-gray-900" 
+              : "text-gray-600 hover:bg-[#d0cfcb]/50 hover:text-gray-900"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <item.icon size={18} weight={item.active ? "fill" : "regular"} />
+            <span>{item.label}</span>
+          </div>
+          {item.count && <span className="text-gray-500">{item.count.toLocaleString()}</span>}
+        </Link>
+      ))}
+    </nav>
+  );
+}
 
 export default function InboxLayout({ children }) {
   const router = useRouter();
@@ -66,16 +105,6 @@ export default function InboxLayout({ children }) {
       </div>
     );
   }
-
-  const navItems = [
-    { label: "Inbox", icon: Tray, href: "/inbox", count: 9364, active: true },
-    { label: "Starred", icon: Star, href: "/inbox?filter=starred" },
-    { label: "Sent", icon: PaperPlaneRight, href: "/inbox?filter=sent" },
-    { label: "Drafts", icon: FileText, href: "/inbox?filter=drafts" },
-    { label: "Done", icon: CheckCircle, href: "/inbox?filter=done" },
-    { label: "Spam", icon: WarningOctagon, href: "/inbox?filter=spam" },
-    { label: "Trash", icon: Trash, href: "/inbox?filter=trash" },
-  ];
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#e4e3e0]">
@@ -125,24 +154,9 @@ export default function InboxLayout({ children }) {
           </div>
         </div>
 
-        <nav className="flex-1 space-y-0.5 px-3">
-          {navItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className={`flex items-center justify-between rounded-lg px-3 py-2 text-[13px] font-medium transition ${
-                item.active 
-                  ? "bg-[#d0cfcb] text-gray-900" 
-                  : "text-gray-600 hover:bg-[#d0cfcb]/50 hover:text-gray-900"
-              }`}
-            >
-              <span>{item.label}</span>
-              {item.count && <span className="text-gray-500">{item.count.toLocaleString()}</span>}
-            </Link>
-          ))}
-          
-
-        </nav>
+        <Suspense fallback={<nav className="flex-1 space-y-0.5 px-3"></nav>}>
+          <SidebarNavigation />
+        </Suspense>
       </aside>
 
       {/* Main Content Area */}

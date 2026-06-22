@@ -12,7 +12,7 @@ import { format } from "date-fns";
 export default function EmailDetailPage({ params }) {
   const { id } = params;
   const router = useRouter();
-  const { session } = useAuthStore();
+  const { session, user } = useAuthStore();
   
   const [email, setEmail] = useState(null);
   const [loading, setLoading] = useState(true);
