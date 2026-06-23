@@ -112,13 +112,7 @@ export default function InboxLayout({ children }) {
           
           {isProfileOpen && (
             <div className="absolute top-12 left-5 w-56 bg-[#f7f7f6] border border-[#e4e3e0] rounded-xl shadow-lg z-50 overflow-hidden text-[15px] py-1 text-gray-800">
-              <button 
-                onClick={() => {}}
-                className="w-full text-left px-4 py-2.5 hover:bg-[#eeeae6] transition flex items-center justify-between"
-              >
-                Switch account
-                <span className="text-gray-400 text-xs icon-cheveron-right"></span>
-              </button>
+
               <Link 
                 href="/inbox/settings"
                 onClick={() => setIsProfileOpen(false)}
