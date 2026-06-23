@@ -240,8 +240,7 @@ export default function InboxLayout({ children }) {
         </Suspense>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-hidden md:m-2 md:ml-0 md:rounded-2xl bg-[#eceae6] shadow-sm flex flex-col relative z-10">
+      <main className="flex-1 overflow-hidden md:m-2 md:ml-0 md:rounded-2xl bg-[#eceae6] shadow-sm flex flex-col">
         <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-400 border-t-gray-800"></div></div>}>
           {children}
         </Suspense>

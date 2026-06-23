@@ -74,44 +74,44 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#dddcdc] flex text-[14px]">
+    <div className="fixed inset-0 z-[60] bg-[#dddcdc] flex flex-col md:flex-row text-[14px]">
       {/* Sidebar */}
-      <div className="w-64 flex-shrink-0 pt-6 px-4 flex flex-col gap-6 border-r border-[#dddcdc]/50">
+      <div className="w-full md:w-64 flex-shrink-0 pt-4 md:pt-6 px-4 flex md:flex-col gap-2 md:gap-6 border-b md:border-b-0 md:border-r border-gray-300 md:border-[#dddcdc]/50 overflow-x-auto md:overflow-x-visible hide-scrollbar">
         <button 
           onClick={() => router.push('/inbox')} 
-          className="flex items-center gap-2 text-gray-700 font-medium px-2 hover:bg-[#2b323b]/5 rounded-md py-1.5 w-max transition"
+          className="flex items-center gap-1 md:gap-2 text-gray-700 font-medium px-2 hover:bg-[#2b323b]/5 rounded-md py-1.5 w-max transition flex-shrink-0"
         >
-          <CaretLeft size={16} weight="bold" /> Back to Inbox
+          <CaretLeft size={16} weight="bold" /> <span className="hidden md:inline">Back to Inbox</span><span className="md:hidden">Back</span>
         </button>
         
-        <div className="flex flex-col gap-0.5">
-          <div className="text-[12px] font-semibold text-gray-400 px-2 mb-1">Account</div>
+        <div className="flex md:flex-col gap-1 md:gap-0.5 items-center md:items-stretch pb-2 md:pb-0">
+          <div className="hidden md:block text-[12px] font-semibold text-gray-400 px-2 mb-1">Account</div>
           <div 
-            className={`px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'profile' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
+            className={`whitespace-nowrap px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'profile' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
             onClick={() => setTab('profile')}
           >
             Profile
           </div>
           <div 
-            className={`px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'accounts' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
+            className={`whitespace-nowrap px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'accounts' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
             onClick={() => setTab('accounts')}
           >
             Connected accounts
           </div>
           <div 
-            className={`px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'context' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
+            className={`whitespace-nowrap px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'context' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
             onClick={() => setTab('context')}
           >
             AI Context
           </div>
           <div 
-            className={`px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'billing' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
+            className={`whitespace-nowrap px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'billing' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
             onClick={() => setTab('billing')}
           >
             Billing
           </div>
           <div 
-            className={`px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'usage' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
+            className={`whitespace-nowrap px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'usage' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
             onClick={() => setTab('usage')}
           >
             Usage
@@ -120,7 +120,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto px-16 py-12">
+      <div className="flex-1 overflow-y-auto px-4 md:px-16 py-6 md:py-12 bg-[#eceae6] md:bg-transparent">
         {tab === 'profile' && (
           <div className="max-w-2xl">
             <h1 className="text-2xl font-medium text-[#2b323b] mb-8">Profile</h1>
