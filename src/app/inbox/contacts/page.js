@@ -6,9 +6,10 @@ import { fetchContacts, createContact, updateContact, deleteContact } from "@/li
 import { Plus, PencilSimple, Trash, User, Phone, EnvelopeSimple, X } from "@phosphor-icons/react";
 
 export default function ContactsPage() {
-  const { user, loading, connectionId } = useAuthStore();
+  const { user, loading, session } = useAuthStore();
   const [contacts, setContacts] = useState([]);
   const [isLoadingContacts, setIsLoadingContacts] = useState(true);
+  const [resolvedToken, setResolvedToken] = useState(null);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingContact, setEditingContact] = useState(null);
@@ -16,15 +17,37 @@ export default function ContactsPage() {
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", resourceName: "", etag: "" });
 
   useEffect(() => {
-    if (!loading && user && connectionId) {
-      loadContacts();
+    async function initToken() {
+      if (session?.providerAccessToken) {
+        setResolvedToken(session.providerAccessToken);
+      } else if (user && session?.provider !== 'google') {
+        try {
+          const { checkComposioStatus, getComposioAccessToken } = await import("@/app/composioActions");
+          const status = await checkComposioStatus(user.$id);
+          if (status.connected) {
+            const compData = await getComposioAccessToken(user.$id);
+            if (compData.connectionId) {
+              setResolvedToken(compData.connectionId);
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
     }
-  }, [loading, user, connectionId]);
+    initToken();
+  }, [session, user]);
 
-  const loadContacts = async () => {
+  useEffect(() => {
+    if (!loading && user && resolvedToken) {
+      loadContacts(resolvedToken);
+    }
+  }, [loading, user, resolvedToken]);
+
+  const loadContacts = async (token) => {
     setIsLoadingContacts(true);
     try {
-      const data = await fetchContacts(connectionId);
+      const data = await fetchContacts(token);
       setContacts(data);
     } catch (error) {
       console.error(error);
@@ -58,18 +81,18 @@ export default function ContactsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (editingContact) {
-      await updateContact(connectionId, formData.resourceName, formData);
+      await updateContact(resolvedToken, formData.resourceName, formData);
     } else {
-      await createContact(connectionId, formData);
+      await createContact(resolvedToken, formData);
     }
     handleCloseModal();
-    loadContacts();
+    loadContacts(resolvedToken);
   };
 
   const handleDelete = async (resourceName) => {
     if (confirm("Are you sure you want to delete this contact?")) {
-      await deleteContact(connectionId, resourceName);
-      loadContacts();
+      await deleteContact(resolvedToken, resourceName);
+      loadContacts(resolvedToken);
     }
   };
 

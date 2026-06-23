@@ -318,7 +318,7 @@ export default function CommandPalette() {
             return <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline" {...props}>{children}</a>;
           },
           code: ({ node, inline, className, children, ...props }) => {
-            const match = /language-(\w+)/.exec(className || '');
+            const match = /language-([\w-]+)/.exec(className || '');
             if (!inline && match && match[1] === 'draft-email') {
               try {
                 const draftData = JSON.parse(String(children).replace(/\n$/, ''));
