@@ -30,7 +30,7 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="text-xl font-semibold mb-3 text-gray-900">3. User Accounts & Responsibilities</h2>
-            <p>To use Vela, you must sign in using your Google account or a registered email address. You are responsible for safeguarding the password and credentials that you use to access the service and for any activities or actions under your password. You agree not to disclose your password to any third party.</p>
+            <p>To use Vela, you must sign in using your Google account or a registered email address. Your use of Vela via your Google account is also subject to Google's Terms of Service and Privacy Policy. You are responsible for safeguarding the password and credentials that you use to access the service and for any activities or actions under your password. You agree not to disclose your password to any third party.</p>
             <p className="mt-2">You agree not to use the service for any unlawful purpose or in any way that interrupts, damages, or impairs the service.</p>
           </section>
 
