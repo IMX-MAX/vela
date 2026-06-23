@@ -1,8 +1,20 @@
 import "./app.css";
 
 export const metadata = {
-  title: "Vela | The fastest email experience",
-  description: "A fast, modern email client powered by Appwrite and Vela Intelligence",
+  title: "Vela | The fastest email client and experience",
+  description: "Vela is a fast, modern email client spearheading UI and AI in email. Experience the fastest email workflow.",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  openGraph: {
+    title: "Vela | The fastest email client and experience",
+    description: "Vela is a fast, modern email client spearheading UI and AI in email.",
+    url: "https://vela.nafen.sbs",
+    siteName: "Vela",
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }) {

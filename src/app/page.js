@@ -73,11 +73,11 @@ export default function LandingPage() {
           </div>
           
           <h1 className="text-5xl md:text-[5.5rem] font-medium tracking-[-0.03em] text-white leading-[1.05] mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            Email,<br />reimagined.
+            The next generation of<br />email is here.
           </h1>
           
           <p className="text-lg md:text-xl text-gray-400 max-w-lg leading-relaxed mb-10 animate-fade-in-up font-light" style={{ animationDelay: '0.15s' }}>
-            An AI-native email client built for speed, clarity, and deep focus. Fly through your inbox and reclaim hours of your week.
+            Vela is an AI-native email client spearheading UI and AI in email. Experience the fastest email workflow, built for speed, clarity, and deep focus. Fly through your inbox and reclaim hours of your week.
           </p>
           
           <div className="flex flex-wrap items-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
@@ -224,6 +224,39 @@ export default function LandingPage() {
               <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">{stat.label}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* FAQ / SEO Section */}
+      <section className="px-6 py-24 bg-white/[0.02]">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-white mb-4">Frequently Asked Questions</h2>
+            <p className="text-gray-400 max-w-lg mx-auto text-sm leading-relaxed">Learn more about how Vela compares to other email clients and productivity tools.</p>
+          </div>
+          
+          <div className="space-y-8">
+            <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6 md:p-8">
+              <h3 className="text-xl font-medium text-white mb-3">Is Vela a replacement for my current email provider?</h3>
+              <p className="text-gray-400 leading-relaxed text-sm">
+                No, Vela is a modern email client that connects securely to your existing Gmail account. You keep your current email address while benefiting from Vela's blazing fast interface and AI tools. If you are looking for tools similar to Vela, check out our comprehensive <Link href="/resources/vs-the-world" className="text-emerald-400 hover:underline">Vela vs The World</Link> comparison to see how we stack up against other modern clients.
+              </p>
+            </div>
+            
+            <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6 md:p-8">
+              <h3 className="text-xl font-medium text-white mb-3">How does the pricing work for Vela?</h3>
+              <p className="text-gray-400 leading-relaxed text-sm">
+                Vela is free to use during our beta period. We offer a generous Free tier that includes 50 AI actions per month. For power users needing more AI assistance, we offer a Pro tier. You can view all the details on our <Link href="/pricing" className="text-emerald-400 hover:underline">Pricing page</Link>.
+              </p>
+            </div>
+            
+            <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6 md:p-8">
+              <h3 className="text-xl font-medium text-white mb-3">How does Vela protect my privacy?</h3>
+              <p className="text-gray-400 leading-relaxed text-sm">
+                Vela is built with privacy by design. We do not sell your data or use it to train AI models. Unlike legacy email providers, there are zero tracking scripts and zero ads in your inbox. Our backend infrastructure is powered securely by open-source technologies like Appwrite, keeping your workflow safe and private.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
