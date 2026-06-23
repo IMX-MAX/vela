@@ -202,7 +202,7 @@ export default function InboxPage() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto pb-24">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-400 border-t-gray-800"></div>
@@ -213,27 +213,36 @@ export default function InboxPage() {
               <div
                 key={email.id}
                 onClick={() => router.push(`/inbox/email/${email.id}`)}
-                className={`group flex items-center px-6 py-2.5 cursor-pointer border-b border-[#2b323b]/5 hover:bg-[#dddcdc]/50 transition ${
+                className={`group flex flex-col md:flex-row md:items-center px-4 md:px-6 py-3 md:py-2.5 cursor-pointer border-b border-[#2b323b]/5 hover:bg-[#dddcdc]/50 transition gap-0.5 md:gap-0 ${
                   email.isUnread ? "bg-white" : ""
                 }`}
               >
-                <div className="w-4 flex-shrink-0 flex items-center justify-center">
-                  {email.isUnread && <div className="h-2 w-2 rounded-full bg-[#2b323b]"></div>}
+                <div className="flex items-center justify-between md:w-auto w-full">
+                  <div className="flex items-center flex-1 min-w-0">
+                    <div className="w-4 flex-shrink-0 flex items-center justify-center">
+                      {email.isUnread && <div className="h-2 w-2 rounded-full bg-[#2b323b]"></div>}
+                    </div>
+                    
+                    <div className={`md:w-48 truncate pr-4 text-[14px] md:text-[13px] ${email.isUnread ? "font-semibold text-[#2b323b]" : "font-medium text-gray-700"}`}>
+                      {email.sender}
+                    </div>
+                  </div>
+                  <div className="md:hidden text-[12px] text-gray-500 flex-shrink-0 ml-2">
+                    {formatTime(email.dateStr)}
+                  </div>
                 </div>
                 
-                <div className={`w-48 truncate pr-4 text-[13px] ${email.isUnread ? "font-semibold text-[#2b323b]" : "font-medium text-gray-700"}`}>
-                  {email.sender}
-                </div>
-                
-                <div className="flex-1 truncate text-[13px] flex items-center">
-                  <span className={`${email.isUnread ? "font-semibold text-[#2b323b]" : "font-medium text-gray-800"}`}>
+                <div className="flex-1 flex flex-col md:flex-row md:items-center pl-4 md:pl-0 min-w-0">
+                  <div className={`truncate text-[13px] ${email.isUnread ? "font-semibold text-[#2b323b]" : "font-medium text-gray-800"}`}>
                     {email.subject}
-                  </span>
-                  <span className="text-gray-500 mx-2">&mdash;</span>
-                  <span className="text-gray-500 truncate">{email.snippet}</span>
+                  </div>
+                  <span className="text-gray-500 mx-2 hidden md:inline">&mdash;</span>
+                  <div className="text-gray-500 truncate text-[13px] md:flex-1">
+                    {email.snippet}
+                  </div>
                 </div>
                 
-                <div className="flex-shrink-0 ml-4 flex items-center w-24 justify-end">
+                <div className="hidden md:flex flex-shrink-0 ml-4 items-center w-24 justify-end">
                   <div className="hidden group-hover:flex items-center gap-2 text-gray-500">
                     <button onClick={(e) => handleDone(e, email.id)} className="hover:text-[#2b323b]"><Check size={16} /></button>
                     <button onClick={(e) => handleTrash(e, email.id)} className="hover:text-[#2b323b]"><Trash size={16} /></button>

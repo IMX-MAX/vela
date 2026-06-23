@@ -67,10 +67,13 @@ function SidebarNavigation() {
   );
 }
 
+import { List } from "@phosphor-icons/react";
+
 export default function InboxLayout({ children }) {
   const router = useRouter();
   const { user, loading, checkAuth, logout, googleProfile, toggleCommandPalette } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const initAuth = async () => {
@@ -85,6 +88,13 @@ export default function InboxLayout({ children }) {
     }
   }, [user, loading, router]);
 
+  // Close mobile menu on route change
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname, searchParams]);
+
   const handleSignOut = async () => {
     await logout();
     router.push("/login");
@@ -92,17 +102,62 @@ export default function InboxLayout({ children }) {
 
   if (loading || !user) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#eceae6]">
+      <div className="flex h-[100dvh] items-center justify-center bg-[#eceae6]">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-400 border-t-gray-800"></div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#dddcdc]">
-      {/* Sidebar */}
-      <aside className="w-64 flex-shrink-0 flex flex-col pt-6 pb-4">
-        <div className="px-5 mb-6 flex items-center justify-between text-gray-500 relative">
+    <div className="flex flex-col md:flex-row h-[100dvh] w-screen overflow-hidden bg-[#eceae6] md:bg-[#dddcdc] relative">
+      
+      {/* Mobile Header */}
+      <div className="md:hidden flex h-14 flex-shrink-0 items-center justify-between px-4 bg-[#eceae6] border-b border-[#dddcdc] z-30">
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="p-1.5 -ml-1.5 rounded-md hover:bg-[#dddcdc] text-[#2b323b] transition"
+          >
+            <List size={22} weight="bold" />
+          </button>
+          <span className="font-semibold text-[15px] text-[#2b323b]">Vela</span>
+        </div>
+        <div 
+          className="h-8 w-8 rounded-full bg-white flex items-center justify-center text-sm font-semibold text-[#50686c] shadow-sm overflow-hidden border border-[#dddcdc]"
+          onClick={() => setIsProfileOpen(!isProfileOpen)}
+        >
+          {googleProfile?.picture ? (
+            <img src={googleProfile.picture} alt="Profile" className="h-full w-full object-cover" />
+          ) : (
+            user.name ? user.name.slice(0, 5).toLowerCase() : "usr"
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Profile Dropdown (simplified) */}
+      {isProfileOpen && (
+        <div className="md:hidden absolute top-14 right-4 w-48 bg-white border border-[#dddcdc] rounded-xl shadow-lg z-50 overflow-hidden text-[14px] py-1 text-gray-800">
+          <Link href="/inbox/settings" onClick={() => setIsProfileOpen(false)} className="block px-4 py-2.5 hover:bg-[#eceae6]">Settings</Link>
+          <button onClick={handleSignOut} className="w-full text-left px-4 py-2.5 hover:bg-[#eceae6] text-red-600">Sign out</button>
+        </div>
+      )}
+
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-[#2b323b]/40 backdrop-blur-sm z-40"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar (Desktop + Mobile Slide-over) */}
+      <aside className={`
+        fixed md:static inset-y-0 left-0 z-50
+        w-64 flex-shrink-0 flex flex-col pt-6 pb-4 bg-[#dddcdc] md:bg-transparent
+        transform transition-transform duration-300 ease-in-out
+        ${isMobileMenuOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full md:translate-x-0"}
+      `}>
+        <div className="hidden md:flex px-5 mb-6 items-center justify-between text-gray-500 relative">
           <div 
             className="flex items-center gap-2 cursor-pointer bg-[#dddcdc] hover:bg-[#c7d4ce] px-2 py-1.5 rounded-lg transition"
             onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -119,7 +174,6 @@ export default function InboxLayout({ children }) {
           
           {isProfileOpen && (
             <div className="absolute top-12 left-5 w-56 bg-[#eceae6] border border-[#dddcdc] rounded-xl shadow-lg z-50 overflow-hidden text-[15px] py-1 text-gray-800">
-
               <Link 
                 href="/inbox/settings"
                 onClick={() => setIsProfileOpen(false)}
@@ -165,7 +219,12 @@ export default function InboxLayout({ children }) {
           </div>
         </div>
 
-
+        <div className="md:hidden px-5 mb-6 flex items-center justify-between">
+           <span className="font-semibold text-lg text-[#2b323b]">Vela</span>
+           <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-gray-500">
+              ✕
+           </button>
+        </div>
 
         <Suspense fallback={<nav className="flex-1 space-y-0.5 px-3"></nav>}>
           <SidebarNavigation />
@@ -173,11 +232,11 @@ export default function InboxLayout({ children }) {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-hidden m-2 ml-0 rounded-2xl bg-[#eceae6] shadow-sm flex flex-col">
+      <main className="flex-1 overflow-hidden md:m-2 md:ml-0 md:rounded-2xl bg-[#eceae6] shadow-sm flex flex-col relative z-10">
         {children}
       </main>
 
-      {/* Command Palette (Ctrl+K) */}
+      {/* Command Palette (Ctrl+K / Bottom Pill) */}
       <CommandPalette />
     </div>
   );
