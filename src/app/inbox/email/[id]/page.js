@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import AiEditor from "@/components/AiEditor";
 
 export default function EmailDetailPage({ params }) {
   const { id } = params;
@@ -27,6 +28,7 @@ export default function EmailDetailPage({ params }) {
   const [isDrafting, setIsDrafting] = useState(false);
   
   const [replyText, setReplyText] = useState("");
+  const [replyHtml, setReplyHtml] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [resolvedToken, setResolvedToken] = useState(null);
 
@@ -210,7 +212,7 @@ export default function EmailDetailPage({ params }) {
     setIsSending(true);
     try {
       const subject = email.subject.toLowerCase().startsWith("re:") ? email.subject : `Re: ${email.subject}`;
-      await sendEmail(resolvedToken, email.rawTo, subject, replyText);
+      await sendEmail(resolvedToken, email.rawTo, subject, replyText, replyHtml || replyText);
       router.push("/inbox");
     } catch (error) {
       console.error("Failed to send", error);
@@ -382,12 +384,16 @@ export default function EmailDetailPage({ params }) {
             <span className="icon-reply"></span>
             Reply to {email.senderName}
           </div>
-          <textarea 
-            value={replyText}
-            onChange={(e) => setReplyText(e.target.value)}
-            placeholder="Write your reply..."
-            className="w-full min-h-[150px] p-4 bg-white outline-none resize-y text-[14px]"
-          />
+          <div className="flex-1 w-full min-h-[150px] overflow-hidden">
+            <AiEditor 
+              value={replyText}
+              onChange={(html, text) => {
+                setReplyHtml(html);
+                setReplyText(text);
+              }}
+              placeholder="Write your reply..."
+            />
+          </div>
           <div className="px-4 py-3 bg-[#fbfbfc] border-t border-gray-100 flex justify-between items-center">
             <div className="flex items-center gap-2 text-gray-400">
               <button className="hover:text-gray-600"><span className="icon-text-b"></span></button>

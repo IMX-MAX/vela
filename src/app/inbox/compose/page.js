@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import { sendEmail } from "@/lib/gmail";
 import { Paperclip, X, ArrowsOutSimple } from "@phosphor-icons/react";
+import AiEditor from "@/components/AiEditor";
 
 export default function ComposePage() {
   const router = useRouter();
@@ -12,13 +13,14 @@ export default function ComposePage() {
   const [to, setTo] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
+  const [bodyText, setBodyText] = useState("");
   const [isSending, setIsSending] = useState(false);
 
   const handleSend = async () => {
     if (!session?.providerAccessToken || !to || !body) return;
     setIsSending(true);
     try {
-      await sendEmail(session.providerAccessToken, to, subject, body);
+      await sendEmail(session.providerAccessToken, to, subject, bodyText || body, body);
       router.push("/inbox");
     } catch (error) {
       console.error("Failed to send email", error);
@@ -65,12 +67,16 @@ export default function ComposePage() {
             />
           </div>
 
-          <textarea 
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            placeholder="Write your message..."
-            className="w-full flex-1 outline-none bg-transparent resize-none text-[14px] text-gray-700 leading-relaxed font-sans placeholder:text-gray-400 py-2"
-          />
+          <div className="flex-1 w-full min-h-[200px] overflow-hidden">
+            <AiEditor 
+              value={body}
+              onChange={(html, text) => {
+                setBody(html);
+                setBodyText(text);
+              }}
+              placeholder="Write your message..."
+            />
+          </div>
         </div>
 
         {/* Footer Actions */}

@@ -56,6 +56,27 @@ export async function draftReplyAction(emailContent, userPrompt, userContext = "
   }
 }
 
+export async function modifyTextAction(selectedText, instruction, userContext = "") {
+  try {
+    const mistral = getMistralClient();
+    const systemPrompt = `You are a helpful AI writing assistant.${userContext ? ` User Context: ${userContext}` : ""} Your task is to modify the given text according to the user's instructions. Return ONLY the modified text, without any conversational filler, markdown formatting blocks (like \`\`\`), or explanations.`;
+    
+    const messages = [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: `Instruction: ${instruction}\n\nText to modify:\n${selectedText}` }
+    ];
+
+    const response = await mistral.agents.complete({
+      agentId: "ag_019ef18378507796bf7f3ed43d822ecf",
+      messages,
+    });
+    return response.choices[0].message.content.trim();
+  } catch (error) {
+    console.error("Mistral Modify Error:", error);
+    return selectedText; // Fallback to original text if error
+  }
+}
+
 export async function chatWithAiAction(messages, tokenOrConnectionId, userContext = "") {
   try {
     const mistral = getMistralClient();

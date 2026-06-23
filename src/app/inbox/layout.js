@@ -67,6 +67,7 @@ export default function InboxLayout({ children }) {
   const router = useRouter();
   const { user, loading, checkAuth, logout, googleProfile } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -146,29 +147,42 @@ export default function InboxLayout({ children }) {
             </div>
           )}
           <div className="flex items-center gap-3">
-            <Link href="/inbox/compose" className="hover:text-gray-800 transition">
+            <button 
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="hover:text-gray-800 transition p-1.5 rounded-md hover:bg-black/5"
+            >
+              <MagnifyingGlass size={18} weight="bold" />
+            </button>
+            <Link href="/inbox/compose" className="hover:text-gray-800 transition p-1.5 rounded-md hover:bg-black/5">
               <PencilSimple size={18} weight="bold" />
             </Link>
           </div>
         </div>
 
-        <div className="px-5 mb-4">
-          <div className="relative flex items-center">
-            <MagnifyingGlass size={16} className="absolute left-3 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-full bg-[#d0cfcb]/30 text-[13px] text-gray-900 placeholder-gray-500 rounded-md pl-9 pr-3 py-1.5 outline-none focus:bg-[#d0cfcb]/50 transition"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && e.target.value.trim()) {
-                  router.push(`/inbox?search=${encodeURIComponent(e.target.value.trim())}`);
-                } else if (e.key === 'Enter' && !e.target.value.trim()) {
-                  router.push(`/inbox`);
-                }
-              }}
-            />
+        {isSearchOpen && (
+          <div className="px-5 mb-4">
+            <div className="relative flex items-center">
+              <MagnifyingGlass size={16} className="absolute left-3 text-gray-500" />
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search..."
+                className="w-full bg-[#d0cfcb]/30 text-[13px] text-gray-900 placeholder-gray-500 rounded-md pl-9 pr-3 py-1.5 outline-none focus:bg-[#d0cfcb]/50 transition"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.target.value.trim()) {
+                    router.push(`/inbox?search=${encodeURIComponent(e.target.value.trim())}`);
+                    setIsSearchOpen(false);
+                  } else if (e.key === 'Enter' && !e.target.value.trim()) {
+                    router.push(`/inbox`);
+                    setIsSearchOpen(false);
+                  } else if (e.key === 'Escape') {
+                    setIsSearchOpen(false);
+                  }
+                }}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         <Suspense fallback={<nav className="flex-1 space-y-0.5 px-3"></nav>}>
           <SidebarNavigation />
