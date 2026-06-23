@@ -72,21 +72,6 @@ export default function InboxLayout({ children }) {
 
   useEffect(() => {
     const initAuth = async () => {
-      if (typeof window !== "undefined") {
-        const urlParams = new URLSearchParams(window.location.search);
-        const secret = urlParams.get('secret');
-        const userId = urlParams.get('userId');
-
-        if (secret && userId) {
-          try {
-            const { account } = await import('@/lib/appwrite');
-            await account.createSession(userId, secret);
-            router.replace('/inbox');
-          } catch (e) {
-            console.error("Failed to create session from OAuth token", e);
-          }
-        }
-      }
       checkAuth();
     };
     initAuth();

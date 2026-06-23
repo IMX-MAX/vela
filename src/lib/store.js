@@ -71,7 +71,7 @@ export const useAuthStore = create((set) => ({
     }
   },
   loginWithGoogle: () => {
-    account.createOAuth2Token(
+    account.createOAuth2Session(
       'google',
       `${window.location.origin}/inbox`,
       `${window.location.origin}/login`,
