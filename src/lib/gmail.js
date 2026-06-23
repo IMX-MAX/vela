@@ -140,3 +140,13 @@ export async function doneEmail(tokenOrConnectionId, messageId) {
     body: JSON.stringify({ removeLabelIds: ["INBOX"] })
   });
 }
+
+export async function markEmailAsRead(tokenOrConnectionId, messageId) {
+  return await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}/modify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ removeLabelIds: ["UNREAD"] })
+  });
+}

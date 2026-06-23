@@ -57,7 +57,18 @@ export default function EmailDetailPage({ params }) {
 
       try {
         const rawMsg = await fetchEmailDetails(token, id);
-        const { fetchThreadDetails } = await import("@/lib/gmail");
+        const { fetchThreadDetails, markEmailAsRead } = await import("@/lib/gmail");
+        
+        // Mark as read if it is unread
+        if (rawMsg.labelIds && rawMsg.labelIds.includes("UNREAD")) {
+          await markEmailAsRead(token, id);
+          // Update global store to reflect this
+          const { inboxEmails, setInboxEmails } = useAuthStore.getState();
+          if (inboxEmails) {
+            setInboxEmails(inboxEmails.map(e => e.id === id ? { ...e, isUnread: false } : e));
+          }
+        }
+
         const threadData = await fetchThreadDetails(token, rawMsg.threadId);
         
         const parsedMsgs = (threadData.messages || [rawMsg]).map(msg => {
