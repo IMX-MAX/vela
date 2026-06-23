@@ -47,7 +47,6 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
   );
 
   const checkSlashCommand = useCallback((editor) => {
-    if (stateRef.current.showSlashCustomPrompt) return;
     const { selection } = editor.state;
     if (!selection.empty) {
       setShowSlashMenu(false);
@@ -81,14 +80,15 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
     let { from, to } = editor.state.selection;
     let selectedText = editor.state.doc.textBetween(from, to, ' ');
     
-    // Fallback to paragraph if selection is empty
-    let isParagraphFallback = false;
+    let isFallback = false;
     if (!selectedText) {
-      const { $from } = editor.state.selection;
-      from = $from.start();
-      to = $from.end();
-      selectedText = editor.state.doc.textBetween(from, to, ' ');
-      isParagraphFallback = true;
+      if (isCustom) {
+        isFallback = true;
+      } else {
+        from = 0;
+        to = editor.state.doc.content.size;
+        selectedText = editor.getText();
+      }
     }
 
     const promptText = isCustom ? inputPrompt : instruction;
@@ -108,7 +108,7 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
       const result = await modifyTextAction(selectedText || "", promptText, context);
       if (result) {
         const startPos = from;
-        if (isParagraphFallback && !selectedText) {
+        if (isFallback) {
           editor.chain().focus().insertContent(result).run();
         } else {
           editor.chain().focus().deleteRange({ from, to }).insertContent(result).run();
@@ -147,16 +147,17 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
 
     if (option.action === 'ask') {
       setShowSlashCustomPrompt(true);
+      setShowSlashMenu(false);
     } else {
       runAiAction(option.action);
     }
   }, [runAiAction]);
 
   // Keep Refs updated for Tiptap callback closures
-  const stateRef = useRef({ showSlashMenu, filteredOptions, selectedSlashIndex, showSlashCustomPrompt });
+  const stateRef = useRef({ showSlashMenu, filteredOptions, selectedSlashIndex });
   useEffect(() => {
-    stateRef.current = { showSlashMenu, filteredOptions, selectedSlashIndex, showSlashCustomPrompt };
-  }, [showSlashMenu, filteredOptions, selectedSlashIndex, showSlashCustomPrompt]);
+    stateRef.current = { showSlashMenu, filteredOptions, selectedSlashIndex };
+  }, [showSlashMenu, filteredOptions, selectedSlashIndex]);
 
   const handleSlashOptionSelectRef = useRef(handleSlashOptionSelect);
   useEffect(() => {
@@ -226,7 +227,7 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
   return (
     <div className="relative w-full h-full flex flex-col" ref={wrapperRef}>
       {/* Slash commands dropdown */}
-      {showSlashMenu && (
+      {showSlashMenu && !showSlashCustomPrompt && (
         <div
           ref={slashMenuRef}
           className="absolute z-50 flex flex-col bg-white border border-gray-200 shadow-xl rounded-xl overflow-hidden min-w-[240px]"
@@ -236,53 +237,61 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
           }}
           onMouseDown={(e) => e.preventDefault()}
         >
-          {showSlashCustomPrompt ? (
-            <div className="p-2 flex items-center gap-2 border-b border-gray-100 bg-gray-50/50">
-              <input 
-                autoFocus
-                type="text"
-                placeholder="Ask AI to write..."
-                value={slashCustomPrompt}
-                onChange={e => setSlashCustomPrompt(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && slashCustomPrompt.trim()) {
-                    runAiAction(slashCustomPrompt.trim(), true, slashCustomPrompt.trim());
-                  } else if (e.key === 'Escape') {
-                    setShowSlashCustomPrompt(false);
-                  }
-                }}
-                className="w-full text-sm bg-white border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gray-400"
-              />
-              <button 
-                onClick={() => slashCustomPrompt.trim() && runAiAction(slashCustomPrompt.trim(), true, slashCustomPrompt.trim())}
-                className="p-1.5 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition text-xs font-bold"
+          <div className="flex flex-col p-1 max-h-[280px] overflow-y-auto">
+            <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">AI Actions</div>
+            {filteredOptions.map((opt, index) => (
+              <button
+                key={opt.id}
+                onClick={() => handleSlashOptionSelect(opt)}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left transition ${
+                  index === selectedSlashIndex ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'
+                }`}
               >
-                {isProcessing ? <div className="h-3 w-3 animate-spin rounded-full border-2 border-white/30 border-t-white"></div> : "→"}
+                <span className="text-[16px] w-5 text-center">{opt.icon}</span>
+                <div className="flex flex-col">
+                  <span className="text-[13px] font-semibold leading-tight">{opt.label}</span>
+                  <span className="text-[11px] text-gray-400 leading-none mt-0.5">{opt.subtitle}</span>
+                </div>
               </button>
-            </div>
-          ) : (
-            <div className="flex flex-col p-1 max-h-[280px] overflow-y-auto">
-              <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">AI Actions</div>
-              {filteredOptions.map((opt, index) => (
-                <button
-                  key={opt.id}
-                  onClick={() => handleSlashOptionSelect(opt)}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left transition ${
-                    index === selectedSlashIndex ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  <span className="text-[16px] w-5 text-center">{opt.icon}</span>
-                  <div className="flex flex-col">
-                    <span className="text-[13px] font-semibold leading-tight">{opt.label}</span>
-                    <span className="text-[11px] text-gray-400 leading-none mt-0.5">{opt.subtitle}</span>
-                  </div>
-                </button>
-              ))}
-              {filteredOptions.length === 0 && (
-                <div className="px-3 py-2 text-xs text-gray-400 text-center">No options match</div>
-              )}
-            </div>
-          )}
+            ))}
+            {filteredOptions.length === 0 && (
+              <div className="px-3 py-2 text-xs text-gray-400 text-center">No options match</div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* AI Custom Prompt Box */}
+      {showSlashCustomPrompt && (
+        <div
+          className="absolute z-50 flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1.5 shadow-xl w-full max-w-[320px]"
+          style={{
+            top: `${slashMenuPos.top}px`,
+            left: `${slashMenuPos.left}px`,
+          }}
+        >
+          <input 
+            autoFocus
+            type="text"
+            placeholder="Ask AI to write..."
+            value={slashCustomPrompt}
+            onChange={e => setSlashCustomPrompt(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && slashCustomPrompt.trim()) {
+                runAiAction(slashCustomPrompt.trim(), true, slashCustomPrompt.trim());
+              } else if (e.key === 'Escape') {
+                setShowSlashCustomPrompt(false);
+              }
+            }}
+            className="flex-1 bg-transparent border-none outline-none text-[13px] px-2 text-gray-800 placeholder-gray-400"
+          />
+          <button 
+            onClick={() => slashCustomPrompt.trim() && runAiAction(slashCustomPrompt.trim(), true, slashCustomPrompt.trim())}
+            disabled={isProcessing || !slashCustomPrompt.trim()}
+            className="bg-gray-800 hover:bg-black text-white rounded px-3 py-1 text-[13px] font-medium transition disabled:opacity-50"
+          >
+            {isProcessing ? "..." : "Draft"}
+          </button>
         </div>
       )}
 
