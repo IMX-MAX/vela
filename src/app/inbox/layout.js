@@ -127,6 +127,14 @@ export default function InboxLayout({ children }) {
                 <div className="font-medium text-gray-900 truncate">{user.name}</div>
                 <div className="text-gray-500 text-xs truncate">{user.email}</div>
               </div>
+              <Link 
+                href="/inbox/settings"
+                onClick={() => setIsProfileOpen(false)}
+                className="w-full text-left px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition flex items-center gap-2"
+              >
+                <FileText size={16} />
+                Settings
+              </Link>
               <button 
                 onClick={handleManageConnections}
                 disabled={isConnecting}
@@ -145,12 +153,27 @@ export default function InboxLayout({ children }) {
             </div>
           )}
           <div className="flex items-center gap-3">
-            <button className="hover:text-gray-800 transition">
-              <MagnifyingGlass size={18} weight="bold" />
-            </button>
             <Link href="/inbox/compose" className="hover:text-gray-800 transition">
               <PencilSimple size={18} weight="bold" />
             </Link>
+          </div>
+        </div>
+
+        <div className="px-5 mb-4">
+          <div className="relative flex items-center">
+            <MagnifyingGlass size={16} className="absolute left-3 text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full bg-[#d0cfcb]/30 text-[13px] text-gray-900 placeholder-gray-500 rounded-md pl-9 pr-3 py-1.5 outline-none focus:bg-[#d0cfcb]/50 transition"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && e.target.value.trim()) {
+                  router.push(`/inbox?search=${encodeURIComponent(e.target.value.trim())}`);
+                } else if (e.key === 'Enter' && !e.target.value.trim()) {
+                  router.push(`/inbox`);
+                }
+              }}
+            />
           </div>
         </div>
 

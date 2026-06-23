@@ -1,5 +1,5 @@
 export function parseEmailContent(message) {
-  if (!message || !message.payload) return { subject: "No Subject", from: "Unknown", body: "", date: "" };
+  if (!message || !message.payload) return { subject: "No Subject", from: "Unknown", body: "", htmlBody: "", date: "" };
 
   const headers = message.payload.headers || [];
   const subject = headers.find((h) => h.name.toLowerCase() === "subject")?.value || "No Subject";
@@ -7,24 +7,42 @@ export function parseEmailContent(message) {
   const date = headers.find((h) => h.name.toLowerCase() === "date")?.value || "";
 
   let body = "";
-  if (message.payload.parts) {
-    const textPart = message.payload.parts.find((p) => p.mimeType === "text/plain");
-    if (textPart && textPart.body && textPart.body.data) {
-      body = decodeURIComponent(escape(atob(textPart.body.data.replace(/-/g, "+").replace(/_/g, "/"))));
-    } else {
-      // Fallback for HTML or other multipart
-      const htmlPart = message.payload.parts.find((p) => p.mimeType === "text/html");
-      if (htmlPart && htmlPart.body && htmlPart.body.data) {
-         body = decodeURIComponent(escape(atob(htmlPart.body.data.replace(/-/g, "+").replace(/_/g, "/"))));
-         // Very basic strip HTML
-         body = body.replace(/<[^>]+>/g, ' ');
+  let htmlBody = "";
+
+  function extractParts(parts) {
+    for (const part of parts) {
+      if (part.mimeType === "text/plain" && part.body && part.body.data) {
+        body = decodeURIComponent(escape(atob(part.body.data.replace(/-/g, "+").replace(/_/g, "/"))));
+      } else if (part.mimeType === "text/html" && part.body && part.body.data) {
+        htmlBody = decodeURIComponent(escape(atob(part.body.data.replace(/-/g, "+").replace(/_/g, "/"))));
+      } else if (part.parts) {
+        extractParts(part.parts);
       }
     }
-  } else if (message.payload.body && message.payload.body.data) {
-    body = decodeURIComponent(escape(atob(message.payload.body.data.replace(/-/g, "+").replace(/_/g, "/"))));
-  } else if (message.snippet) {
-    body = message.snippet;
   }
 
-  return { subject, from, body, date, snippet: message.snippet };
+  if (message.payload.parts) {
+    extractParts(message.payload.parts);
+  } else if (message.payload.body && message.payload.body.data) {
+    if (message.payload.mimeType === "text/html") {
+      htmlBody = decodeURIComponent(escape(atob(message.payload.body.data.replace(/-/g, "+").replace(/_/g, "/"))));
+    } else {
+      body = decodeURIComponent(escape(atob(message.payload.body.data.replace(/-/g, "+").replace(/_/g, "/"))));
+    }
+  }
+
+  if (!body && htmlBody) {
+    // Basic fallback if only HTML exists
+    body = htmlBody.replace(/<[^>]+>/g, " ");
+  }
+  if (!htmlBody && body) {
+    // If only text exists, wrap it in pre to keep formatting in HTML views
+    htmlBody = `<div style="white-space: pre-wrap; font-family: sans-serif;">${body.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>`;
+  }
+  if (!body && !htmlBody && message.snippet) {
+    body = message.snippet;
+    htmlBody = message.snippet;
+  }
+
+  return { subject, from, body, htmlBody, date, snippet: message.snippet };
 }

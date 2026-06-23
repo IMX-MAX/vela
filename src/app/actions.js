@@ -10,17 +10,21 @@ function getMistralClient() {
   return new Mistral({ apiKey: process.env.MISTRAL_API_KEY });
 }
 
-export async function summarizeEmailAction(emailContent) {
+export async function summarizeEmailAction(emailContent, userContext = "") {
   try {
     const mistral = getMistralClient();
+    const systemPrompt = userContext ? `You are a helpful AI assistant. User Context: ${userContext}` : "";
+    
+    const messages = [];
+    if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
+    messages.push({
+      role: "user",
+      content: `Summarize the following email in 3-5 concise bullet points:\n\n${emailContent}`,
+    });
+
     const response = await mistral.agents.complete({
       agentId: "ag_019ef18378507796bf7f3ed43d822ecf",
-      messages: [
-        {
-          role: "user",
-          content: `Summarize the following email in 3-5 concise bullet points:\n\n${emailContent}`,
-        },
-      ],
+      messages,
     });
     return response.choices[0].message.content;
   } catch (error) {
@@ -29,17 +33,21 @@ export async function summarizeEmailAction(emailContent) {
   }
 }
 
-export async function draftReplyAction(emailContent, userPrompt) {
+export async function draftReplyAction(emailContent, userPrompt, userContext = "") {
   try {
     const mistral = getMistralClient();
+    const systemPrompt = userContext ? `You are a helpful AI assistant. User Context: ${userContext}` : "";
+    
+    const messages = [];
+    if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
+    messages.push({
+      role: "user",
+      content: `Draft a reply to the following email. Use a professional tone. User prompt: "${userPrompt}".\n\nEmail:\n${emailContent}`,
+    });
+
     const response = await mistral.agents.complete({
       agentId: "ag_019ef18378507796bf7f3ed43d822ecf",
-      messages: [
-        {
-          role: "user",
-          content: `Draft a reply to the following email. Use a professional tone. User prompt: "${userPrompt}".\n\nEmail:\n${emailContent}`,
-        },
-      ],
+      messages,
     });
     return response.choices[0].message.content;
   } catch (error) {
@@ -48,14 +56,19 @@ export async function draftReplyAction(emailContent, userPrompt) {
   }
 }
 
-export async function chatWithAiAction(messages, tokenOrConnectionId) {
+export async function chatWithAiAction(messages, tokenOrConnectionId, userContext = "") {
   try {
     const mistral = getMistralClient();
     
-    // We provide Mistral the search tool
+    // Inject system prompt if there is user context, but only if we haven't already
+    let updatedMessages = [...messages];
+    if (userContext && !updatedMessages.some(m => m.role === "system")) {
+      updatedMessages = [{ role: "system", content: `You are a helpful AI assistant. User Context: ${userContext}` }, ...updatedMessages];
+    }
+    
     const response = await mistral.agents.complete({
       agentId: "ag_019ef18378507796bf7f3ed43d822ecf",
-      messages,
+      messages: updatedMessages,
       tools: [
         {
           type: "function",
@@ -80,16 +93,13 @@ export async function chatWithAiAction(messages, tokenOrConnectionId) {
 
     const choice = response.choices[0].message;
 
-    // Check if the agent wants to call a tool
     if (choice.toolCalls && choice.toolCalls.length > 0) {
       const toolCall = choice.toolCalls[0];
       if (toolCall.function.name === "search_inbox") {
         const args = typeof toolCall.function.arguments === 'string' ? JSON.parse(toolCall.function.arguments) : toolCall.function.arguments;
         
-        // Dynamically import fetchEmails to avoid circular deps
         const { fetchEmails } = await import("@/lib/gmail");
-        // Fetch up to 10 emails matching query
-        const emails = await fetchEmails(tokenOrConnectionId, 10, "inbox", args.query);
+        const { messages: emails } = await fetchEmails(tokenOrConnectionId, 10, "inbox", args.query);
         
         const { parseEmailContent } = await import("@/lib/emailParser");
         const parsedEmails = emails.map(m => {
@@ -99,9 +109,8 @@ export async function chatWithAiAction(messages, tokenOrConnectionId) {
 
         const toolResult = parsedEmails || "No emails found.";
 
-        // Recurse to get the final answer
         return await chatWithAiAction([
-          ...messages,
+          ...updatedMessages,
           choice,
           {
             role: "tool",
@@ -109,7 +118,7 @@ export async function chatWithAiAction(messages, tokenOrConnectionId) {
             content: toolResult,
             toolCallId: toolCall.id
           }
-        ], tokenOrConnectionId);
+        ], tokenOrConnectionId, userContext);
       }
     }
 

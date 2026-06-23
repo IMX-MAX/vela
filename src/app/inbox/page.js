@@ -1,29 +1,62 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { fetchEmails } from "@/lib/gmail";
 import { parseEmailContent } from "@/lib/emailParser";
 import { useAuthStore } from "@/lib/store";
 import { format, isToday } from "date-fns";
-import { Check, Trash, MagnifyingGlass, Command, Link as LinkIcon } from "@phosphor-icons/react";
+import { Check, Trash, MagnifyingGlass, Command, Link as LinkIcon, Spinner } from "@phosphor-icons/react";
 import { checkComposioStatus, initiateComposioConnection, getComposioAccessToken } from "@/app/composioActions";
 
 export default function InboxPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filter = searchParams.get("filter") || "inbox";
+  const searchQuery = searchParams.get("search");
+  
   const { session, user } = useAuthStore();
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [needsComposio, setNeedsComposio] = useState(false);
+  const [nextPageToken, setNextPageToken] = useState(null);
+  const [resolvedToken, setResolvedToken] = useState(null);
+
+  const observerTarget = useRef(null);
+
+  const fetchEmailBatch = async (token, pageToken = null) => {
+    try {
+      const data = await fetchEmails(token, 20, filter, searchQuery, pageToken);
+      const parsed = data.messages.map((msg) => {
+        const parsedContent = parseEmailContent(msg);
+        const isUnread = msg.labelIds && msg.labelIds.includes("UNREAD");
+        let senderName = parsedContent.from;
+        if (senderName.includes("<")) {
+          senderName = senderName.split("<")[0].replace(/"/g, "").trim();
+        }
+        
+        return {
+          id: msg.id,
+          isUnread,
+          sender: senderName,
+          subject: parsedContent.subject,
+          snippet: parsedContent.snippet || "",
+          dateStr: parsedContent.date,
+        };
+      });
+      return { parsed, next: data.nextPageToken };
+    } catch (error) {
+      console.error("Error fetching emails:", error);
+      return { parsed: [], next: null };
+    }
+  };
 
   useEffect(() => {
     async function initInbox() {
       setLoading(true);
       let token = session?.providerAccessToken;
 
-      // If no Google OAuth token, check Composio MCP
       if (!token && user) {
         const status = await checkComposioStatus(user.$id);
         if (status.connected) {
@@ -41,29 +74,10 @@ export default function InboxPage() {
       }
 
       if (token) {
-        try {
-          const data = await fetchEmails(token, 15, filter);
-          const parsed = data.map((msg) => {
-            const parsedContent = parseEmailContent(msg);
-            const isUnread = msg.labelIds && msg.labelIds.includes("UNREAD");
-            let senderName = parsedContent.from;
-            if (senderName.includes("<")) {
-              senderName = senderName.split("<")[0].replace(/"/g, "").trim();
-            }
-            
-            return {
-              id: msg.id,
-              isUnread,
-              sender: senderName,
-              subject: parsedContent.subject,
-              snippet: parsedContent.snippet || "",
-              dateStr: parsedContent.date,
-            };
-          });
-          setEmails(parsed);
-        } catch (error) {
-          console.error("Error fetching emails:", error);
-        }
+        setResolvedToken(token);
+        const { parsed, next } = await fetchEmailBatch(token);
+        setEmails(parsed);
+        setNextPageToken(next);
       }
       setLoading(false);
     }
@@ -71,7 +85,37 @@ export default function InboxPage() {
     if (session) {
       initInbox();
     }
-  }, [session, user, filter]);
+  }, [session, user, filter, searchQuery]);
+
+  const handleLoadMore = useCallback(async () => {
+    if (loadingMore || !nextPageToken || !resolvedToken) return;
+    setLoadingMore(true);
+    const { parsed, next } = await fetchEmailBatch(resolvedToken, nextPageToken);
+    setEmails((prev) => [...prev, ...parsed]);
+    setNextPageToken(next);
+    setLoadingMore(false);
+  }, [loadingMore, nextPageToken, resolvedToken, filter, searchQuery]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          handleLoadMore();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => {
+      if (observerTarget.current) {
+        observer.unobserve(observerTarget.current);
+      }
+    };
+  }, [handleLoadMore]);
 
   const handleConnectComposio = async () => {
     setLoading(true);
@@ -79,7 +123,6 @@ export default function InboxPage() {
     const res = await initiateComposioConnection(user.$id, callbackUrl);
     
     if (res.connected) {
-      // User is already connected
       window.location.reload();
       return;
     }
@@ -134,7 +177,7 @@ export default function InboxPage() {
       <div className="h-14 border-b border-[#e4e3e0] flex items-center px-6 sticky top-0 bg-[#f2f2f1]/90 backdrop-blur-sm z-10 rounded-t-2xl">
         <div className="flex items-center gap-3">
           <div className="bg-white px-3 py-1.5 rounded-md text-sm font-medium shadow-sm flex items-center gap-2">
-            Inbox
+            {searchQuery ? `Search: ${searchQuery}` : "Inbox"}
           </div>
         </div>
       </div>
@@ -155,7 +198,7 @@ export default function InboxPage() {
                 }`}
               >
                 <div className="w-4 flex-shrink-0 flex items-center justify-center">
-                  {email.isUnread && <div className="h-2 w-2 rounded-full bg-blue-500"></div>}
+                  {email.isUnread && <div className="h-2 w-2 rounded-full bg-gray-900"></div>}
                 </div>
                 
                 <div className={`w-48 truncate pr-4 text-[13px] ${email.isUnread ? "font-semibold text-gray-900" : "font-medium text-gray-700"}`}>
@@ -182,9 +225,17 @@ export default function InboxPage() {
                 </div>
               </div>
             ))}
+            
+            {/* Infinite Scroll Target */}
+            {nextPageToken && (
+              <div ref={observerTarget} className="py-8 flex justify-center">
+                {loadingMore && <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-400 border-t-gray-800"></div>}
+              </div>
+            )}
+            
             {emails.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-                <p>No messages in Inbox</p>
+                <p>{searchQuery ? "No emails found" : "No messages in Inbox"}</p>
               </div>
             )}
           </div>
