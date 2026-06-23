@@ -55,7 +55,14 @@ export default function InboxPage() {
 
   useEffect(() => {
     async function initInbox() {
-      setLoading(true);
+      const currentInbox = useAuthStore.getState().inboxEmails;
+      if (currentInbox && currentInbox.length > 0) {
+        setEmails(currentInbox);
+        setLoading(false); // Instant render
+      } else {
+        setLoading(true);
+      }
+      
       let token = session?.providerAccessToken;
 
       if (session?.provider === 'google') {
@@ -100,7 +107,9 @@ export default function InboxPage() {
           useAuthStore.getState().setGoogleProfile(profile);
         }
       }
-      setLoading(false);
+      if (!useAuthStore.getState().inboxEmails?.length) {
+        setLoading(false);
+      }
     }
 
     if (session) {

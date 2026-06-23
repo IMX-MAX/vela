@@ -20,8 +20,18 @@ export default function EmailDetailPage({ params }) {
   const { session, user } = useAuthStore();
   const iframeRef = useRef(null);
   
-  const [email, setEmail] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState(() => {
+    const cached = useAuthStore.getState().inboxEmails?.find(e => e.id === id);
+    if (cached) {
+      return {
+        ...cached,
+        senderName: cached.sender,
+        senderEmail: "",
+      };
+    }
+    return null;
+  });
+  const [loading, setLoading] = useState(!email);
   
   const [summary, setSummary] = useState("");
   const [isSummarizing, setIsSummarizing] = useState(false);
@@ -117,7 +127,9 @@ export default function EmailDetailPage({ params }) {
         console.error("Error fetching email:", error);
         setAuthError(`Gmail API Error: ${error.message}. Please ensure you checked all permission boxes during Google sign-in.`);
       } finally {
-        setLoading(false);
+        if (email === null) {
+          setLoading(false);
+        }
       }
     }
     if (session) {
@@ -421,9 +433,17 @@ export default function EmailDetailPage({ params }) {
                 title="Email Content"
                 style={{ overflow: 'hidden' }}
               />
-            ) : (
+            ) : email.body ? (
               <div className="text-[15px] leading-relaxed text-gray-800 whitespace-pre-wrap font-sans">
                 {email.body}
+              </div>
+            ) : (
+              <div className="animate-pulse flex flex-col gap-4 mt-2">
+                 <div className="h-4 bg-gray-200 rounded w-full"></div>
+                 <div className="h-4 bg-gray-200 rounded w-11/12"></div>
+                 <div className="h-4 bg-gray-200 rounded w-10/12"></div>
+                 <div className="h-4 bg-gray-200 rounded w-full mt-4"></div>
+                 <div className="h-4 bg-gray-200 rounded w-8/12"></div>
               </div>
             )}
           </div>
