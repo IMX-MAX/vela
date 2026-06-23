@@ -4,9 +4,20 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Markdown } from 'tiptap-markdown';
+import { Mark, mergeAttributes } from '@tiptap/core';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { modifyTextAction } from '@/app/actions';
 import { useAuthStore } from '@/lib/store';
+
+const AiDustMark = Mark.create({
+  name: 'aiDust',
+  renderHTML({ HTMLAttributes }) {
+    return ['span', mergeAttributes(HTMLAttributes, { class: 'ai-dust' }), 0];
+  },
+  parseHTML() {
+    return [{ tag: 'span.ai-dust' }];
+  }
+});
 
 export default function AiEditor({ value, onChange, placeholder = "Write something...", borderless = false }) {
   const { user } = useAuthStore();
@@ -102,11 +113,19 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
     try {
       const result = await modifyTextAction(selectedText || "", promptText, context);
       if (result) {
+        const startPos = from;
         if (isParagraphFallback && !selectedText) {
           editor.chain().focus().insertContent(result).run();
         } else {
           editor.chain().focus().deleteRange({ from, to }).insertContent(result).run();
         }
+        const endPos = editor.state.selection.from;
+        editor.chain()
+          .setTextSelection({ from: startPos, to: endPos })
+          .setMark('aiDust')
+          .setTextSelection(endPos)
+          .removeMark('aiDust')
+          .run();
       }
     } catch (e) {
       console.error(e);
@@ -160,6 +179,7 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
         placeholder,
       }),
       Markdown,
+      AiDustMark,
     ],
     content: value,
     editorProps: {
@@ -373,7 +393,7 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
       )}
 
       {/* Editor Canvas container */}
-      <div className={`flex-1 bg-white overflow-hidden cursor-text flex flex-col ${
+      <div className={`flex-1 bg-white overflow-visible cursor-text flex flex-col ${
         borderless 
           ? '' 
           : 'border border-gray-200 rounded-xl hover:border-gray-300 focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-100 transition-all'

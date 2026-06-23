@@ -105,7 +105,14 @@ export default function CommandPalette() {
   let options = [];
   if (mode === "search") {
     if (!input.trim()) {
-      options = savedChats.slice(0, 5).map(chat => ({ type: 'ai_chat', chat, label: chat.title }));
+      options.push({ type: 'nav', label: 'Compose message', href: '/inbox/compose' });
+      options.push({ type: 'nav', label: 'Go to inbox', href: '/inbox' });
+      if (currentEmailId) {
+        options.push({ type: 'action', label: 'Mark thread done', actionType: 'done' });
+      }
+      savedChats.slice(0, 5).forEach(chat => {
+        options.push({ type: 'ai_chat', chat, label: chat.title });
+      });
     } else {
       const q = input.trim().toLowerCase();
       

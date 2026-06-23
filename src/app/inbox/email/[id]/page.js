@@ -380,7 +380,7 @@ export default function EmailDetailPage({ params }) {
                 <Sparkle size={14} weight="fill" className="text-gray-600" />
                 AI Summary
               </div>
-              <div className="text-[14px] text-gray-600 whitespace-pre-wrap leading-relaxed prose prose-sm prose-gray max-w-none">
+              <div className="text-[14px] text-gray-600 whitespace-pre-wrap leading-relaxed prose prose-sm prose-gray max-w-none ai-dust">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {summary}
                 </ReactMarkdown>
@@ -427,12 +427,12 @@ export default function EmailDetailPage({ params }) {
         })}
 
         {/* Reply Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:ring-2 focus-within:ring-black/5 focus-within:border-gray-400 transition mb-12">
-          <div className="px-4 py-3 bg-[#fbfbfc] border-b border-gray-100 flex items-center gap-2 text-[13px] text-gray-600 font-medium">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-visible focus-within:ring-2 focus-within:ring-black/5 focus-within:border-gray-400 transition mb-12">
+          <div className="px-4 py-3 bg-[#fbfbfc] border-b border-gray-100 flex items-center gap-2 text-[13px] text-gray-600 font-medium rounded-t-xl">
             <span className="icon-reply"></span>
             Reply to {email.senderName}
           </div>
-          <div className="flex-1 w-full min-h-[150px] overflow-hidden">
+          <div className="flex-1 w-full min-h-[150px] overflow-visible">
             <AiEditor 
               value={replyText}
               onChange={(html, text) => {
@@ -443,7 +443,7 @@ export default function EmailDetailPage({ params }) {
               borderless={true}
             />
           </div>
-          <div className="px-4 py-3 bg-[#fbfbfc] border-t border-gray-100 flex justify-between items-center">
+          <div className="px-4 py-3 bg-[#fbfbfc] border-t border-gray-100 flex justify-between items-center rounded-b-xl">
             <div className="flex items-center gap-2 text-gray-400">
               <button className="hover:text-gray-600"><span className="icon-text-b"></span></button>
               <button className="hover:text-gray-600"><span className="icon-paperclip"></span></button>

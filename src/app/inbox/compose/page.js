@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import { sendEmail } from "@/lib/gmail";
@@ -17,6 +17,14 @@ export default function ComposePage() {
   const [body, setBody] = useState("");
   const [bodyText, setBodyText] = useState("");
   const [isSending, setIsSending] = useState(false);
+  
+  const [attachments, setAttachments] = useState([]);
+  const fileInputRef = React.useRef(null);
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    setAttachments(prev => [...prev, ...files]);
+  };
 
   const handleSend = async () => {
     if (!session?.providerAccessToken || !to || !body) return;
@@ -31,8 +39,8 @@ export default function ComposePage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-[#f4f3f0] relative overflow-hidden p-6">
-      <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden flex flex-col min-h-[400px]">
+    <div className="flex flex-col items-center justify-center h-full bg-[#f4f3f0] relative overflow-visible p-6">
+      <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg border border-gray-200 overflow-visible flex flex-col min-h-[400px]">
         {/* Header Controls */}
         <div className="flex items-center justify-end p-2 gap-1 border-b border-gray-100">
           <button className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded transition">
@@ -69,7 +77,7 @@ export default function ComposePage() {
             />
           </div>
 
-          <div className="flex-1 w-full min-h-[200px] overflow-hidden">
+          <div className="flex-1 w-full min-h-[200px] overflow-visible">
             <AiEditor 
               value={body}
               onChange={(html, text) => {
@@ -82,9 +90,33 @@ export default function ComposePage() {
           </div>
         </div>
 
+        {attachments.length > 0 && (
+          <div className="px-6 pb-4 flex flex-wrap gap-2">
+            {attachments.map((file, idx) => (
+              <div key={idx} className="flex items-center gap-2 bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-lg text-[13px] text-gray-700">
+                <Paperclip size={14} />
+                <span className="truncate max-w-[150px]">{file.name}</span>
+                <button onClick={() => setAttachments(prev => prev.filter((_, i) => i !== idx))} className="ml-1 text-gray-500 hover:text-gray-800">
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Footer Actions */}
-        <div className="flex items-center justify-between p-4 bg-[#fbfbfc] border-t border-gray-100">
-          <button className="p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded transition">
+        <div className="flex items-center justify-between p-4 bg-[#fbfbfc] border-t border-gray-100 rounded-b-xl">
+          <input 
+            type="file" 
+            className="hidden" 
+            ref={fileInputRef} 
+            onChange={handleFileChange} 
+            multiple 
+          />
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            className="p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded transition"
+          >
             <Paperclip size={18} />
           </button>
 
