@@ -246,7 +246,7 @@ export default function LandingPage() {
             <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6 md:p-8">
               <h3 className="text-xl font-medium text-white mb-3">How does the pricing work for Vela?</h3>
               <p className="text-gray-400 leading-relaxed text-sm">
-                Vela is free to use during our beta period. We offer a generous Free tier that includes 50 AI actions per month. For power users needing more AI assistance, we offer a Pro tier. You can view all the details on our <Link href="/pricing" className="text-emerald-400 hover:underline">Pricing page</Link>.
+                Vela is free to use during our beta period. We offer a generous Free tier with limited monthly usage. For power users needing more AI assistance, we offer a Pro tier with up to 30x higher usage than free. You can view all the details on our <Link href="/pricing" className="text-emerald-400 hover:underline">Pricing page</Link>.
               </p>
             </div>
             

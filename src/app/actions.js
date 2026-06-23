@@ -95,6 +95,117 @@ export async function modifyTextAction(selectedText, instruction, userContext = 
   }
 }
 
+export async function chatStepAction(messages, tokenOrConnectionId, userContext = "") {
+  try {
+    const mistral = getMistralClient();
+    userContext = clamp(userContext, MAX_CONTEXT_CHARS);
+
+    if (Array.isArray(messages)) {
+      messages = messages.map((m) =>
+        typeof m?.content === "string" ? { ...m, content: clamp(m.content, MAX_CONTENT_CHARS) } : m
+      );
+    }
+
+    let updatedMessages = [...messages];
+    const systemContent = `You are Vela AI, a helpful email assistant. Be concise. When referencing specific emails from search results, always format them as markdown links like [Subject or description](/inbox/email/MESSAGE_ID) so the user can click to view them.${userContext ? ` User Context: ${userContext}` : ""}`;
+    if (!updatedMessages.some(m => m.role === "system")) {
+      updatedMessages = [{ role: "system", content: systemContent }, ...updatedMessages];
+    }
+    
+    const response = await mistral.agents.complete({
+      agentId: "ag_019ef18378507796bf7f3ed43d822ecf",
+      messages: updatedMessages,
+      tools: [
+        {
+          type: "function",
+          function: {
+            name: "search_inbox",
+            description: "Search the user's inbox for emails matching a query string.",
+            parameters: {
+              type: "object",
+              properties: {
+                query: { type: "string", description: "The search query." }
+              },
+              required: ["query"]
+            }
+          }
+        },
+        {
+          type: "function",
+          function: {
+            name: "search_contacts",
+            description: "Search the user's Google Contacts for names, emails, or phone numbers.",
+            parameters: {
+              type: "object",
+              properties: {
+                query: { type: "string", description: "The name or email to search for." }
+              },
+              required: ["query"]
+            }
+          }
+        },
+        {
+          type: "function",
+          function: {
+            name: "draft_email",
+            description: "Draft an email for the user to review. Call this when the user asks you to send an email or draft a reply.",
+            parameters: {
+              type: "object",
+              properties: {
+                to: { type: "string", description: "The recipient's email address." },
+                subject: { type: "string", description: "The subject of the email." },
+                body: { type: "string", description: "The body of the email in plain text." }
+              },
+              required: ["to", "subject", "body"]
+            }
+          }
+        }
+      ],
+      toolChoice: "auto"
+    });
+
+    const choice = response.choices[0].message;
+
+    if (choice.toolCalls && choice.toolCalls.length > 0) {
+      const toolCall = choice.toolCalls[0];
+      const args = typeof toolCall.function.arguments === 'string' ? JSON.parse(toolCall.function.arguments) : toolCall.function.arguments;
+
+      if (toolCall.function.name === "search_inbox") {
+        const { searchEmailsQuick } = await import("@/lib/gmail");
+        const emails = await searchEmailsQuick(tokenOrConnectionId, args.query, 8);
+        const parsedEmails = emails.map(m => {
+          const headers = m.payload?.headers || [];
+          const getHeader = (name) => headers.find(h => h.name.toLowerCase() === name.toLowerCase())?.value || "";
+          return `Message ID: ${m.id}\nDate: ${getHeader("Date")}\nFrom: ${getHeader("From")}\nSubject: ${getHeader("Subject")}\nSnippet: ${m.snippet || ""}`;
+        }).join("\n\n---\n\n");
+        const toolResult = parsedEmails || "No emails found.";
+        return { type: 'tool', name: toolCall.function.name, args, result: toolResult, message: choice, toolCallId: toolCall.id };
+      } else if (toolCall.function.name === "search_contacts") {
+        const { fetchContacts } = await import("@/lib/contacts");
+        const { contacts } = await fetchContacts(tokenOrConnectionId);
+        const q = (args.query || "").toLowerCase();
+        const matched = contacts.filter(c => {
+          const name = c.names?.[0]?.givenName?.toLowerCase() || "";
+          const email = c.emailAddresses?.[0]?.value?.toLowerCase() || "";
+          return name.includes(q) || email.includes(q);
+        });
+        const parsedContacts = matched.map(c => `Name: ${c.names?.[0]?.givenName || "Unknown"}\nEmail: ${c.emailAddresses?.[0]?.value || "None"}\nPhone: ${c.phoneNumbers?.[0]?.value || "None"}`).join("\n\n---\n\n");
+        const toolResult = parsedContacts || "No contacts found matching the query.";
+        return { type: 'tool', name: toolCall.function.name, args, result: toolResult, message: choice, toolCallId: toolCall.id };
+      } else if (toolCall.function.name === "draft_email") {
+        const result = `I've prepared a draft for you to review:\n\n\`\`\`draft-email\n${JSON.stringify({ to: args.to, subject: args.subject, body: args.body }, null, 2)}\n\`\`\``;
+        return { type: 'text', content: result, message: choice };
+      }
+    }
+
+    return { type: 'text', content: choice.content, message: choice };
+  } catch (error) {
+    console.error("Mistral Chat Step Error:", error);
+    return { type: 'error', content: "Error communicating with AI. Please try again." };
+  }
+}
+
+
 export async function chatWithAiAction(messages, tokenOrConnectionId, userContext = "") {
   try {
     const mistral = getMistralClient();

@@ -3,8 +3,8 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
-import { chatWithAiAction } from "@/app/actions";
-import { ArrowLeft, MagnifyingGlass, Sparkle, Envelope, ArrowRight, Gear, Tray, Star, PaperPlaneRight, FileText, CheckCircle, WarningOctagon, Trash, PencilSimple, Prohibit } from "@phosphor-icons/react";
+import { chatWithAiAction, chatStepAction } from "@/app/actions";
+import { ArrowLeft, MagnifyingGlass, Sparkle, Envelope, ArrowRight, Gear, Tray, Star, PaperPlaneRight, FileText, CheckCircle, WarningOctagon, Trash, PencilSimple, Prohibit, CaretDown, CaretRight, Users } from "@phosphor-icons/react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
@@ -29,6 +29,8 @@ export default function CommandPalette() {
   const [mode, setMode] = useState("search"); // "search" | "ai"
   const [resolvedToken, setResolvedToken] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [expandedSteps, setExpandedSteps] = useState({});
+  const toggleSteps = (idx) => setExpandedSteps(prev => ({ ...prev, [idx]: !prev[idx] }));
   
   const emailIdMatch = pathname?.match(/^\/inbox\/email\/(.+)$/);
   const currentEmailId = emailIdMatch ? emailIdMatch[1] : null;
@@ -236,8 +238,47 @@ export default function CommandPalette() {
         return;
       }
       
-      const responseContent = await chatWithAiAction(newHistory, resolvedToken, context);
-      setChatHistory([...newHistory, { role: "assistant", content: responseContent }]);
+      let isDone = false;
+      let loopCount = 0;
+      let currentMessages = newHistory.map(m => ({ role: m.role, content: m.content }));
+      
+      const assistantMsg = { role: "assistant", content: "", steps: [], startTime: Date.now() };
+      setChatHistory([...newHistory, assistantMsg]);
+
+      while (!isDone && loopCount < 15) {
+        loopCount++;
+        const stepResponse = await chatStepAction(currentMessages, resolvedToken, context);
+        
+        if (stepResponse.type === 'tool') {
+          assistantMsg.steps.push({
+            name: stepResponse.name,
+            result: stepResponse.result,
+            time: Date.now()
+          });
+          
+          currentMessages.push(stepResponse.message);
+          currentMessages.push({
+            role: "tool",
+            name: stepResponse.name,
+            content: stepResponse.result,
+            toolCallId: stepResponse.toolCallId
+          });
+          
+          setChatHistory([...newHistory, { ...assistantMsg }]);
+        } else if (stepResponse.type === 'text') {
+          assistantMsg.content = stepResponse.content;
+          assistantMsg.endTime = Date.now();
+          currentMessages.push(stepResponse.message);
+          
+          setChatHistory([...newHistory, { ...assistantMsg }]);
+          isDone = true;
+        } else {
+          assistantMsg.content = stepResponse.content || "An error occurred.";
+          assistantMsg.endTime = Date.now();
+          setChatHistory([...newHistory, { ...assistantMsg }]);
+          isDone = true;
+        }
+      }
     } catch (error) {
       setChatHistory([...newHistory, { role: "assistant", content: "Sorry, I encountered an error." }]);
     } finally {
@@ -464,9 +505,45 @@ export default function CommandPalette() {
                     <div className="text-[14px] text-gray-600 font-medium">{msg.content}</div>
                   ) : (
                     <div className="flex flex-col gap-3">
-                      <div className="prose prose-sm prose-gray max-w-none text-[14px] leading-relaxed text-gray-800">
-                        {renderAiContent(msg.content, idx)}
-                      </div>
+                      {msg.steps && msg.steps.length > 0 && (
+                        <div className="mb-2">
+                          <button 
+                            onClick={() => toggleSteps(idx)} 
+                            className="flex items-center gap-1.5 text-[12px] font-medium text-gray-500 hover:text-gray-800 transition"
+                          >
+                            <span>{msg.endTime ? `Worked for ${Math.max(1, Math.round((msg.endTime - msg.startTime)/1000))}s` : `Working...`}</span>
+                            {expandedSteps[idx] ? <CaretDown size={12} weight="bold" /> : <CaretRight size={12} weight="bold" />}
+                          </button>
+                          {expandedSteps[idx] && (
+                            <div className="mt-2 pl-3 border-l-2 border-gray-200 flex flex-col gap-2.5">
+                               {msg.steps.map((step, sIdx) => {
+                                 const Icon = step.name === 'search_inbox' ? Envelope : (step.name === 'search_contacts' ? Users : Sparkle);
+                                 const description = step.name === 'search_inbox' ? `Searched inbox for "${step.args?.query || ''}"` :
+                                                     step.name === 'search_contacts' ? `Searched contacts for "${step.args?.query || ''}"` :
+                                                     `Used tool ${step.name}`;
+                                 return (
+                                   <div key={sIdx} className="flex items-start gap-2.5 text-[12px] text-gray-600 bg-black/[0.02] p-2 rounded-md">
+                                     <Icon size={14} className="mt-0.5 text-[#50686c] shrink-0" weight="bold" />
+                                     <div className="flex-1">
+                                       <span className="font-medium text-gray-700">{description}</span>
+                                       {step.result && step.name !== 'draft_email' && (
+                                         <div className="mt-1 text-[11px] text-gray-500 line-clamp-2 italic">
+                                           {step.result.slice(0, 150)}{step.result.length > 150 ? '...' : ''}
+                                         </div>
+                                       )}
+                                     </div>
+                                   </div>
+                                 );
+                               })}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {msg.content && (
+                        <div className="prose prose-sm prose-gray max-w-none text-[14px] leading-relaxed text-gray-800">
+                          {renderAiContent(msg.content, idx)}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
