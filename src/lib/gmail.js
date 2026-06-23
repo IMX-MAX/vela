@@ -164,3 +164,23 @@ export async function markEmailAsRead(tokenOrConnectionId, messageId) {
     body: JSON.stringify({ removeLabelIds: ["UNREAD"] })
   });
 }
+
+export async function starEmail(tokenOrConnectionId, messageId) {
+  return await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}/modify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ addLabelIds: ["STARRED"] })
+  });
+}
+
+export async function spamEmail(tokenOrConnectionId, messageId) {
+  return await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}/modify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ addLabelIds: ["SPAM"], removeLabelIds: ["INBOX"] })
+  });
+}

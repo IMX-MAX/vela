@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import { chatWithAiAction } from "@/app/actions";
-import { ArrowLeft, MagnifyingGlass, Sparkle, Envelope, ArrowRight, Gear } from "@phosphor-icons/react";
+import { ArrowLeft, MagnifyingGlass, Sparkle, Envelope, ArrowRight, Gear, Tray, Star, PaperPlaneRight, FileText, CheckCircle, WarningOctagon, Trash, PencilSimple, Prohibit } from "@phosphor-icons/react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
 
 export default function CommandPalette() {
   const router = useRouter();
+  const pathname = usePathname();
   const { 
     session, user, 
     isCommandPaletteOpen, toggleCommandPalette, closeCommandPalette,
@@ -23,6 +24,10 @@ export default function CommandPalette() {
   const [mode, setMode] = useState("search"); // "search" | "ai"
   const [resolvedToken, setResolvedToken] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  
+  const emailIdMatch = pathname?.match(/^\/inbox\/email\/(.+)$/);
+  const currentEmailId = emailIdMatch ? emailIdMatch[1] : null;
+
   const inputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
@@ -100,15 +105,41 @@ export default function CommandPalette() {
   let options = [];
   if (mode === "search") {
     if (!input.trim()) {
-      options = savedChats.slice(0, 3).map(chat => ({ type: 'ai_chat', chat, label: chat.title }));
+      options = savedChats.slice(0, 5).map(chat => ({ type: 'ai_chat', chat, label: chat.title }));
     } else {
       const q = input.trim().toLowerCase();
       
+      const addNav = (label, href) => {
+        if (label.toLowerCase().includes(q)) options.push({ type: 'nav', label, href });
+      };
+      
+      const addAction = (label, actionType) => {
+        if (label.toLowerCase().includes(q)) options.push({ type: 'action', label, actionType });
+      };
+
       if ("search settings".includes(q)) {
         options.push({ type: 'settings', label: 'Search Settings' });
       }
       if ("settings".includes(q)) {
         options.push({ type: 'settings', label: 'Settings' });
+      }
+
+      addNav("Compose message", "/inbox/compose");
+      addNav("Go to inbox", "/inbox");
+      addNav("Go to starred", "/inbox?filter=starred");
+      addNav("Go to sent", "/inbox?filter=sent");
+      addNav("Go to drafts", "/inbox?filter=drafts");
+      addNav("Go to done", "/inbox?filter=done");
+      addNav("Go to spam", "/inbox?filter=spam");
+      addNav("Go to trash", "/inbox?filter=trash");
+
+      if (currentEmailId) {
+        addAction("Mark thread done", "done");
+        addAction("Star thread", "star");
+        addAction("Block sender", "block_sender");
+        addAction("Block domain", "block_domain");
+        addAction("Mark thread trash", "trash");
+        addAction("Mark thread spam", "spam");
       }
       
       options.push({ type: 'search_emails', label: `Search emails for "${input}"` });
@@ -123,12 +154,35 @@ export default function CommandPalette() {
     }
   }
 
-  const executeOption = (option) => {
+  const executeOption = async (option) => {
     if (option.type === 'search_emails') {
       router.push(`/inbox?search=${encodeURIComponent(input.trim())}`);
       closeCommandPalette();
     } else if (option.type === 'settings') {
       router.push(`/inbox/settings`);
+      closeCommandPalette();
+    } else if (option.type === 'nav') {
+      router.push(option.href);
+      closeCommandPalette();
+    } else if (option.type === 'action') {
+      setIsLoading(true);
+      const { trashEmail, doneEmail, starEmail, spamEmail } = await import("@/lib/gmail");
+      
+      if (option.actionType === 'trash') {
+        await trashEmail(resolvedToken, currentEmailId);
+        router.push("/inbox");
+      } else if (option.actionType === 'done') {
+        await doneEmail(resolvedToken, currentEmailId);
+        router.push("/inbox");
+      } else if (option.actionType === 'star') {
+        await starEmail(resolvedToken, currentEmailId);
+      } else if (option.actionType === 'spam') {
+        await spamEmail(resolvedToken, currentEmailId);
+        router.push("/inbox");
+      } else {
+        console.log("Mocked action:", option.actionType);
+      }
+      setIsLoading(false);
       closeCommandPalette();
     } else if (option.type === 'ai_chat') {
       if (chatHistory.length > 0) saveCurrentChat();
@@ -357,21 +411,56 @@ export default function CommandPalette() {
               {!input.trim() ? "Recent AI Chats" : "Suggestions"}
             </div>
             <div className="flex flex-col gap-1">
-              {options.map((option, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => executeOption(option)}
-                  className={`text-left px-3 py-2 rounded-lg transition flex items-center gap-3 text-[13px] ${
-                    idx === selectedIndex ? 'bg-[#e4e3e0] text-gray-900' : 'hover:bg-[#e4e3e0]/50 text-gray-700'
-                  }`}
-                  onMouseEnter={() => setSelectedIndex(idx)}
-                >
-                  {option.type === 'ai_chat' && <Sparkle size={14} className="text-gray-400 flex-shrink-0" />}
-                  {option.type === 'search_emails' && <MagnifyingGlass size={14} className="text-gray-400 flex-shrink-0" />}
-                  {option.type === 'settings' && <Gear size={14} className="text-gray-400 flex-shrink-0" />}
-                  <span className="truncate">{option.label}</span>
-                </button>
-              ))}
+              {options.map((option, idx) => {
+                let Icon = null;
+                if (option.type === 'ai_chat') Icon = Sparkle;
+                else if (option.type === 'search_emails') Icon = MagnifyingGlass;
+                else if (option.type === 'settings') Icon = Gear;
+                else if (option.type === 'nav') {
+                  if (option.label.includes('inbox')) Icon = Tray;
+                  else if (option.label.includes('starred')) Icon = Star;
+                  else if (option.label.includes('sent')) Icon = PaperPlaneRight;
+                  else if (option.label.includes('drafts')) Icon = FileText;
+                  else if (option.label.includes('done')) Icon = CheckCircle;
+                  else if (option.label.includes('spam')) Icon = WarningOctagon;
+                  else if (option.label.includes('trash')) Icon = Trash;
+                  else if (option.label.includes('Compose')) Icon = PencilSimple;
+                  else Icon = ArrowRight;
+                } else if (option.type === 'action') {
+                  if (option.actionType === 'done') Icon = CheckCircle;
+                  else if (option.actionType === 'star') Icon = Star;
+                  else if (option.actionType === 'trash') Icon = Trash;
+                  else if (option.actionType === 'spam') Icon = WarningOctagon;
+                  else if (option.actionType.includes('block')) Icon = Prohibit;
+                  else Icon = Sparkle;
+                }
+
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => executeOption(option)}
+                    className={`text-left px-3 py-2 rounded-lg transition flex items-center gap-3 text-[13px] ${
+                      idx === selectedIndex ? 'bg-[#e4e3e0] text-gray-900' : 'hover:bg-[#e4e3e0]/50 text-gray-700'
+                    }`}
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                  >
+                    {Icon && <Icon size={14} className="text-gray-500 flex-shrink-0" />}
+                    <span className="truncate flex-1">{option.label}</span>
+                    
+                    {/* Add keyboard shortcuts to UI if applicable */}
+                    {option.type === 'nav' && option.label.includes('inbox') && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">G then I</span>}
+                    {option.type === 'nav' && option.label.includes('starred') && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">G then S</span>}
+                    {option.type === 'nav' && option.label.includes('sent') && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">G then N</span>}
+                    {option.type === 'nav' && option.label.includes('drafts') && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">G then D</span>}
+                    {option.type === 'nav' && option.label.includes('Compose') && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">C</span>}
+                    
+                    {option.type === 'action' && option.actionType === 'done' && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">E</span>}
+                    {option.type === 'action' && option.actionType === 'star' && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">S</span>}
+                    {option.type === 'action' && option.actionType === 'trash' && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">#</span>}
+                    {option.type === 'action' && option.actionType === 'spam' && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">!</span>}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
