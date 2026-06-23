@@ -17,7 +17,7 @@ const AiEditor = dynamic(() => import("@/components/AiEditor"), { ssr: false });
 export default function EmailDetailPage({ params }) {
   const { id } = params;
   const router = useRouter();
-  const { session, user, inboxEmails } = useAuthStore();
+  const { session, user, inboxEmails, checkAuth } = useAuthStore();
   const iframeRef = useRef(null);
   
   const [email, setEmail] = useState(() => {
@@ -169,6 +169,15 @@ export default function EmailDetailPage({ params }) {
 
   const handleSummarize = async () => {
     if (!email) return;
+
+    try {
+      const { incrementAiUsage } = await import("@/lib/usage");
+      await incrementAiUsage(user, checkAuth);
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
+
     setIsSummarizing(true);
     
     let context = "";
@@ -228,6 +237,15 @@ export default function EmailDetailPage({ params }) {
 
   const handleDraftReply = async () => {
     if (!email) return;
+    
+    try {
+      const { incrementAiUsage } = await import("@/lib/usage");
+      await incrementAiUsage(user, checkAuth);
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
+
     setIsDrafting(true);
     const promptToUse = aiPrompt.trim() ? aiPrompt : "Reply professionally acknowledging receipt.";
     

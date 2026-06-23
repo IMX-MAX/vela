@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useAuthStore } from "@/lib/store";
 import { useEffect, useState, useRef } from "react";
 import { Sparkle, Lightning, MagnifyingGlass, ArrowRight, Command, EnvelopeSimple, ShieldCheck, Clock } from "@phosphor-icons/react";
+import MarketingNavbar from "@/components/MarketingNavbar";
+import MarketingFooter from "@/components/MarketingFooter";
 
 export default function LandingPage() {
   const { user, loading, checkAuth } = useAuthStore();
@@ -43,19 +45,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-[#2b323b] text-white font-[Inter] selection:bg-[#50686c] selection:text-white overflow-x-hidden">
       
       {/* Navbar */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? "bg-[#2b323b]/90 backdrop-blur-xl border-b border-white/[0.06] py-3" : "bg-transparent py-5"}`}>
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 font-medium text-base tracking-tight text-white">
-            <img src="/logo.png" alt="Vela Logo" className="h-7 w-auto rounded-lg bg-white p-1 shadow-sm" />
-            <span className="font-semibold">Vela</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href={ctaLink} className="text-xs font-medium bg-white text-[#2b323b] px-5 py-2 rounded-full hover:bg-gray-100 transition-all duration-200 shadow-sm">
-              {ctaText}
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <MarketingNavbar />
 
       {/* Hero Section */}
       <section ref={heroRef} className="relative min-h-screen flex flex-col justify-center px-6 max-w-6xl mx-auto">
@@ -254,18 +244,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.04] py-12 text-sm text-gray-500">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2 font-medium text-gray-400">
-            <img src="/logo.png" alt="Vela Logo" className="h-4 w-auto rounded-sm brightness-0 invert opacity-50" />
-            Vela
-          </div>
-          <div className="flex items-center gap-6">
-            <Link href="/privacy" className="hover:text-gray-300 transition">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-gray-300 transition">Terms of Service</Link>
-          </div>
-        </div>
-      </footer>
+      <MarketingFooter />
       
       {/* Global Animation Styles */}
       <style jsx global>{`

@@ -20,7 +20,7 @@ const AiDustMark = Mark.create({
 });
 
 export default function AiEditor({ value, onChange, placeholder = "Write something...", borderless = false }) {
-  const { user } = useAuthStore();
+  const { user, checkAuth } = useAuthStore();
   const [isProcessing, setIsProcessing] = useState(false);
   
   // Slash Commands Menu
@@ -95,6 +95,17 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
     if (!selectedText && !isCustom) {
       setShowSlashMenu(false);
       setShowSlashCustomPrompt(false);
+      return;
+    }
+
+    try {
+      const { incrementAiUsage } = await import("@/lib/usage");
+      await incrementAiUsage(user, checkAuth);
+    } catch (error) {
+      alert(error.message);
+      setShowSlashCustomPrompt(false);
+      setSlashCustomPrompt("");
+      setShowSlashMenu(false);
       return;
     }
 

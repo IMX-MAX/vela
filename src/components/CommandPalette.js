@@ -17,7 +17,7 @@ export default function CommandPalette() {
     session, user, 
     isCommandPaletteOpen, toggleCommandPalette, closeCommandPalette,
     chatHistory, setChatHistory, clearChat,
-    savedChats, loadChat, saveCurrentChat, initSavedChats
+    savedChats, loadChat, saveCurrentChat, initSavedChats, checkAuth
   } = useAuthStore();
 
   useEffect(() => {
@@ -227,6 +227,15 @@ export default function CommandPalette() {
         if (user.prefs.writingStyle) {
           context += `Writing Style: ${user.prefs.writingStyle}`;
         }
+      }
+      
+      try {
+        const { incrementAiUsage } = await import("@/lib/usage");
+        await incrementAiUsage(user, checkAuth);
+      } catch (usageError) {
+        setChatHistory([...newHistory, { role: "assistant", content: `Error: ${usageError.message}` }]);
+        setIsLoading(false);
+        return;
       }
       
       const responseContent = await chatWithAiAction(newHistory, resolvedToken, context);
