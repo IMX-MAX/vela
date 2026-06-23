@@ -17,7 +17,7 @@ const AiEditor = dynamic(() => import("@/components/AiEditor"), { ssr: false });
 export default function EmailDetailPage({ params }) {
   const { id } = params;
   const router = useRouter();
-  const { session, user } = useAuthStore();
+  const { session, user, inboxEmails } = useAuthStore();
   const iframeRef = useRef(null);
   
   const [email, setEmail] = useState(() => {
@@ -319,7 +319,11 @@ export default function EmailDetailPage({ params }) {
             <button className="bg-white border border-gray-200 text-gray-500 hover:text-[#2b323b] transition rounded-md h-7 w-7 flex items-center justify-center">
                <CaretDown size={14} weight="bold" />
             </button>
-            <span className="ml-2 font-medium">1 / 9,370</span>
+            <span className="ml-2 font-medium">
+              {inboxEmails && inboxEmails.length > 0 
+                ? `${(inboxEmails.findIndex(e => e.id === id) + 1) || 1} / ${inboxEmails.length}`
+                : "1 / 1"}
+            </span>
           </div>
         </div>
         <div className="flex items-center gap-4 text-gray-500 pr-2">
@@ -511,7 +515,7 @@ export default function EmailDetailPage({ params }) {
         })}
 
         {/* Reply Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-visible focus-within:ring-2 focus-within:ring-[#c7d4ce]/50 focus-within:border-[#50686c] transition mb-12">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-visible transition mb-12">
           <div className="px-4 py-3 bg-[#fbfbfc] border-b border-gray-100 flex items-center gap-2 text-[13px] text-gray-500 font-medium rounded-t-xl">
             <span className="icon-reply"></span>
             Reply to {email.senderName}
