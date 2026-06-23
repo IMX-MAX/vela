@@ -418,6 +418,26 @@ export default function CommandPalette() {
           />
 
           {mode === "search" && (
+            <button
+              onClick={() => {
+                setMode("ai");
+                inputRef.current?.focus();
+              }}
+              className="md:hidden flex items-center justify-center p-1.5 rounded-md text-gray-500 hover:text-gray-800 hover:bg-black/5 transition"
+            >
+              <Sparkle size={18} weight="fill" />
+            </button>
+          )}
+          {mode === "ai" && input.trim() && (
+            <button
+              onClick={handleSubmit}
+              className="md:hidden flex items-center justify-center p-1.5 rounded-md text-gray-500 hover:text-gray-800 hover:bg-black/5 transition"
+            >
+              <PaperPlaneRight size={18} weight="fill" />
+            </button>
+          )}
+
+          {mode === "search" && (
             <div className="hidden md:flex items-center gap-1 text-[11px] text-gray-500 flex-shrink-0 bg-white/50 px-2 py-1 rounded-md shadow-sm border border-white/60">
               <span className="font-mono">Tab</span>
               <span>for AI</span>

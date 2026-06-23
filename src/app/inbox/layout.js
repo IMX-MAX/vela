@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/lib/store";
@@ -102,6 +102,10 @@ export default function InboxLayout({ children }) {
     router.push("/login");
   };
 
+  const closeMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(false);
+  }, []);
+
   if (loading || !user) {
     return (
       <div className="flex h-[100dvh] items-center justify-center bg-[#eceae6]">
@@ -115,7 +119,7 @@ export default function InboxLayout({ children }) {
       
       {/* Route Change Listener to close mobile menu */}
       <Suspense fallback={null}>
-        <RouteChangeListener onChange={() => setIsMobileMenuOpen(false)} />
+        <RouteChangeListener onChange={closeMobileMenu} />
       </Suspense>
 
       {/* Mobile Header */}
