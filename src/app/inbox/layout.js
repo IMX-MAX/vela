@@ -27,9 +27,11 @@ import { Suspense } from "react";
 function SidebarNavigation() {
   const searchParams = useSearchParams();
   const currentFilter = searchParams.get("filter") || "inbox";
+  const inboxEmails = useAuthStore((state) => state.inboxEmails);
+  const unreadCount = inboxEmails ? inboxEmails.filter((e) => e.isUnread).length : 0;
 
   const navItems = [
-    { label: "Inbox", icon: Tray, href: "/inbox", count: 9364, active: currentFilter === "inbox" },
+    { label: "Inbox", icon: Tray, href: "/inbox", count: unreadCount > 0 ? unreadCount : null, active: currentFilter === "inbox" },
     { label: "Starred", icon: Star, href: "/inbox?filter=starred", active: currentFilter === "starred" },
     { label: "Sent", icon: PaperPlaneRight, href: "/inbox?filter=sent", active: currentFilter === "sent" },
     { label: "Drafts", icon: FileText, href: "/inbox?filter=drafts", active: currentFilter === "drafts" },
