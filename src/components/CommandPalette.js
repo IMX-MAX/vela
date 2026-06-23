@@ -39,21 +39,12 @@ export default function CommandPalette() {
 
   // Resolve token
   useEffect(() => {
-    async function initToken() {
+    async function loadToken() {
       if (session?.providerAccessToken) {
         setResolvedToken(session.providerAccessToken);
-      } else if (user && session?.provider !== 'google') {
-        const { checkComposioStatus, getComposioAccessToken } = await import("@/app/composioActions");
-        const status = await checkComposioStatus(user.$id);
-        if (status.connected) {
-          const compData = await getComposioAccessToken(user.$id);
-          if (compData.connectionId) {
-            setResolvedToken(compData.connectionId);
-          }
-        }
       }
     }
-    initToken();
+    loadToken();
   }, [session, user]);
 
   // Ctrl+K toggle

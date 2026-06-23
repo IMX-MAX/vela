@@ -25,7 +25,7 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="text-xl font-semibold mb-3 text-[#2b323b]">2. Description of Service</h2>
-            <p>Vela is an advanced, AI-powered email client built on top of the Gmail API and Composio integrations. It allows users to read, organize, and send emails, and utilizes Vela Intelligence to provide summarization and automated drafting capabilities.</p>
+            <p>Vela is an advanced, AI-powered email client built on top of the Gmail API. It allows users to read, organize, and send emails, and utilizes Vela Intelligence to provide summarization and automated drafting capabilities.</p>
           </section>
 
           <section>

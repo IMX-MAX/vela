@@ -1,39 +1,15 @@
 "use server";
 
-import { Composio } from "@composio/core";
-
-// We reuse the proxy approach from gmail.js for contacts to be consistent
 async function makePeopleRequest(tokenOrConnectionId, url, options = {}) {
-  if (tokenOrConnectionId.startsWith("ca_")) {
-    const composio = new Composio({ apiKey: process.env.COMPOSIO_API_KEY });
-    
-    let parsedBody = undefined;
-    if (options.body) {
-      try {
-        parsedBody = JSON.parse(options.body);
-      } catch (e) {
-        parsedBody = options.body;
-      }
-    }
-    
-    const response = await composio.client.tools.proxy({
-      endpoint: url,
-      method: options.method || "GET",
-      connected_account_id: tokenOrConnectionId,
-      body: parsedBody,
-    });
-    return response.data;
-  } else {
-    const res = await fetch(url, {
-      ...options,
-      cache: "no-store",
-      headers: {
-        ...options.headers,
-        Authorization: `Bearer ${tokenOrConnectionId}`,
-      },
-    });
-    return res.json();
-  }
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${tokenOrConnectionId}`,
+    },
+    cache: "no-store",
+  });
+  return res.json();
 }
 
 export async function fetchContacts(tokenOrConnectionId) {

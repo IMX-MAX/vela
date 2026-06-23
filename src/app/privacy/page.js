@@ -30,7 +30,7 @@ export default function PrivacyPolicy() {
               <li><strong>Identity Data</strong> includes your first name, last name, and profile picture obtained via Google OAuth or standard registration.</li>
               <li><strong>Contact Data</strong> includes your email address.</li>
               <li><strong>Email Data</strong> includes the content of your emails, which we access via the Gmail API to display within the application and process using Vela Intelligence for summarization and drafting replies at your explicit request.</li>
-              <li><strong>Technical Data</strong> includes authentication tokens required to securely communicate with the Google APIs and Composio.</li>
+              <li><strong>Technical Data</strong> includes authentication tokens required to securely communicate with the Google APIs.</li>
             </ul>
           </section>
 
@@ -50,7 +50,7 @@ export default function PrivacyPolicy() {
             <ul className="list-disc pl-5 mt-2 space-y-2">
               <li><strong>Google:</strong> We use Google OAuth for authentication and the Gmail API to access your mailbox. Vela's use and transfer to any other app of information received from Google APIs will adhere to <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Google API Services User Data Policy</a>, including the Limited Use requirements.</li>
               <li><strong>Vela Intelligence:</strong> We use Vela Intelligence (powered by third-party LLM providers) to power the intelligent summarization and drafting features.</li>
-              <li><strong>Composio:</strong> We use Composio MCP to manage secure API integrations for your inbox.</li>
+
               <li><strong>Appwrite:</strong> We use Appwrite Cloud as our backend infrastructure to securely store your session data and access tokens.</li>
             </ul>
           </section>

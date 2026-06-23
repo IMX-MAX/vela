@@ -5,7 +5,7 @@ import { useAuthStore } from "@/lib/store";
 import { account } from "@/lib/appwrite";
 import { ArrowLeft, CaretLeft, DotsThree } from "@phosphor-icons/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { checkComposioStatus, initiateComposioConnection, getComposioAccessToken } from "@/app/composioActions";
+
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -18,9 +18,6 @@ export default function SettingsPage() {
   const [jobName, setJobName] = useState("");
   const [company, setCompany] = useState("");
   const [writingStyle, setWritingStyle] = useState("");
-  
-  const [composioStatus, setComposioStatus] = useState(null);
-  const [isConnecting, setIsConnecting] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -30,10 +27,6 @@ export default function SettingsPage() {
         setCompany(user.prefs.company || "");
         setWritingStyle(user.prefs.writingStyle || "");
       }
-      
-      checkComposioStatus(user.$id).then(status => {
-        setComposioStatus(status);
-      });
     }
   }, [user]);
 
@@ -59,23 +52,6 @@ export default function SettingsPage() {
       await checkAuth();
     } catch (error) {
       console.error("Failed to update prefs", error);
-    }
-  };
-
-  const handleConnect = async () => {
-    setIsConnecting(true);
-    const callbackUrl = window.location.origin + "/inbox/settings?tab=accounts";
-    const res = await initiateComposioConnection(user.$id, callbackUrl);
-    
-    if (res.connected) {
-      const status = await checkComposioStatus(user.$id);
-      setComposioStatus(status);
-      setIsConnecting(false);
-    } else if (res.url) {
-      window.location.href = res.url;
-    } else {
-      setIsConnecting(false);
-      alert("Failed to connect: " + (res.error || "Unknown error"));
     }
   };
 
@@ -243,53 +219,7 @@ export default function SettingsPage() {
               </table>
             </div>
 
-            <h2 className="text-[15px] font-medium text-gray-800 mb-3">Composio MCP</h2>
-            <div className="bg-[#eceae6] rounded-xl border border-[#dddcdc]/60 shadow-sm mb-10 overflow-hidden">
-              {composioStatus?.connected ? (
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-[#dddcdc]/60">
-                      <th className="font-medium text-gray-500 text-[13px] py-3 px-6">Name</th>
-                      <th className="font-medium text-gray-500 text-[13px] py-3 px-6 w-24">Status</th>
-                      <th className="w-12"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b border-[#dddcdc]/40 last:border-0 hover:bg-[#2b323b]/[0.02] transition">
-                      <td className="py-4 px-6 flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-white border border-[#dddcdc] flex items-center justify-center text-[10px] font-bold text-[#2b323b]">
-                          CMP
-                        </div>
-                        <div>
-                          <div className="font-medium text-[#2b323b]">Composio MCP</div>
-                          <div className="text-[13px] text-gray-500">Connected for AI actions</div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-gray-700">Active</td>
-                      <td className="py-4 px-6 text-right">
-                        <button className="text-gray-400 hover:text-gray-800 transition"><DotsThree size={20} weight="bold" /></button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              ) : (
-                <div className="p-4 px-6 flex items-center justify-between">
-                  <div className="flex items-center gap-3 font-medium text-[#2b323b]">
-                    <span className="flex items-center justify-center h-5 w-5 bg-white border border-[#dddcdc] rounded-full text-[8px] font-bold">
-                      CMP
-                    </span>
-                    Composio connection
-                  </div>
-                  <button 
-                    onClick={handleConnect}
-                    disabled={isConnecting}
-                    className="px-4 py-1.5 bg-white border border-[#dddcdc] rounded-md text-[13px] font-medium text-gray-800 hover:bg-gray-50 transition shadow-sm disabled:opacity-50"
-                  >
-                    {isConnecting ? "Connecting..." : "Connect"}
-                  </button>
-                </div>
-              )}
-            </div>
+
 
           </div>
         )}

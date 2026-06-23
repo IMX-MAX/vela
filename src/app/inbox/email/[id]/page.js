@@ -61,26 +61,10 @@ export default function EmailDetailPage({ params }) {
     async function load() {
       let token = session?.providerAccessToken;
 
-      if (session?.provider === 'google') {
-        if (!token) {
+      if (!token) {
            setAuthError("No Google access token found. Please ensure 'Store access tokens' is enabled in your Appwrite Google Provider settings, then sign out and sign in again.");
            setLoading(false);
            return;
-        }
-      } else if (!token && user) {
-        const { checkComposioStatus, getComposioAccessToken } = await import("@/app/composioActions");
-        const status = await checkComposioStatus(user.$id);
-        if (status.connected) {
-          const compData = await getComposioAccessToken(user.$id);
-          if (compData.connectionId) {
-            token = compData.connectionId;
-          }
-        }
-      }
-
-      if (!token) {
-        setLoading(false);
-        return;
       }
 
       try {

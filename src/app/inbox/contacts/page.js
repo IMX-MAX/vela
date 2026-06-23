@@ -30,19 +30,6 @@ export default function ContactsPage() {
     async function initToken() {
       if (session?.providerAccessToken) {
         setResolvedToken(session.providerAccessToken);
-      } else if (user && session?.provider !== 'google') {
-        try {
-          const { checkComposioStatus, getComposioAccessToken } = await import("@/app/composioActions");
-          const status = await checkComposioStatus(user.$id);
-          if (status.connected) {
-            const compData = await getComposioAccessToken(user.$id);
-            if (compData.connectionId) {
-              setResolvedToken(compData.connectionId);
-            }
-          }
-        } catch (e) {
-          console.error(e);
-        }
       }
     }
     initToken();
@@ -168,9 +155,13 @@ export default function ContactsPage() {
                 </div>
 
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="h-12 w-12 rounded-full bg-[#c7d4ce] flex items-center justify-center text-[#2b323b] font-semibold text-lg shrink-0">
-                    {contact.names?.[0]?.givenName?.charAt(0)?.toUpperCase() || "U"}
-                  </div>
+                  {contact.photos?.[0]?.url && !contact.photos[0].default ? (
+                    <img src={contact.photos[0].url} alt="Profile" className="h-12 w-12 rounded-full object-cover shrink-0" />
+                  ) : (
+                    <div className="h-12 w-12 rounded-full bg-[#c7d4ce] flex items-center justify-center text-[#2b323b] font-semibold text-lg shrink-0">
+                      {contact.names?.[0]?.givenName?.charAt(0)?.toUpperCase() || "U"}
+                    </div>
+                  )}
                   <div className="overflow-hidden">
                     <h3 className="font-semibold text-gray-800 text-lg truncate">
                       {contact.names?.[0]?.givenName || ""} {contact.names?.[0]?.familyName || ""}

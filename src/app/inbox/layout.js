@@ -19,7 +19,7 @@ import {
   Link as LinkIcon,
   AddressBook
 } from "@phosphor-icons/react";
-import { initiateComposioConnection } from "@/app/composioActions";
+
 import dynamic from "next/dynamic";
 
 const CommandPalette = dynamic(() => import("@/components/CommandPalette"), { ssr: false });

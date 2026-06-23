@@ -7,7 +7,7 @@ import { parseEmailContent } from "@/lib/emailParser";
 import { useAuthStore } from "@/lib/store";
 import { format, isToday } from "date-fns";
 import { Check, Trash, MagnifyingGlass, Command, Link as LinkIcon, Spinner } from "@phosphor-icons/react";
-import { checkComposioStatus, initiateComposioConnection, getComposioAccessToken } from "@/app/composioActions";
+
 
 export default function InboxPage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function InboxPage() {
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [needsComposio, setNeedsComposio] = useState(false);
+  const [needsGoogleConnect, setNeedsGoogleConnect] = useState(false);
   const [nextPageToken, setNextPageToken] = useState(null);
   const [resolvedToken, setResolvedToken] = useState(null);
   const [authError, setAuthError] = useState(null);
@@ -72,19 +72,9 @@ export default function InboxPage() {
            return;
         }
       } else if (!token && user) {
-        const status = await checkComposioStatus(user.$id);
-        if (status.connected) {
-          const compData = await getComposioAccessToken(user.$id);
-          if (compData.connectionId) {
-            token = compData.connectionId;
-          } else {
-            console.warn("Composio connected but no connection ID available.");
-          }
-        } else {
-          setNeedsComposio(true);
-          setLoading(false);
-          return;
-        }
+        setNeedsGoogleConnect(true);
+        setLoading(false);
+        return;
       }
 
       if (token) {
@@ -165,26 +155,8 @@ export default function InboxPage() {
     };
   }, [handleLoadMore]);
 
-  const handleConnectComposio = async () => {
-    setLoading(true);
-    const callbackUrl = window.location.origin + "/inbox";
-    const res = await initiateComposioConnection(user.$id, callbackUrl);
-    
-    if (res.connected) {
-      window.location.reload();
-      return;
-    }
-
-    if (res.url) {
-      window.location.href = res.url;
-    } else {
-      setLoading(false);
-      if (res.error) {
-        alert(`Composio Error: ${res.error}`);
-      } else {
-        alert("Failed to get Composio redirect URL. Check server logs.");
-      }
-    }
+  const handleConnectGoogle = () => {
+    useAuthStore.getState().loginWithGoogle();
   };
 
   const formatTime = (dateStr) => {
@@ -197,7 +169,7 @@ export default function InboxPage() {
     return format(date, "MMM d");
   };
 
-  if (needsComposio) {
+  if (needsGoogleConnect) {
     return (
       <div className="flex flex-col items-center justify-center h-full bg-[#eceae6] rounded-2xl relative">
         <div className="text-center max-w-md p-8 bg-white rounded-2xl border border-gray-200 shadow-sm">
@@ -206,14 +178,14 @@ export default function InboxPage() {
           </div>
           <h2 className="text-2xl font-semibold mb-3">Connect your Gmail</h2>
           <p className="text-gray-500 mb-8 text-sm">
-            To use Vela's powerful AI features, you need to connect your Google account securely via Composio MCP.
+            To use Vela's powerful AI features, you need to connect your Google account securely.
           </p>
           <button 
-            onClick={handleConnectComposio}
+            onClick={handleConnectGoogle}
             disabled={loading}
             className="w-full bg-[#2b323b] text-white px-4 py-3 rounded-xl font-medium hover:bg-[#50686c] transition disabled:opacity-50"
           >
-            {loading ? "Connecting..." : "Connect with Composio"}
+            {loading ? "Connecting..." : "Connect Google Account"}
           </button>
         </div>
       </div>
