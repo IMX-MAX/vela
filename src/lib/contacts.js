@@ -40,7 +40,7 @@ export async function fetchContacts(tokenOrConnectionId) {
   try {
     const data = await makePeopleRequest(
       tokenOrConnectionId,
-      "https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses,phoneNumbers"
+      "https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses,phoneNumbers,organizations,biographies"
     );
     if (data?.error) {
       throw new Error(data.error.message || JSON.stringify(data.error));
@@ -54,15 +54,17 @@ export async function fetchContacts(tokenOrConnectionId) {
 
 export async function createContact(tokenOrConnectionId, contactData) {
   const body = {
-    names: contactData.name ? [{ givenName: contactData.name }] : [],
+    names: contactData.firstName || contactData.lastName ? [{ givenName: contactData.firstName || "", familyName: contactData.lastName || "" }] : [],
     emailAddresses: contactData.email ? [{ value: contactData.email }] : [],
-    phoneNumbers: contactData.phone ? [{ value: contactData.phone }] : []
+    phoneNumbers: contactData.phone ? [{ value: contactData.phone }] : [],
+    organizations: contactData.company || contactData.jobTitle ? [{ name: contactData.company || "", title: contactData.jobTitle || "" }] : [],
+    biographies: contactData.notes ? [{ value: contactData.notes }] : []
   };
 
   try {
     const data = await makePeopleRequest(
       tokenOrConnectionId,
-      "https://people.googleapis.com/v1/people:createContact?personFields=names,emailAddresses,phoneNumbers",
+      "https://people.googleapis.com/v1/people:createContact?personFields=names,emailAddresses,phoneNumbers,organizations,biographies",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -79,15 +81,17 @@ export async function createContact(tokenOrConnectionId, contactData) {
 export async function updateContact(tokenOrConnectionId, resourceName, contactData) {
   const body = {
     etag: contactData.etag,
-    names: contactData.name ? [{ givenName: contactData.name }] : [],
+    names: contactData.firstName || contactData.lastName ? [{ givenName: contactData.firstName || "", familyName: contactData.lastName || "" }] : [],
     emailAddresses: contactData.email ? [{ value: contactData.email }] : [],
-    phoneNumbers: contactData.phone ? [{ value: contactData.phone }] : []
+    phoneNumbers: contactData.phone ? [{ value: contactData.phone }] : [],
+    organizations: contactData.company || contactData.jobTitle ? [{ name: contactData.company || "", title: contactData.jobTitle || "" }] : [],
+    biographies: contactData.notes ? [{ value: contactData.notes }] : []
   };
 
   try {
     const data = await makePeopleRequest(
       tokenOrConnectionId,
-      `https://people.googleapis.com/v1/${resourceName}:updateContact?updatePersonFields=names,emailAddresses,phoneNumbers`,
+      `https://people.googleapis.com/v1/${resourceName}:updateContact?updatePersonFields=names,emailAddresses,phoneNumbers,organizations,biographies`,
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

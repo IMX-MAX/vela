@@ -14,7 +14,17 @@ export default function ContactsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingContact, setEditingContact] = useState(null);
   
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "", resourceName: "", etag: "" });
+  const [formData, setFormData] = useState({ 
+    firstName: "", 
+    lastName: "", 
+    email: "", 
+    phone: "", 
+    company: "",
+    jobTitle: "",
+    notes: "",
+    resourceName: "", 
+    etag: "" 
+  });
 
   useEffect(() => {
     async function initToken() {
@@ -60,15 +70,19 @@ export default function ContactsPage() {
     if (contact) {
       setEditingContact(contact);
       setFormData({
-        name: contact.names?.[0]?.givenName || "",
+        firstName: contact.names?.[0]?.givenName || "",
+        lastName: contact.names?.[0]?.familyName || "",
         email: contact.emailAddresses?.[0]?.value || "",
         phone: contact.phoneNumbers?.[0]?.value || "",
+        company: contact.organizations?.[0]?.name || "",
+        jobTitle: contact.organizations?.[0]?.title || "",
+        notes: contact.biographies?.[0]?.value || "",
         resourceName: contact.resourceName,
         etag: contact.etag,
       });
     } else {
       setEditingContact(null);
-      setFormData({ name: "", email: "", phone: "", resourceName: "", etag: "" });
+      setFormData({ firstName: "", lastName: "", email: "", phone: "", company: "", jobTitle: "", notes: "", resourceName: "", etag: "" });
     }
     setIsModalOpen(true);
   };
@@ -159,8 +173,13 @@ export default function ContactsPage() {
                   </div>
                   <div className="overflow-hidden">
                     <h3 className="font-semibold text-gray-800 text-lg truncate">
-                      {contact.names?.[0]?.givenName || "Unknown"}
+                      {contact.names?.[0]?.givenName || ""} {contact.names?.[0]?.familyName || ""}
                     </h3>
+                    {(contact.organizations?.[0]?.title || contact.organizations?.[0]?.name) && (
+                      <p className="text-[13px] text-gray-500 truncate">
+                        {contact.organizations?.[0]?.title} {contact.organizations?.[0]?.title && contact.organizations?.[0]?.name ? 'at' : ''} {contact.organizations?.[0]?.name}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -186,8 +205,8 @@ export default function ContactsPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-[#2b323b]/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-          <div className="bg-[#eceae6] w-full max-w-md rounded-2xl shadow-2xl border border-[#d0cfcb] overflow-hidden flex flex-col transform animate-in slide-in-from-bottom-4 duration-300">
-            <div className="px-6 py-5 border-b border-[#dddcdc] flex justify-between items-center">
+          <div className="bg-[#eceae6] w-full max-w-lg rounded-2xl shadow-2xl border border-[#d0cfcb] overflow-hidden flex flex-col transform animate-in slide-in-from-bottom-4 duration-300">
+            <div className="px-6 py-5 border-b border-[#dddcdc] flex justify-between items-center bg-[#eceae6]">
               <h2 className="text-[16px] font-medium text-[#2b323b]">
                 {editingContact ? "Edit Contact" : "Add New Contact"}
               </h2>
@@ -199,51 +218,96 @@ export default function ContactsPage() {
               </button>
             </div>
             
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
-              <div>
-                <label className="block text-[13px] font-medium text-gray-800 mb-2">Name</label>
-                <div className="relative">
-                  <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" weight="bold" />
+            <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto max-h-[70vh]">
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[13px] font-medium text-gray-800 mb-2">First Name</label>
                   <input
                     type="text"
                     required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full pl-9 pr-4 py-2.5 bg-transparent border border-[#dddcdc] rounded-lg focus:outline-none focus:border-gray-400 transition text-[14px] text-[#2b323b] placeholder-gray-400"
-                    placeholder="Jane Doe"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    className="w-full px-4 py-2 bg-transparent border border-[#dddcdc] rounded-lg focus:outline-none focus:border-gray-400 transition text-[14px] text-[#2b323b] placeholder-gray-400"
+                    placeholder="Jane"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-medium text-gray-800 mb-2">Last Name</label>
+                  <input
+                    type="text"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    className="w-full px-4 py-2 bg-transparent border border-[#dddcdc] rounded-lg focus:outline-none focus:border-gray-400 transition text-[14px] text-[#2b323b] placeholder-gray-400"
+                    placeholder="Doe"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[13px] font-medium text-gray-800 mb-2">Email Address</label>
+                  <div className="relative">
+                    <EnvelopeSimple size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" weight="bold" />
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full pl-9 pr-4 py-2 bg-transparent border border-[#dddcdc] rounded-lg focus:outline-none focus:border-gray-400 transition text-[14px] text-[#2b323b] placeholder-gray-400"
+                      placeholder="jane@example.com"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[13px] font-medium text-gray-800 mb-2">Phone Number</label>
+                  <div className="relative">
+                    <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" weight="bold" />
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full pl-9 pr-4 py-2 bg-transparent border border-[#dddcdc] rounded-lg focus:outline-none focus:border-gray-400 transition text-[14px] text-[#2b323b] placeholder-gray-400"
+                      placeholder="+1 (234) 567-8900"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[13px] font-medium text-gray-800 mb-2">Company</label>
+                  <input
+                    type="text"
+                    value={formData.company}
+                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    className="w-full px-4 py-2 bg-transparent border border-[#dddcdc] rounded-lg focus:outline-none focus:border-gray-400 transition text-[14px] text-[#2b323b] placeholder-gray-400"
+                    placeholder="Acme Corp"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-medium text-gray-800 mb-2">Job Title</label>
+                  <input
+                    type="text"
+                    value={formData.jobTitle}
+                    onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
+                    className="w-full px-4 py-2 bg-transparent border border-[#dddcdc] rounded-lg focus:outline-none focus:border-gray-400 transition text-[14px] text-[#2b323b] placeholder-gray-400"
+                    placeholder="Manager"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[13px] font-medium text-gray-800 mb-2">Email Address</label>
-                <div className="relative">
-                  <EnvelopeSimple size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" weight="bold" />
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full pl-9 pr-4 py-2.5 bg-transparent border border-[#dddcdc] rounded-lg focus:outline-none focus:border-gray-400 transition text-[14px] text-[#2b323b] placeholder-gray-400"
-                    placeholder="jane@example.com"
-                  />
-                </div>
+                <label className="block text-[13px] font-medium text-gray-800 mb-2">Notes</label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="w-full px-4 py-2 bg-transparent border border-[#dddcdc] rounded-lg focus:outline-none focus:border-gray-400 transition text-[14px] text-[#2b323b] placeholder-gray-400 min-h-[80px] resize-y"
+                  placeholder="Additional information..."
+                />
               </div>
 
-              <div>
-                <label className="block text-[13px] font-medium text-gray-800 mb-2">Phone Number</label>
-                <div className="relative">
-                  <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" weight="bold" />
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full pl-9 pr-4 py-2.5 bg-transparent border border-[#dddcdc] rounded-lg focus:outline-none focus:border-gray-400 transition text-[14px] text-[#2b323b] placeholder-gray-400"
-                    placeholder="+1 (234) 567-8900"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-4 flex gap-3">
+              <div className="pt-4 flex gap-3 sticky bottom-0 bg-[#eceae6]">
                 <button
                   type="button"
                   onClick={handleCloseModal}
