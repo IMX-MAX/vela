@@ -65,7 +65,6 @@ export default function InboxLayout({ children }) {
   const router = useRouter();
   const { user, loading, checkAuth, logout } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -82,22 +81,6 @@ export default function InboxLayout({ children }) {
     router.push("/login");
   };
 
-  const handleManageConnections = async () => {
-    setIsConnecting(true);
-    const callbackUrl = window.location.origin + "/inbox";
-    const res = await initiateComposioConnection(user.$id, callbackUrl);
-    
-    if (res.connected) {
-      alert("You are already connected to Composio.");
-      setIsConnecting(false);
-    } else if (res.url) {
-      window.location.href = res.url;
-    } else {
-      setIsConnecting(false);
-      alert("Failed to connect: " + (res.error || "Unknown error"));
-    }
-  };
-
   if (loading || !user) {
     return (
       <div className="flex h-screen items-center justify-center bg-[#f2f2f1]">
@@ -112,68 +95,52 @@ export default function InboxLayout({ children }) {
       <aside className="w-64 flex-shrink-0 flex flex-col pt-6 pb-4">
         <div className="px-5 mb-6 flex items-center justify-between text-gray-500 relative">
           <div 
-            className="flex items-center gap-2 cursor-pointer hover:bg-[#d0cfcb]/50 px-2 py-1 rounded-md transition"
+            className="flex items-center gap-2 cursor-pointer bg-[#e4e3e0] hover:bg-[#d0cfcb] px-2 py-1.5 rounded-lg transition"
             onClick={() => setIsProfileOpen(!isProfileOpen)}
           >
-            <div className="h-6 w-6 rounded-full bg-[#d0cfcb] flex items-center justify-center text-xs font-semibold text-gray-700">
-              {user.name ? user.name[0].toUpperCase() : "U"}
+            <div className="h-6 w-6 rounded-full bg-white flex items-center justify-center text-xs font-semibold text-[#8baba4]">
+              {user.name ? user.name.slice(0, 5).toLowerCase() : "usr"}
             </div>
-            <span className="icon-cheveron-down text-xs"></span>
+            <span className="icon-cheveron-down text-xs text-gray-500"></span>
           </div>
           
           {isProfileOpen && (
-            <div className="absolute top-10 left-5 w-56 bg-[#eeeae6] border border-[#d0cfcb] rounded-xl shadow-lg z-50 overflow-hidden text-sm">
-              <div className="px-4 py-3 border-b border-[#d0cfcb]">
-                <div className="font-medium text-gray-900 truncate">{user.name}</div>
-                <div className="text-gray-500 text-xs truncate">{user.email}</div>
-              </div>
-              <div className="px-4 py-2 border-b border-[#d0cfcb]">
-                <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Personalize Name</label>
-                <input 
-                  type="text"
-                  placeholder="Your Name"
-                  defaultValue={user.name}
-                  onBlur={async (e) => {
-                    const newName = e.target.value.trim();
-                    if (newName && newName !== user.name) {
-                      const { account } = await import("@/lib/appwrite");
-                      try {
-                        await account.updateName(newName);
-                        await checkAuth(); // refresh user data
-                      } catch (error) {
-                        console.error("Failed to update name", error);
-                      }
-                    }
-                  }}
-                  onKeyDown={async (e) => {
-                    if (e.key === "Enter") {
-                      e.target.blur();
-                    }
-                  }}
-                  className="w-full bg-white text-[13px] text-gray-900 placeholder-gray-500 rounded px-2 py-1 outline-none border border-transparent focus:border-gray-300 transition"
-                />
-              </div>
+            <div className="absolute top-12 left-5 w-56 bg-[#f7f7f6] border border-[#e4e3e0] rounded-xl shadow-lg z-50 overflow-hidden text-[15px] py-1 text-gray-800">
+              <button 
+                onClick={() => {}}
+                className="w-full text-left px-4 py-2.5 hover:bg-[#eeeae6] transition flex items-center justify-between"
+              >
+                Switch account
+                <span className="text-gray-400 text-xs icon-cheveron-right"></span>
+              </button>
               <Link 
                 href="/inbox/settings"
                 onClick={() => setIsProfileOpen(false)}
-                className="w-full text-left px-4 py-2.5 text-gray-700 hover:bg-[#d0cfcb]/50 transition flex items-center gap-2"
+                className="w-full text-left px-4 py-2.5 hover:bg-[#eeeae6] transition flex items-center justify-between"
               >
-                <FileText size={16} />
                 Settings
+                <span className="text-gray-400 text-xs">G then G</span>
               </Link>
               <button 
-                onClick={handleManageConnections}
-                disabled={isConnecting}
-                className="w-full text-left px-4 py-2.5 text-gray-700 hover:bg-[#d0cfcb]/50 transition flex items-center gap-2"
+                onClick={() => {}}
+                className="w-full text-left px-4 py-2.5 hover:bg-[#eeeae6] transition flex items-center justify-between"
               >
-                <LinkIcon size={16} />
-                {isConnecting ? "Connecting..." : "Manage Connections"}
+                Help
+                <span className="text-gray-400 text-xs">?</span>
+              </button>
+              
+              <div className="h-px bg-[#e4e3e0] my-1 mx-4"></div>
+              
+              <button 
+                onClick={() => {}}
+                className="w-full text-left px-4 py-2.5 hover:bg-[#eeeae6] transition"
+              >
+                Reset local data
               </button>
               <button 
                 onClick={handleSignOut}
-                className="w-full text-left px-4 py-2.5 text-red-600 hover:bg-red-50 transition flex items-center gap-2"
+                className="w-full text-left px-4 py-2.5 hover:bg-[#eeeae6] transition"
               >
-                <SignOut size={16} />
                 Sign out
               </button>
             </div>
