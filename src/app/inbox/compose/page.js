@@ -77,6 +77,7 @@ export default function ComposePage() {
                 setBodyText(text);
               }}
               placeholder="Write your message..."
+              borderless={true}
             />
           </div>
         </div>

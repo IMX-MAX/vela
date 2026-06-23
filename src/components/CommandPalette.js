@@ -205,9 +205,8 @@ export default function CommandPalette() {
           )}
           
           {mode === "ai" && (
-            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-gradient-to-r from-purple-100 to-blue-100 border border-purple-200/50 rounded-lg flex-shrink-0">
-              <Sparkle size={14} className="text-purple-500" weight="fill" />
-              <span className="text-[12px] font-semibold text-purple-600">AI</span>
+            <div className="flex items-center text-gray-400 flex-shrink-0">
+              <Sparkle size={18} className="text-gray-400" weight="fill" />
             </div>
           )}
           

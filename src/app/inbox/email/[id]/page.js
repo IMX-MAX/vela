@@ -394,6 +394,7 @@ export default function EmailDetailPage({ params }) {
                 setReplyText(text);
               }}
               placeholder="Write your reply..."
+              borderless={true}
             />
           </div>
           <div className="px-4 py-3 bg-[#fbfbfc] border-t border-gray-100 flex justify-between items-center">
