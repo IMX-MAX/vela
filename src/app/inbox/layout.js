@@ -69,6 +69,15 @@ function SidebarNavigation() {
 
 import { List } from "@phosphor-icons/react";
 
+function RouteChangeListener({ onChange }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    onChange();
+  }, [pathname, searchParams, onChange]);
+  return null;
+}
+
 export default function InboxLayout({ children }) {
   const router = useRouter();
   const { user, loading, checkAuth, logout, googleProfile, toggleCommandPalette } = useAuthStore();
@@ -88,13 +97,6 @@ export default function InboxLayout({ children }) {
     }
   }, [user, loading, router]);
 
-  // Close mobile menu on route change
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [pathname, searchParams]);
-
   const handleSignOut = async () => {
     await logout();
     router.push("/login");
@@ -111,6 +113,11 @@ export default function InboxLayout({ children }) {
   return (
     <div className="flex flex-col md:flex-row h-[100dvh] w-screen overflow-hidden bg-[#eceae6] md:bg-[#dddcdc] relative">
       
+      {/* Route Change Listener to close mobile menu */}
+      <Suspense fallback={null}>
+        <RouteChangeListener onChange={() => setIsMobileMenuOpen(false)} />
+      </Suspense>
+
       {/* Mobile Header */}
       <div className="md:hidden flex h-14 flex-shrink-0 items-center justify-between px-4 bg-[#eceae6] border-b border-[#dddcdc] z-30">
         <div className="flex items-center gap-3">
@@ -233,7 +240,9 @@ export default function InboxLayout({ children }) {
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-hidden md:m-2 md:ml-0 md:rounded-2xl bg-[#eceae6] shadow-sm flex flex-col relative z-10">
-        {children}
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-400 border-t-gray-800"></div></div>}>
+          {children}
+        </Suspense>
       </main>
 
       {/* Command Palette (Ctrl+K / Bottom Pill) */}
