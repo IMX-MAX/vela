@@ -77,6 +77,20 @@ export async function fetchEmailDetails(tokenOrConnectionId, messageId) {
   return await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=full`);
 }
 
+// Fast metadata-only search for AI — uses format=metadata to skip body parsing
+export async function searchEmailsQuick(tokenOrConnectionId, query, maxResults = 5) {
+  const url = `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=${maxResults}&q=${encodeURIComponent(query)}`;
+  const data = await makeGmailRequest(tokenOrConnectionId, url);
+  if (!data || !data.messages) return [];
+
+  const details = await Promise.all(
+    data.messages.map((msg) =>
+      makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`)
+    )
+  );
+  return details;
+}
+
 export async function sendEmail(tokenOrConnectionId, to, subject, body, htmlBody = null) {
   let rawMessage = "";
 

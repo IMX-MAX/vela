@@ -19,8 +19,9 @@ import {
   Link as LinkIcon
 } from "@phosphor-icons/react";
 import { initiateComposioConnection } from "@/app/composioActions";
+import dynamic from "next/dynamic";
 
-import AiSidebar from "./AiSidebar";
+const CommandPalette = dynamic(() => import("@/components/CommandPalette"), { ssr: false });
 
 import { Suspense } from "react";
 
@@ -194,8 +195,8 @@ export default function InboxLayout({ children }) {
         {children}
       </main>
 
-      {/* AI Sidebar */}
-      <AiSidebar />
+      {/* Command Palette (Ctrl+K) */}
+      <CommandPalette />
     </div>
   );
 }

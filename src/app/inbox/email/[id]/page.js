@@ -10,7 +10,9 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import AiEditor from "@/components/AiEditor";
+import dynamic from "next/dynamic";
+
+const AiEditor = dynamic(() => import("@/components/AiEditor"), { ssr: false });
 
 export default function EmailDetailPage({ params }) {
   const { id } = params;

@@ -83,8 +83,9 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
     
     // Inject system prompt if there is user context, but only if we haven't already
     let updatedMessages = [...messages];
-    if (userContext && !updatedMessages.some(m => m.role === "system")) {
-      updatedMessages = [{ role: "system", content: `You are a helpful AI assistant. User Context: ${userContext}` }, ...updatedMessages];
+    const systemContent = `You are Vela AI, a helpful email assistant. Be concise. When referencing specific emails from search results, always format them as markdown links like [Subject or description](/inbox/email/MESSAGE_ID) so the user can click to view them.${userContext ? ` User Context: ${userContext}` : ""}`;
+    if (!updatedMessages.some(m => m.role === "system")) {
+      updatedMessages = [{ role: "system", content: systemContent }, ...updatedMessages];
     }
     
     const response = await mistral.agents.complete({
@@ -119,13 +120,13 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
       if (toolCall.function.name === "search_inbox") {
         const args = typeof toolCall.function.arguments === 'string' ? JSON.parse(toolCall.function.arguments) : toolCall.function.arguments;
         
-        const { fetchEmails } = await import("@/lib/gmail");
-        const { messages: emails } = await fetchEmails(tokenOrConnectionId, 10, "inbox", args.query);
+        const { searchEmailsQuick } = await import("@/lib/gmail");
+        const emails = await searchEmailsQuick(tokenOrConnectionId, args.query, 8);
         
-        const { parseEmailContent } = await import("@/lib/emailParser");
         const parsedEmails = emails.map(m => {
-          const p = parseEmailContent(m);
-          return `ID: ${m.id}\nDate: ${p.date}\nFrom: ${p.from}\nSubject: ${p.subject}\nSnippet: ${p.snippet}`;
+          const headers = m.payload?.headers || [];
+          const getHeader = (name) => headers.find(h => h.name.toLowerCase() === name.toLowerCase())?.value || "";
+          return `Message ID: ${m.id}\nDate: ${getHeader("Date")}\nFrom: ${getHeader("From")}\nSubject: ${getHeader("Subject")}\nSnippet: ${m.snippet || ""}`;
         }).join("\n\n---\n\n");
 
         const toolResult = parsedEmails || "No emails found.";

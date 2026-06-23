@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import { sendEmail } from "@/lib/gmail";
 import { Paperclip, X, ArrowsOutSimple } from "@phosphor-icons/react";
-import AiEditor from "@/components/AiEditor";
+import dynamic from "next/dynamic";
+
+const AiEditor = dynamic(() => import("@/components/AiEditor"), { ssr: false });
 
 export default function ComposePage() {
   const router = useRouter();
