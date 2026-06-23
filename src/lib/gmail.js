@@ -63,6 +63,9 @@ export async function fetchEmails(tokenOrConnectionId, maxResults = 20, label = 
   }
   
   const data = await makeGmailRequest(tokenOrConnectionId, url);
+  if (data?.error) {
+    throw new Error(data.error.message || JSON.stringify(data.error));
+  }
   if (!data || !data.messages) return { messages: [], nextPageToken: null };
 
   // Fetch details for each message

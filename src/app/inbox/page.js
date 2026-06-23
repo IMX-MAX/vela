@@ -22,6 +22,7 @@ export default function InboxPage() {
   const [needsComposio, setNeedsComposio] = useState(false);
   const [nextPageToken, setNextPageToken] = useState(null);
   const [resolvedToken, setResolvedToken] = useState(null);
+  const [authError, setAuthError] = useState(null);
 
   const observerTarget = useRef(null);
 
@@ -45,10 +46,10 @@ export default function InboxPage() {
           dateStr: parsedContent.date,
         };
       });
-      return { parsed, next: data.nextPageToken };
+      return { parsed, next: data.nextPageToken, error: null };
     } catch (error) {
       console.error("Error fetching emails:", error);
-      return { parsed: [], next: null };
+      return { parsed: [], next: null, error: error.message || "Failed to fetch emails" };
     }
   };
 
@@ -58,7 +59,11 @@ export default function InboxPage() {
       let token = session?.providerAccessToken;
 
       if (session?.provider === 'google') {
-        // Bypass Composio entirely for Google native login
+        if (!token) {
+           setAuthError("No Google access token found. Please ensure 'Store access tokens' is enabled in your Appwrite Google Provider settings, then sign out and sign in again.");
+           setLoading(false);
+           return;
+        }
       } else if (!token && user) {
         const status = await checkComposioStatus(user.$id);
         if (status.connected) {
@@ -78,14 +83,18 @@ export default function InboxPage() {
       if (token) {
         setResolvedToken(token);
         const { fetchGoogleProfile } = await import("@/lib/gmail");
-        const [{ parsed, next }, profile] = await Promise.all([
+        const [{ parsed, next, error }, profile] = await Promise.all([
           fetchEmailBatch(token),
           fetchGoogleProfile(token)
         ]);
         
-        setEmails(parsed);
-        setInboxEmails(parsed);
-        setNextPageToken(next);
+        if (error) {
+          setAuthError(`Gmail API Error: ${error}. Please ensure you checked all permission boxes during Google sign-in.`);
+        } else {
+          setEmails(parsed);
+          setInboxEmails(parsed);
+          setNextPageToken(next);
+        }
         
         if (profile) {
           useAuthStore.getState().setGoogleProfile(profile);
@@ -264,7 +273,19 @@ export default function InboxPage() {
               </div>
             )}
             
-            {emails.length === 0 && (
+            {authError && (
+              <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+                <p className="text-red-500 font-medium max-w-md text-center">{authError}</p>
+                <button 
+                  onClick={async () => { await useAuthStore.getState().logout(); window.location.href = "/login"; }} 
+                  className="mt-6 px-5 py-2.5 bg-gray-900 text-white hover:bg-black transition rounded-lg text-sm font-medium"
+                >
+                  Sign out and re-login
+                </button>
+              </div>
+            )}
+            
+            {!authError && emails.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-gray-500">
                 <p>{searchQuery ? "No emails found" : "No messages in Inbox"}</p>
               </div>

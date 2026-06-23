@@ -38,6 +38,7 @@ export default function EmailDetailPage({ params }) {
   const [showAiPrompt, setShowAiPrompt] = useState(false);
 
   const [threadMessages, setThreadMessages] = useState([]);
+  const [authError, setAuthError] = useState(null);
   
   const [showDetails, setShowDetails] = useState(false);
 
@@ -51,7 +52,11 @@ export default function EmailDetailPage({ params }) {
       let token = session?.providerAccessToken;
 
       if (session?.provider === 'google') {
-        // Bypass Composio entirely for Google native login
+        if (!token) {
+           setAuthError("No Google access token found. Please ensure 'Store access tokens' is enabled in your Appwrite Google Provider settings, then sign out and sign in again.");
+           setLoading(false);
+           return;
+        }
       } else if (!token && user) {
         const { checkComposioStatus, getComposioAccessToken } = await import("@/app/composioActions");
         const status = await checkComposioStatus(user.$id);
@@ -110,6 +115,7 @@ export default function EmailDetailPage({ params }) {
         setResolvedToken(token);
       } catch (error) {
         console.error("Error fetching email:", error);
+        setAuthError(`Gmail API Error: ${error.message}. Please ensure you checked all permission boxes during Google sign-in.`);
       } finally {
         setLoading(false);
       }
@@ -235,6 +241,20 @@ export default function EmailDetailPage({ params }) {
     return (
       <div className="flex h-full items-center justify-center bg-[#f4f3f0] rounded-2xl">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-400 border-t-gray-800"></div>
+      </div>
+    );
+  }
+
+  if (authError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full bg-[#f4f3f0] rounded-2xl p-8">
+        <p className="text-red-500 font-medium max-w-md text-center">{authError}</p>
+        <button 
+          onClick={async () => { await useAuthStore.getState().logout(); window.location.href = "/login"; }} 
+          className="mt-6 px-5 py-2.5 bg-gray-900 text-white hover:bg-black transition rounded-lg text-sm font-medium"
+        >
+          Sign out and re-login
+        </button>
       </div>
     );
   }
