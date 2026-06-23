@@ -73,11 +73,11 @@ export default function LandingPage() {
           </div>
           
           <h1 className="text-5xl md:text-[5.5rem] font-medium tracking-[-0.03em] text-white leading-[1.05] mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            The next generation of<br />email is here.
+            The next generation<br />AI email client is here.
           </h1>
           
           <p className="text-lg md:text-xl text-gray-400 max-w-lg leading-relaxed mb-10 animate-fade-in-up font-light" style={{ animationDelay: '0.15s' }}>
-            Vela is an AI-native email client spearheading UI and AI in email. Experience the fastest email workflow, built for speed, clarity, and deep focus. Fly through your inbox and reclaim hours of your week.
+            Vela is the ultimate AI email client spearheading UI and AI in email. Experience the fastest email workflow, built for speed, clarity, and deep focus. Fly through your inbox and reclaim hours of your week.
           </p>
           
           <div className="flex flex-wrap items-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
@@ -237,9 +237,9 @@ export default function LandingPage() {
           
           <div className="space-y-8">
             <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6 md:p-8">
-              <h3 className="text-xl font-medium text-white mb-3">Is Vela a replacement for my current email provider?</h3>
+              <h3 className="text-xl font-medium text-white mb-3">Why is Vela the best AI email client for my workflow?</h3>
               <p className="text-gray-400 leading-relaxed text-sm">
-                No, Vela is a modern email client that connects securely to your existing Gmail account. You keep your current email address while benefiting from Vela's blazing fast interface and AI tools. If you are looking for tools similar to Vela, check out our comprehensive <Link href="/resources/vs-the-world" className="text-emerald-400 hover:underline">Vela vs The World</Link> comparison to see how we stack up against other modern clients.
+                Vela is a modern AI email client that connects securely to your existing Gmail account. You keep your current email address while benefiting from Vela's blazing fast interface and AI tools. If you are looking for tools similar to Vela, check out our comprehensive <Link href="/resources/vs-the-world" className="text-emerald-400 hover:underline">Vela vs The World</Link> comparison to see how we stack up against other modern clients.
               </p>
             </div>
             

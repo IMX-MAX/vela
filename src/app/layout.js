@@ -1,15 +1,16 @@
 import "./app.css";
 
 export const metadata = {
-  title: "Vela | The fastest email client and experience",
-  description: "Vela is a fast, modern email client spearheading UI and AI in email. Experience the fastest email workflow.",
+  title: "Vela | The Fastest AI Email Client",
+  description: "Vela is a fast, modern AI email client spearheading UI and artificial intelligence in email. Experience the fastest email workflow.",
+  keywords: ["vela", "ai email client", "email client", "AI email", "fast email client"],
   icons: {
     icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "Vela | The fastest email client and experience",
-    description: "Vela is a fast, modern email client spearheading UI and AI in email.",
+    title: "Vela | The Fastest AI Email Client",
+    description: "Vela is a fast, modern AI email client spearheading UI and artificial intelligence in email.",
     url: "https://vela.nafen.sbs",
     siteName: "Vela",
     locale: "en_US",
