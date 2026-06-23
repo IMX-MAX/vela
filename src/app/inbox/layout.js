@@ -24,8 +24,6 @@ import dynamic from "next/dynamic";
 
 const CommandPalette = dynamic(() => import("@/components/CommandPalette"), { ssr: false });
 
-import { Suspense } from "react";
-
 function SidebarNavigation() {
   const searchParams = useSearchParams();
   const pathname = usePathname();

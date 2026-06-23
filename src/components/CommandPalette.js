@@ -377,10 +377,10 @@ export default function CommandPalette() {
 
       <div 
         ref={containerRef}
-        className={`fixed z-[100] bottom-4 left-4 right-4 md:bottom-8 md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[680px] 
-          bg-white/70 backdrop-blur-2xl border border-white/50 shadow-2xl overflow-hidden flex flex-col-reverse transition-all duration-300 ease-out
+        className={`fixed z-[100] bottom-4 left-4 right-4 md:bottom-auto md:top-[15vh] md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[680px] 
+          bg-white/70 md:bg-[#eceae6] backdrop-blur-2xl md:backdrop-blur-none border border-white/50 md:border-[#d0cfcb] shadow-2xl overflow-hidden flex flex-col-reverse md:flex-col transition-all duration-300 ease-out
           ${!isOpen ? "flex md:hidden" : "flex"}
-          ${isOpen ? "rounded-3xl" : "rounded-[28px]"}
+          ${isOpen ? "rounded-3xl md:rounded-2xl" : "rounded-[28px] md:rounded-2xl"}
         `}
         style={{ 
           maxHeight: isOpen ? '75vh' : '56px',
@@ -388,7 +388,7 @@ export default function CommandPalette() {
         }}
       >
         {/* Input Area */}
-        <div className={`h-[56px] flex-shrink-0 flex items-center gap-3 px-5 transition-colors duration-300 ${isOpen ? "bg-white/50 border-t border-white/40" : "bg-transparent"}`}>
+        <div className={`h-[56px] flex-shrink-0 flex items-center gap-3 px-5 transition-colors duration-300 ${isOpen ? "bg-white/50 md:bg-transparent border-t md:border-t-0 md:border-b border-white/40 md:border-[#dddcdc]" : "bg-transparent"}`}>
           {mode === "ai" && (
             <button 
               onClick={handleBack}
