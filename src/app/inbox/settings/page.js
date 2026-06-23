@@ -17,6 +17,7 @@ export default function SettingsPage() {
   const [userName, setUserName] = useState("");
   const [jobName, setJobName] = useState("");
   const [company, setCompany] = useState("");
+  const [writingStyle, setWritingStyle] = useState("");
   
   const [composioStatus, setComposioStatus] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -27,6 +28,7 @@ export default function SettingsPage() {
       if (user.prefs) {
         setJobName(user.prefs.jobName || "");
         setCompany(user.prefs.company || "");
+        setWritingStyle(user.prefs.writingStyle || "");
       }
       
       checkComposioStatus(user.$id).then(status => {
@@ -51,7 +53,8 @@ export default function SettingsPage() {
       await account.updatePrefs({
         ...user.prefs,
         jobName,
-        company
+        company,
+        writingStyle
       });
       await checkAuth();
     } catch (error) {
@@ -101,22 +104,12 @@ export default function SettingsPage() {
           >
             Connected accounts
           </div>
-          <div className="px-3 py-1.5 rounded-lg font-medium text-gray-600 hover:bg-[#c7d4ce]/50 cursor-pointer transition">
-            Preferences
+          <div 
+            className={`px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'context' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
+            onClick={() => setTab('context')}
+          >
+            AI Context
           </div>
-        </div>
-        
-        <div className="flex flex-col gap-0.5">
-          <div className="text-[12px] font-semibold text-gray-400 px-2 mb-1">Features</div>
-          <div className="px-3 py-1.5 rounded-lg font-medium text-gray-600 hover:bg-[#c7d4ce]/50 cursor-pointer transition">Labels</div>
-          <div className="px-3 py-1.5 rounded-lg font-medium text-gray-600 hover:bg-[#c7d4ce]/50 cursor-pointer transition">Blocked senders</div>
-        </div>
-        
-        <div className="flex flex-col gap-0.5">
-          <div className="text-[12px] font-semibold text-gray-400 px-2 mb-1">Organization</div>
-          <div className="px-3 py-1.5 rounded-lg font-medium text-gray-600 hover:bg-[#c7d4ce]/50 cursor-pointer transition">Workspace</div>
-          <div className="px-3 py-1.5 rounded-lg font-medium text-gray-600 hover:bg-[#c7d4ce]/50 cursor-pointer transition">Members</div>
-          <div className="px-3 py-1.5 rounded-lg font-medium text-gray-600 hover:bg-[#c7d4ce]/50 cursor-pointer transition">Billing</div>
         </div>
       </div>
 
@@ -160,8 +153,19 @@ export default function SettingsPage() {
                 />
               </div>
 
+            </div>
+
+          </div>
+        )}
+
+        {tab === 'context' && (
+          <div className="max-w-2xl">
+            <h1 className="text-2xl font-medium text-[#2b323b] mb-8">AI Context</h1>
+            
+            <h2 className="text-[15px] font-medium text-gray-800 mb-3">Professional identity</h2>
+            <div className="bg-[#eceae6] rounded-xl border border-[#dddcdc]/60 p-6 mb-10 shadow-sm">
               <div className="mb-6">
-                <label className="block text-[13px] font-medium text-gray-800 mb-2">Job Title (AI Context)</label>
+                <label className="block text-[13px] font-medium text-gray-800 mb-2">Job Title</label>
                 <input
                   type="text"
                   value={jobName}
@@ -173,7 +177,7 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="block text-[13px] font-medium text-gray-800 mb-2">Company (AI Context)</label>
+                <label className="block text-[13px] font-medium text-gray-800 mb-2">Company</label>
                 <input
                   type="text"
                   value={company}
@@ -185,13 +189,23 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <h2 className="text-[15px] font-medium text-gray-800 mb-3">Workspace access</h2>
-            <div className="bg-[#eceae6] rounded-xl border border-[#dddcdc]/60 p-6 shadow-sm flex items-center justify-between">
-              <span className="text-[#2b323b] font-medium text-[14px]">Remove yourself from the workspace.</span>
-              <button className="px-4 py-1.5 bg-white border border-[#dddcdc] rounded-md text-[13px] font-medium text-gray-800 hover:bg-gray-50 transition shadow-sm">
-                Leave workspace
-              </button>
+            <h2 className="text-[15px] font-medium text-gray-800 mb-3">Dynamic profiling</h2>
+            <div className="bg-[#eceae6] rounded-xl border border-[#dddcdc]/60 p-6 shadow-sm">
+              <div>
+                <label className="block text-[13px] font-medium text-gray-800 mb-2">Writing style</label>
+                <p className="text-[13px] text-gray-500 mb-4 leading-relaxed">
+                  The AI automatically updates this profile as you send emails. You can manually edit it to fine-tune how the AI drafts emails for you.
+                </p>
+                <textarea
+                  value={writingStyle}
+                  onChange={(e) => setWritingStyle(e.target.value)}
+                  onBlur={handleSavePrefs}
+                  placeholder="e.g. Casual but professional. Always signs off with 'Cheers'."
+                  className="w-full bg-transparent border border-[#dddcdc] rounded-md px-3 py-2 text-[14px] text-[#2b323b] outline-none focus:border-gray-400 transition min-h-[120px] resize-y"
+                />
+              </div>
             </div>
+
           </div>
         )}
 

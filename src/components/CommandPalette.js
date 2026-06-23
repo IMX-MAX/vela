@@ -8,6 +8,7 @@ import { ArrowLeft, MagnifyingGlass, Sparkle, Envelope, ArrowRight, Gear, Tray, 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
+import AiComposeBox from "./AiComposeBox";
 
 export default function CommandPalette() {
   const router = useRouter();
@@ -227,8 +228,14 @@ export default function CommandPalette() {
 
     try {
       let context = "";
+      if (user?.name) {
+        context += `Name: ${user.name}. `;
+      }
       if (user?.prefs) {
-        context = `Job Title: ${user.prefs.jobName || 'Unknown'}, Company: ${user.prefs.company || 'Unknown'}`;
+        context += `Job Title: ${user.prefs.jobName || 'Unknown'}, Company: ${user.prefs.company || 'Unknown'}. `;
+        if (user.prefs.writingStyle) {
+          context += `Writing Style: ${user.prefs.writingStyle}`;
+        }
       }
       
       const responseContent = await chatWithAiAction(newHistory, resolvedToken, context);
@@ -286,8 +293,8 @@ export default function CommandPalette() {
     setInput("");
   };
 
-  // Custom renderer to turn email references into clickable links
-  const renderAiContent = (content) => {
+  // Custom renderer to turn email references into clickable links and render draft emails
+  const renderAiContent = (content, msgIdx) => {
     return (
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
@@ -309,6 +316,33 @@ export default function CommandPalette() {
               );
             }
             return <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline" {...props}>{children}</a>;
+          },
+          code: ({ node, inline, className, children, ...props }) => {
+            const match = /language-(\w+)/.exec(className || '');
+            if (!inline && match && match[1] === 'draft-email') {
+              try {
+                const draftData = JSON.parse(String(children).replace(/\n$/, ''));
+                return (
+                  <AiComposeBox
+                    initialTo={draftData.to}
+                    initialSubject={draftData.subject}
+                    initialBody={draftData.body}
+                    resolvedToken={resolvedToken}
+                    onDiscard={() => {
+                      // Optionally we could remove the draft from history, but here we'll just clear the component by tricking state
+                      // Actually, let's update chatHistory to remove this block or replace it.
+                      const updatedHistory = [...chatHistory];
+                      const msg = updatedHistory[msgIdx];
+                      msg.content = msg.content.replace(new RegExp(`\`\`\`draft-email[\\s\\S]*?\`\`\``), "_Draft discarded._");
+                      setChatHistory(updatedHistory);
+                    }}
+                  />
+                );
+              } catch (e) {
+                return <code className={className} {...props}>{children}</code>;
+              }
+            }
+            return <code className={className} {...props}>{children}</code>;
           }
         }}
       >
@@ -383,7 +417,7 @@ export default function CommandPalette() {
                   ) : (
                     <div className="flex flex-col gap-3">
                       <div className="prose prose-sm prose-gray max-w-none text-[14px] leading-relaxed text-gray-800">
-                        {renderAiContent(msg.content)}
+                        {renderAiContent(msg.content, idx)}
                       </div>
                     </div>
                   )}

@@ -31,6 +31,22 @@ export default function ComposePage() {
     setIsSending(true);
     try {
       await sendEmail(session.providerAccessToken, to, subject, bodyText || body, body);
+      
+      // Background Profiling
+      const user = useAuthStore.getState().user;
+      if (user) {
+        import("@/app/actions").then(({ analyzeWritingStyleAction }) => {
+          const currentStyle = user.prefs?.writingStyle || "";
+          analyzeWritingStyleAction(bodyText || body, currentStyle).then(async (newStyle) => {
+            if (newStyle && newStyle !== currentStyle) {
+              const { account } = await import("@/lib/appwrite");
+              await account.updatePrefs({ ...user.prefs, writingStyle: newStyle });
+              useAuthStore.getState().checkAuth(); // Refresh user state
+            }
+          });
+        });
+      }
+
       router.push("/inbox");
     } catch (error) {
       console.error("Failed to send email", error);

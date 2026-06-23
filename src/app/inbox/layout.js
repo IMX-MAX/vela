@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/lib/store";
 import { 
@@ -16,7 +16,8 @@ import {
   MagnifyingGlass, 
   PencilSimple,
   SignOut,
-  Link as LinkIcon
+  Link as LinkIcon,
+  AddressBook
 } from "@phosphor-icons/react";
 import { initiateComposioConnection } from "@/app/composioActions";
 import dynamic from "next/dynamic";
@@ -27,18 +28,20 @@ import { Suspense } from "react";
 
 function SidebarNavigation() {
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const currentFilter = searchParams.get("filter") || "inbox";
   const inboxEmails = useAuthStore((state) => state.inboxEmails);
   const unreadCount = inboxEmails ? inboxEmails.filter((e) => e.isUnread).length : 0;
 
   const navItems = [
-    { label: "Inbox", icon: Tray, href: "/inbox", count: unreadCount > 0 ? unreadCount : null, active: currentFilter === "inbox" },
-    { label: "Starred", icon: Star, href: "/inbox?filter=starred", active: currentFilter === "starred" },
-    { label: "Sent", icon: PaperPlaneRight, href: "/inbox?filter=sent", active: currentFilter === "sent" },
-    { label: "Drafts", icon: FileText, href: "/inbox?filter=drafts", active: currentFilter === "drafts" },
-    { label: "Done", icon: CheckCircle, href: "/inbox?filter=done", active: currentFilter === "done" },
-    { label: "Spam", icon: WarningOctagon, href: "/inbox?filter=spam", active: currentFilter === "spam" },
-    { label: "Trash", icon: Trash, href: "/inbox?filter=trash", active: currentFilter === "trash" },
+    { label: "Inbox", icon: Tray, href: "/inbox", count: unreadCount > 0 ? unreadCount : null, active: currentFilter === "inbox" && !searchParams.get("contacts") && pathname === "/inbox" },
+    { label: "Starred", icon: Star, href: "/inbox?filter=starred", active: currentFilter === "starred" && pathname === "/inbox" },
+    { label: "Sent", icon: PaperPlaneRight, href: "/inbox?filter=sent", active: currentFilter === "sent" && pathname === "/inbox" },
+    { label: "Drafts", icon: FileText, href: "/inbox?filter=drafts", active: currentFilter === "drafts" && pathname === "/inbox" },
+    { label: "Done", icon: CheckCircle, href: "/inbox?filter=done", active: currentFilter === "done" && pathname === "/inbox" },
+    { label: "Spam", icon: WarningOctagon, href: "/inbox?filter=spam", active: currentFilter === "spam" && pathname === "/inbox" },
+    { label: "Trash", icon: Trash, href: "/inbox?filter=trash", active: currentFilter === "trash" && pathname === "/inbox" },
+    { label: "Contacts", icon: AddressBook, href: "/inbox/contacts", active: pathname.startsWith("/inbox/contacts") },
   ];
 
   return (
