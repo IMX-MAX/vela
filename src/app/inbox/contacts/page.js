@@ -121,18 +121,22 @@ export default function ContactsPage() {
 
   return (
     <div className="flex flex-col h-full bg-[#eceae6] relative">
-      <div className="px-8 py-6 border-b border-gray-200/50 bg-[#eceae6] flex justify-between items-center shrink-0 z-10 sticky top-0">
-        <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Contacts</h1>
+      <div className="h-14 border-b border-[#dddcdc] flex justify-between items-center px-6 sticky top-0 bg-[#eceae6]/90 backdrop-blur-sm z-10 rounded-t-2xl">
+        <div className="flex items-center gap-3">
+          <div className="bg-white px-3 py-1.5 rounded-md text-sm font-medium shadow-sm flex items-center gap-2">
+            Contacts
+          </div>
+        </div>
         <button
           onClick={() => handleOpenModal()}
-          className="flex items-center gap-2 bg-[#2b323b] hover:bg-[#3d4651] text-[#eceae6] px-4 py-2 rounded-xl transition shadow-sm font-medium"
+          className="flex items-center gap-2 bg-[#2b323b] hover:bg-[#3d4651] text-[#eceae6] px-3 py-1.5 rounded-md transition shadow-sm font-medium text-sm"
         >
-          <Plus size={18} weight="bold" />
+          <Plus size={14} weight="bold" />
           <span>Add Contact</span>
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-8">
+      <div className="flex-1 overflow-y-auto">
         {contacts.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-400 space-y-4">
             <User size={64} weight="light" className="opacity-50" />
@@ -145,65 +149,75 @@ export default function ContactsPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {contacts.map((contact) => (
-              <div 
-                key={contact.resourceName}
-                className="bg-white/60 hover:bg-white backdrop-blur-sm p-5 rounded-2xl border border-gray-200/50 shadow-sm hover:shadow-md transition group relative overflow-hidden flex flex-col"
-              >
-                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition flex items-center gap-1">
-                  <button 
-                    onClick={() => handleOpenModal(contact)}
-                    className="p-1.5 text-gray-400 hover:text-[#2b323b] hover:bg-gray-100 rounded-md transition"
-                    title="Edit"
-                  >
-                    <PencilSimple size={16} weight="bold" />
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(contact.resourceName)}
-                    className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition"
-                    title="Delete"
-                  >
-                    <Trash size={16} weight="bold" />
-                  </button>
-                </div>
+          <div className="flex flex-col bg-white min-h-full">
+            {/* List Header */}
+            <div className="flex items-center px-6 py-3 border-b border-[#2b323b]/10 text-[13px] font-medium text-gray-500 sticky top-0 bg-white z-10">
+              <div className="w-[30%] pl-14">Name</div>
+              <div className="w-[25%]">Email</div>
+              <div className="w-[20%]">Phone number</div>
+              <div className="flex-1">Job title and company</div>
+              <div className="w-16"></div>
+            </div>
 
-                <div className="flex items-center gap-4 mb-4">
-                  {contact.photos?.[0]?.url && !contact.photos[0].default ? (
-                    <img src={contact.photos[0].url} alt="Profile" className="h-12 w-12 rounded-full object-cover shrink-0" />
-                  ) : (
-                    <div className="h-12 w-12 rounded-full bg-[#c7d4ce] flex items-center justify-center text-[#2b323b] font-semibold text-lg shrink-0">
-                      {contact.names?.[0]?.givenName?.charAt(0)?.toUpperCase() || "U"}
-                    </div>
-                  )}
-                  <div className="overflow-hidden">
-                    <h3 className="font-semibold text-gray-800 text-lg truncate">
-                      {contact.names?.[0]?.givenName || ""} {contact.names?.[0]?.familyName || ""}
-                    </h3>
-                    {(contact.organizations?.[0]?.title || contact.organizations?.[0]?.name) && (
-                      <p className="text-[13px] text-gray-500 truncate">
-                        {contact.organizations?.[0]?.title} {contact.organizations?.[0]?.title && contact.organizations?.[0]?.name ? 'at' : ''} {contact.organizations?.[0]?.name}
-                      </p>
+            {/* List Items */}
+            {contacts.map((contact) => {
+              const hasName = !!(contact.names?.[0]?.givenName || contact.names?.[0]?.familyName);
+              const displayName = hasName 
+                ? `${contact.names[0].givenName || ""} ${contact.names[0].familyName || ""}`.trim()
+                : contact.emailAddresses?.[0]?.value?.split('@')[0] || "Unknown";
+              
+              const avatarLetter = displayName.charAt(0).toUpperCase();
+              const jobStr = `${contact.organizations?.[0]?.title || ""} ${contact.organizations?.[0]?.title && contact.organizations?.[0]?.name ? 'at' : ''} ${contact.organizations?.[0]?.name || ""}`.trim();
+
+              return (
+                <div 
+                  key={contact.resourceName}
+                  className="group flex items-center px-6 py-2.5 border-b border-[#2b323b]/5 hover:bg-[#dddcdc]/30 transition-colors"
+                >
+                  <div className="w-[30%] flex items-center gap-4 pr-4">
+                    {contact.photos?.[0]?.url && !contact.photos[0].default ? (
+                      <img src={contact.photos[0].url} alt="Profile" className="h-9 w-9 rounded-full object-cover shrink-0" />
+                    ) : (
+                      <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#c7d4ce] to-[#aebcb6] flex items-center justify-center text-[#2b323b] font-medium text-sm shrink-0">
+                        {avatarLetter}
+                      </div>
                     )}
+                    <span className={`truncate text-[14px] ${hasName ? 'font-medium text-gray-800' : 'text-gray-500'}`}>
+                      {displayName}
+                    </span>
+                  </div>
+
+                  <div className="w-[25%] pr-4 text-[13px] text-gray-600 truncate">
+                    {contact.emailAddresses?.[0]?.value || ""}
+                  </div>
+
+                  <div className="w-[20%] pr-4 text-[13px] text-gray-600 truncate">
+                    {contact.phoneNumbers?.[0]?.value || ""}
+                  </div>
+
+                  <div className="flex-1 text-[13px] text-gray-600 truncate">
+                    {jobStr}
+                  </div>
+
+                  <div className="w-16 flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={() => handleOpenModal(contact)}
+                      className="p-1.5 text-gray-400 hover:text-[#2b323b] transition"
+                      title="Edit"
+                    >
+                      <PencilSimple size={16} weight="bold" />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(contact.resourceName)}
+                      className="p-1.5 text-gray-400 hover:text-red-500 transition"
+                      title="Delete"
+                    >
+                      <Trash size={16} weight="bold" />
+                    </button>
                   </div>
                 </div>
-
-                <div className="space-y-2 mt-auto">
-                  {contact.emailAddresses?.[0]?.value && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <EnvelopeSimple size={16} className="text-gray-400 shrink-0" />
-                      <span className="truncate">{contact.emailAddresses[0].value}</span>
-                    </div>
-                  )}
-                  {contact.phoneNumbers?.[0]?.value && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Phone size={16} className="text-gray-400 shrink-0" />
-                      <span className="truncate">{contact.phoneNumbers[0].value}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
