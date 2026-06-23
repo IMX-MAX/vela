@@ -111,4 +111,22 @@ export async function sendEmail(tokenOrConnectionId, to, subject, body, htmlBody
   });
 }
 
+export async function fetchThreadDetails(tokenOrConnectionId, threadId) {
+  return await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/threads/${threadId}?format=full`);
+}
 
+export async function trashEmail(tokenOrConnectionId, messageId) {
+  return await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}/trash`, {
+    method: "POST"
+  });
+}
+
+export async function doneEmail(tokenOrConnectionId, messageId) {
+  return await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}/modify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ removeLabelIds: ["INBOX"] })
+  });
+}

@@ -8,6 +8,8 @@ import { summarizeEmailAction, draftReplyAction } from "@/app/actions";
 import { ArrowLeft, Sparkle, PaperPlaneRight, CaretDown } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function EmailDetailPage({ params }) {
   const { id } = params;
@@ -31,6 +33,8 @@ export default function EmailDetailPage({ params }) {
   const [aiPrompt, setAiPrompt] = useState("");
   const [showAiPrompt, setShowAiPrompt] = useState(false);
 
+  const [threadMessages, setThreadMessages] = useState([]);
+
   useEffect(() => {
     async function load() {
       let token = session?.providerAccessToken;
@@ -53,23 +57,33 @@ export default function EmailDetailPage({ params }) {
 
       try {
         const rawMsg = await fetchEmailDetails(token, id);
-        const parsed = parseEmailContent(rawMsg);
+        const { fetchThreadDetails } = await import("@/lib/gmail");
+        const threadData = await fetchThreadDetails(token, rawMsg.threadId);
         
-        let senderName = parsed.from;
-        let senderEmail = "";
-        if (senderName.includes("<")) {
-          const parts = senderName.split("<");
-          senderName = parts[0].replace(/"/g, "").trim();
-          senderEmail = parts[1].replace(">", "").trim();
-        }
-
-        setEmail({
-          ...parsed,
-          senderName,
-          senderEmail: senderEmail || parsed.from,
-          rawTo: parsed.from
+        const parsedMsgs = (threadData.messages || [rawMsg]).map(msg => {
+          const parsed = parseEmailContent(msg);
+          let senderName = parsed.from;
+          let senderEmail = "";
+          if (senderName && senderName.includes("<")) {
+            const parts = senderName.split("<");
+            senderName = parts[0].replace(/"/g, "").trim();
+            senderEmail = parts[1].replace(">", "").trim();
+          }
+          return {
+            ...parsed,
+            senderName,
+            senderEmail: senderEmail || parsed.from,
+            rawTo: parsed.from,
+            id: msg.id
+          };
         });
-        
+
+        const targetIndex = parsedMsgs.findIndex(m => m.id === id);
+        const mainMsg = targetIndex !== -1 ? parsedMsgs[targetIndex] : parsedMsgs[parsedMsgs.length - 1];
+        const previousMsgs = targetIndex !== -1 ? parsedMsgs.slice(0, targetIndex) : parsedMsgs.slice(0, -1);
+
+        setEmail(mainMsg);
+        setThreadMessages(previousMsgs);
         setResolvedToken(token);
       } catch (error) {
         console.error("Error fetching email:", error);
@@ -115,8 +129,53 @@ export default function EmailDetailPage({ params }) {
     
     const result = await summarizeEmailAction(email.body || email.snippet, context);
     setSummary(result);
+    
+    const { saveSummary } = await import("@/lib/db");
+    await saveSummary(id, result);
+    
     setIsSummarizing(false);
   };
+
+  useEffect(() => {
+    async function loadSummary() {
+      const { getSummary } = await import("@/lib/db");
+      const cached = await getSummary(id);
+      if (cached) {
+        setSummary(cached);
+      }
+    }
+    loadSummary();
+  }, [id]);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      // Don't trigger if user is typing in an input or textarea
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.isContentEditable) {
+        return;
+      }
+      
+      const { inboxEmails } = useAuthStore.getState();
+      if (!inboxEmails || inboxEmails.length === 0) return;
+      
+      const currentIndex = inboxEmails.findIndex(e => e.id === id);
+      if (currentIndex === -1) return;
+
+      if (e.key === "j") {
+        e.preventDefault();
+        if (currentIndex < inboxEmails.length - 1) {
+          router.push(`/inbox/email/${inboxEmails[currentIndex + 1].id}`);
+        }
+      } else if (e.key === "k") {
+        e.preventDefault();
+        if (currentIndex > 0) {
+          router.push(`/inbox/email/${inboxEmails[currentIndex - 1].id}`);
+        }
+      }
+    };
+    
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [id, router]);
 
   const handleDraftReply = async () => {
     if (!email) return;
@@ -178,6 +237,23 @@ export default function EmailDetailPage({ params }) {
       <div className="max-w-4xl mx-auto w-full px-8 pb-12 pt-4">
         <h1 className="text-2xl font-medium text-gray-900 mb-8 text-center">{email.subject}</h1>
         
+        {/* Thread History (Collapsed) */}
+        {threadMessages.map((msg, idx) => (
+          <div key={idx} className="bg-[#f0ece9] rounded-xl shadow-sm border border-[#e4e3e0] overflow-hidden mb-4 p-4 flex items-center justify-between opacity-80 hover:opacity-100 transition cursor-pointer" onClick={() => router.push(`/inbox/email/${msg.id}`)}>
+            <div className="flex items-center gap-3">
+              <div className="font-medium text-[14px] text-gray-900">
+                {msg.senderName}
+              </div>
+              <div className="text-[13px] text-gray-500 truncate max-w-md">
+                {msg.snippet}
+              </div>
+            </div>
+            <div className="text-[13px] text-gray-400">
+              {msg.date ? format(new Date(msg.date), "MMM d") : ""}
+            </div>
+          </div>
+        ))}
+
         {/* Email Card (Tatem Style) */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
           
@@ -257,8 +333,10 @@ export default function EmailDetailPage({ params }) {
                 <Sparkle size={14} weight="fill" className="text-gray-600" />
                 AI Summary
               </div>
-              <div className="text-[14px] text-gray-600 whitespace-pre-wrap leading-relaxed">
-                {summary}
+              <div className="text-[14px] text-gray-600 whitespace-pre-wrap leading-relaxed prose prose-sm prose-gray max-w-none">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {summary}
+                </ReactMarkdown>
               </div>
             </div>
           )}

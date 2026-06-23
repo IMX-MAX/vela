@@ -6,10 +6,25 @@ export const useAuthStore = create((set) => ({
   session: null,
   loading: true,
   isAiSidebarOpen: false,
+  aiSidebarWidth: 320,
   chatHistory: [],
+  savedChats: [],
+  inboxEmails: [],
+  setInboxEmails: (emails) => set({ inboxEmails: emails }),
+  setAiSidebarWidth: (width) => set({ aiSidebarWidth: width }),
   toggleAiSidebar: () => set((state) => ({ isAiSidebarOpen: !state.isAiSidebarOpen })),
   addChatMessage: (message) => set((state) => ({ chatHistory: [...state.chatHistory, message] })),
   setChatHistory: (history) => set({ chatHistory: history }),
+  saveCurrentChat: () => set((state) => {
+    if (state.chatHistory.length === 0) return state;
+    const newChat = { id: Date.now(), title: state.chatHistory[0].content.substring(0, 30) + '...', messages: [...state.chatHistory] };
+    return { savedChats: [newChat, ...state.savedChats], chatHistory: [] };
+  }),
+  clearChat: () => set({ chatHistory: [] }),
+  loadChat: (id) => set((state) => {
+    const chat = state.savedChats.find(c => c.id === id);
+    return chat ? { chatHistory: chat.messages } : state;
+  }),
   checkAuth: async () => {
     try {
       const user = await account.get();

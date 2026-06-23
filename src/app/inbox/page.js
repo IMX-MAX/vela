@@ -15,7 +15,7 @@ export default function InboxPage() {
   const filter = searchParams.get("filter") || "inbox";
   const searchQuery = searchParams.get("search");
   
-  const { session, user } = useAuthStore();
+  const { session, user, setInboxEmails } = useAuthStore();
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -77,6 +77,7 @@ export default function InboxPage() {
         setResolvedToken(token);
         const { parsed, next } = await fetchEmailBatch(token);
         setEmails(parsed);
+        setInboxEmails(parsed);
         setNextPageToken(next);
       }
       setLoading(false);
@@ -85,16 +86,36 @@ export default function InboxPage() {
     if (session) {
       initInbox();
     }
-  }, [session, user, filter, searchQuery]);
+  }, [session, user, filter, searchQuery, setInboxEmails]);
 
   const handleLoadMore = useCallback(async () => {
     if (loadingMore || !nextPageToken || !resolvedToken) return;
     setLoadingMore(true);
     const { parsed, next } = await fetchEmailBatch(resolvedToken, nextPageToken);
-    setEmails((prev) => [...prev, ...parsed]);
+    setEmails((prev) => {
+      const newEmails = [...prev, ...parsed];
+      setInboxEmails(newEmails);
+      return newEmails;
+    });
     setNextPageToken(next);
     setLoadingMore(false);
-  }, [loadingMore, nextPageToken, resolvedToken, filter, searchQuery]);
+  }, [loadingMore, nextPageToken, resolvedToken, filter, searchQuery, setInboxEmails]);
+
+  const handleDone = async (e, id) => {
+    e.stopPropagation();
+    setEmails(emails.filter(email => email.id !== id));
+    setInboxEmails(emails.filter(email => email.id !== id));
+    const { doneEmail } = await import("@/lib/gmail");
+    await doneEmail(resolvedToken, id);
+  };
+
+  const handleTrash = async (e, id) => {
+    e.stopPropagation();
+    setEmails(emails.filter(email => email.id !== id));
+    setInboxEmails(emails.filter(email => email.id !== id));
+    const { trashEmail } = await import("@/lib/gmail");
+    await trashEmail(resolvedToken, id);
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -215,9 +236,8 @@ export default function InboxPage() {
                 
                 <div className="flex-shrink-0 ml-4 flex items-center w-24 justify-end">
                   <div className="hidden group-hover:flex items-center gap-2 text-gray-500">
-                    <button className="hover:text-gray-900"><Check size={16} /></button>
-                    <button className="hover:text-gray-900"><Trash size={16} /></button>
-                    <button className="hover:text-gray-900"><Command size={16} /></button>
+                    <button onClick={(e) => handleDone(e, email.id)} className="hover:text-gray-900"><Check size={16} /></button>
+                    <button onClick={(e) => handleTrash(e, email.id)} className="hover:text-gray-900"><Trash size={16} /></button>
                   </div>
                   <div className={`group-hover:hidden text-[12px] ${email.isUnread ? "font-medium text-gray-900" : "text-gray-500"}`}>
                     {formatTime(email.dateStr)}

@@ -122,15 +122,41 @@ export default function InboxLayout({ children }) {
           </div>
           
           {isProfileOpen && (
-            <div className="absolute top-10 left-5 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden text-sm">
-              <div className="px-4 py-3 border-b border-gray-100">
+            <div className="absolute top-10 left-5 w-56 bg-[#eeeae6] border border-[#d0cfcb] rounded-xl shadow-lg z-50 overflow-hidden text-sm">
+              <div className="px-4 py-3 border-b border-[#d0cfcb]">
                 <div className="font-medium text-gray-900 truncate">{user.name}</div>
                 <div className="text-gray-500 text-xs truncate">{user.email}</div>
+              </div>
+              <div className="px-4 py-2 border-b border-[#d0cfcb]">
+                <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Personalize Name</label>
+                <input 
+                  type="text"
+                  placeholder="Your Name"
+                  defaultValue={user.name}
+                  onBlur={async (e) => {
+                    const newName = e.target.value.trim();
+                    if (newName && newName !== user.name) {
+                      const { account } = await import("@/lib/appwrite");
+                      try {
+                        await account.updateName(newName);
+                        await checkAuth(); // refresh user data
+                      } catch (error) {
+                        console.error("Failed to update name", error);
+                      }
+                    }
+                  }}
+                  onKeyDown={async (e) => {
+                    if (e.key === "Enter") {
+                      e.target.blur();
+                    }
+                  }}
+                  className="w-full bg-white text-[13px] text-gray-900 placeholder-gray-500 rounded px-2 py-1 outline-none border border-transparent focus:border-gray-300 transition"
+                />
               </div>
               <Link 
                 href="/inbox/settings"
                 onClick={() => setIsProfileOpen(false)}
-                className="w-full text-left px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition flex items-center gap-2"
+                className="w-full text-left px-4 py-2.5 text-gray-700 hover:bg-[#d0cfcb]/50 transition flex items-center gap-2"
               >
                 <FileText size={16} />
                 Settings
@@ -138,7 +164,7 @@ export default function InboxLayout({ children }) {
               <button 
                 onClick={handleManageConnections}
                 disabled={isConnecting}
-                className="w-full text-left px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition flex items-center gap-2"
+                className="w-full text-left px-4 py-2.5 text-gray-700 hover:bg-[#d0cfcb]/50 transition flex items-center gap-2"
               >
                 <LinkIcon size={16} />
                 {isConnecting ? "Connecting..." : "Manage Connections"}
