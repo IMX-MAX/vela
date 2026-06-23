@@ -14,7 +14,7 @@ export async function initiateComposioConnection(userId, callbackUrl) {
     const composio = getComposioClient();
     
     // Check if connection already exists
-    const accounts = await composio.connectedAccounts.list({ userId });
+    const accounts = await composio.connectedAccounts.list({ userIds: [userId] });
     const items = accounts?.items || [];
     const gmailConnection = items.find(c => c.toolkit?.slug === "gmail" && c.status === "ACTIVE");
     
@@ -47,7 +47,7 @@ export async function initiateComposioConnection(userId, callbackUrl) {
 export async function checkComposioStatus(userId) {
   try {
     const composio = getComposioClient();
-    const accounts = await composio.connectedAccounts.list({ userId });
+    const accounts = await composio.connectedAccounts.list({ userIds: [userId] });
     const items = accounts?.items || [];
     const gmailConnection = items.find(c => c.toolkit?.slug === "gmail" && c.status === "ACTIVE");
     
@@ -61,7 +61,7 @@ export async function executeComposioAction(userId, actionName, params = {}) {
   try {
     const composio = getComposioClient();
     // Assuming executeAction takes connectedAccountId
-    const accounts = await composio.connectedAccounts.list({ userId });
+    const accounts = await composio.connectedAccounts.list({ userIds: [userId] });
     const items = accounts?.items || [];
     const gmailConnection = items.find(c => c.toolkit?.slug === "gmail" && c.status === "ACTIVE");
     
@@ -84,7 +84,7 @@ export async function executeComposioAction(userId, actionName, params = {}) {
 export async function getComposioAccessToken(userId) {
   try {
     const composio = getComposioClient();
-    const accounts = await composio.connectedAccounts.list({ userId });
+    const accounts = await composio.connectedAccounts.list({ userIds: [userId] });
     const items = accounts?.items || [];
     const gmailConnection = items.find(c => c.toolkit?.slug === "gmail" && c.status === "ACTIVE");
     
