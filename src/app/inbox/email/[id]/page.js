@@ -38,6 +38,13 @@ export default function EmailDetailPage({ params }) {
   const [showAiPrompt, setShowAiPrompt] = useState(false);
 
   const [threadMessages, setThreadMessages] = useState([]);
+  
+  const [showDetails, setShowDetails] = useState(false);
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    // Optional: could add a toast here
+  };
 
   useEffect(() => {
     async function load() {
@@ -259,7 +266,7 @@ export default function EmailDetailPage({ params }) {
 
 
           {/* Card Header */}
-          <div className="px-8 py-6 flex items-start justify-between border-b border-gray-100">
+          <div className="px-8 py-6 flex items-start justify-between border-b border-gray-100 relative">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-full bg-[#f0f0f0] flex items-center justify-center text-sm font-medium text-gray-700">
                 {email.senderName ? email.senderName[0].toUpperCase() : "U"}
@@ -269,14 +276,53 @@ export default function EmailDetailPage({ params }) {
                   {email.senderName}
                   <span className="text-[13px] font-normal text-gray-400">{email.senderEmail}</span>
                 </div>
-                <div className="text-[13px] text-gray-400">
-                  to me <CaretDown size={12} className="inline" />
+                <div 
+                  className="text-[13px] text-gray-400 cursor-pointer inline-flex items-center gap-1 hover:text-gray-600"
+                  onClick={() => setShowDetails(!showDetails)}
+                >
+                  to me <CaretDown size={12} />
                 </div>
               </div>
             </div>
             <div className="text-[13px] text-gray-400 pt-1">
               {email.date ? format(new Date(email.date), "MMM d, yyyy, h:mm a") : ""}
             </div>
+            
+            {showDetails && (
+              <div className="absolute top-20 left-8 bg-white border border-gray-200 shadow-lg rounded-xl p-4 z-20 w-[400px] text-[13px]">
+                <div 
+                  className="grid grid-cols-[60px_1fr] gap-2 py-1.5 hover:bg-gray-50 cursor-pointer rounded px-2 transition-colors"
+                  onClick={() => copyToClipboard(`From: ${email.senderName} <${email.senderEmail}>`)}
+                >
+                  <span className="text-gray-500">From:</span>
+                  <span className="text-gray-900">{email.senderName} &lt;{email.senderEmail}&gt;</span>
+                </div>
+                <div 
+                  className="grid grid-cols-[60px_1fr] gap-2 py-1.5 hover:bg-gray-50 cursor-pointer rounded px-2 transition-colors"
+                  onClick={() => copyToClipboard(`To: ${email.rawTo || "me"}`)}
+                >
+                  <span className="text-gray-500">To:</span>
+                  <span className="text-gray-900">{email.rawTo || "me"}</span>
+                </div>
+                <div 
+                  className="grid grid-cols-[60px_1fr] gap-2 py-1.5 hover:bg-gray-50 cursor-pointer rounded px-2 transition-colors"
+                  onClick={() => copyToClipboard(`Subject: ${email.subject}`)}
+                >
+                  <span className="text-gray-500">Subject:</span>
+                  <span className="text-gray-900">{email.subject}</span>
+                </div>
+                <div 
+                  className="grid grid-cols-[60px_1fr] gap-2 py-1.5 hover:bg-gray-50 cursor-pointer rounded px-2 transition-colors"
+                  onClick={() => {
+                    const d = email.date ? format(new Date(email.date), "EEEE, MMMM d, yyyy 'at' h:mm a") : "";
+                    copyToClipboard(`Date: ${d}`);
+                  }}
+                >
+                  <span className="text-gray-500">Date:</span>
+                  <span className="text-gray-900">{email.date ? format(new Date(email.date), "EEEE, MMMM d, yyyy 'at' h:mm a") : ""}</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* AI Toolbar within Card */}

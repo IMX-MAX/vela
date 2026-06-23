@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import { chatWithAiAction } from "@/app/actions";
-import { ArrowLeft, MagnifyingGlass, Sparkle, Envelope, ArrowRight } from "@phosphor-icons/react";
+import { ArrowLeft, MagnifyingGlass, Sparkle, Envelope, ArrowRight, Gear } from "@phosphor-icons/react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
@@ -22,6 +22,7 @@ export default function CommandPalette() {
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState("search"); // "search" | "ai"
   const [resolvedToken, setResolvedToken] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
@@ -69,8 +70,13 @@ export default function CommandPalette() {
       // Reset mode when closing
       setMode("search");
       setInput("");
+      setSelectedIndex(0);
     }
   }, [isCommandPaletteOpen]);
+
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [input, mode]);
 
   // Scroll to bottom of messages
   useEffect(() => {
@@ -90,6 +96,47 @@ export default function CommandPalette() {
   }, [isCommandPaletteOpen, closeCommandPalette]);
 
   if (!isCommandPaletteOpen) return null;
+
+  let options = [];
+  if (mode === "search") {
+    if (!input.trim()) {
+      options = savedChats.slice(0, 3).map(chat => ({ type: 'ai_chat', chat, label: chat.title }));
+    } else {
+      const q = input.trim().toLowerCase();
+      
+      if ("search settings".includes(q)) {
+        options.push({ type: 'settings', label: 'Search Settings' });
+      }
+      if ("settings".includes(q)) {
+        options.push({ type: 'settings', label: 'Settings' });
+      }
+      
+      options.push({ type: 'search_emails', label: `Search emails for "${input}"` });
+
+      const matchedChats = savedChats.filter(c => 
+        c.title.toLowerCase().includes(q) || 
+        c.messages?.some(m => m.content?.toLowerCase().includes(q))
+      );
+      matchedChats.slice(0, 5).forEach(chat => {
+        options.push({ type: 'ai_chat', chat, label: chat.title });
+      });
+    }
+  }
+
+  const executeOption = (option) => {
+    if (option.type === 'search_emails') {
+      router.push(`/inbox?search=${encodeURIComponent(input.trim())}`);
+      closeCommandPalette();
+    } else if (option.type === 'settings') {
+      router.push(`/inbox/settings`);
+      closeCommandPalette();
+    } else if (option.type === 'ai_chat') {
+      if (chatHistory.length > 0) saveCurrentChat();
+      loadChat(option.chat.id);
+      setMode("ai");
+      setInput("");
+    }
+  };
 
   const handleSubmit = async () => {
     if (!input.trim()) return;
@@ -125,20 +172,38 @@ export default function CommandPalette() {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Tab' && mode === "search") {
-      e.preventDefault();
-      setMode("ai");
-      return;
-    }
-    if (e.key === 'Tab' && mode === "ai") {
-      e.preventDefault();
-      handleSubmit();
-      return;
-    }
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleSubmit();
-      return;
+    if (mode === "search") {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedIndex(prev => Math.min(prev + 1, options.length - 1));
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedIndex(prev => Math.max(prev - 1, 0));
+        return;
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (options[selectedIndex]) {
+          executeOption(options[selectedIndex]);
+        } else if (input.trim()) {
+          router.push(`/inbox?search=${encodeURIComponent(input.trim())}`);
+          closeCommandPalette();
+        }
+        return;
+      }
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        setMode("ai");
+        return;
+      }
+    } else {
+      if (e.key === 'Tab' || e.key === 'Enter') {
+        e.preventDefault();
+        handleSubmit();
+        return;
+      }
     }
   };
 
@@ -268,7 +333,7 @@ export default function CommandPalette() {
         )}
 
         {/* Footer hints */}
-        {mode === "search" && !input.trim() && (
+        {mode === "search" && !input.trim() && options.length === 0 && (
           <div className="px-5 py-3 border-t border-[#e4e3e0]/50 flex items-center gap-4 text-[12px] text-gray-400">
             <div className="flex items-center gap-1.5">
               <MagnifyingGlass size={13} />
@@ -285,37 +350,31 @@ export default function CommandPalette() {
           </div>
         )}
 
-        {/* Saved Chat History (search mode with input) */}
-        {mode === "search" && input.trim() && savedChats.length > 0 && (() => {
-          const q = input.trim().toLowerCase();
-          const matchedChats = savedChats.filter(c => 
-            c.title.toLowerCase().includes(q) || 
-            c.messages?.some(m => m.content?.toLowerCase().includes(q))
-          );
-          if (matchedChats.length === 0) return null;
-          return (
-            <div className="border-t border-[#e4e3e0]/50 px-5 py-3">
-              <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Chat History</div>
-              <div className="flex flex-col gap-1">
-                {matchedChats.slice(0, 5).map((chat) => (
-                  <button
-                    key={chat.id}
-                    onClick={() => {
-                      if (chatHistory.length > 0) saveCurrentChat();
-                      loadChat(chat.id);
-                      setMode("ai");
-                      setInput("");
-                    }}
-                    className="text-left px-3 py-2 rounded-lg hover:bg-[#e4e3e0]/50 transition flex items-center gap-3 text-[13px]"
-                  >
-                    <Sparkle size={14} className="text-gray-400 flex-shrink-0" />
-                    <span className="text-gray-700 truncate">{chat.title}</span>
-                  </button>
-                ))}
-              </div>
+        {/* Search Options Area */}
+        {mode === "search" && options.length > 0 && (
+          <div className="border-t border-[#e4e3e0]/50 px-5 py-3">
+            <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
+              {!input.trim() ? "Recent AI Chats" : "Suggestions"}
             </div>
-          );
-        })()}
+            <div className="flex flex-col gap-1">
+              {options.map((option, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => executeOption(option)}
+                  className={`text-left px-3 py-2 rounded-lg transition flex items-center gap-3 text-[13px] ${
+                    idx === selectedIndex ? 'bg-[#e4e3e0] text-gray-900' : 'hover:bg-[#e4e3e0]/50 text-gray-700'
+                  }`}
+                  onMouseEnter={() => setSelectedIndex(idx)}
+                >
+                  {option.type === 'ai_chat' && <Sparkle size={14} className="text-gray-400 flex-shrink-0" />}
+                  {option.type === 'search_emails' && <MagnifyingGlass size={14} className="text-gray-400 flex-shrink-0" />}
+                  {option.type === 'settings' && <Gear size={14} className="text-gray-400 flex-shrink-0" />}
+                  <span className="truncate">{option.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <style jsx>{`
