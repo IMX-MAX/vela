@@ -70,12 +70,15 @@ export default function CommandPalette() {
     if (isCommandPaletteOpen) {
       setTimeout(() => inputRef.current?.focus(), 50);
     } else {
-      // Reset mode when closing
+      // Save chat if exists, then reset mode when closing
+      if (useAuthStore.getState().chatHistory.length > 0) {
+        saveCurrentChat();
+      }
       setMode("search");
       setInput("");
       setSelectedIndex(0);
     }
-  }, [isCommandPaletteOpen]);
+  }, [isCommandPaletteOpen, saveCurrentChat]);
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -326,7 +329,7 @@ export default function CommandPalette() {
 
   const handleBack = () => {
     if (chatHistory.length > 0) {
-      clearChat();
+      saveCurrentChat();
     }
     setMode("search");
     setInput("");

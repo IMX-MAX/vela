@@ -6,8 +6,8 @@ export const metadata = {
   description: "Vela is a fast, modern AI email client spearheading UI and artificial intelligence in email. Experience the fastest email workflow.",
   keywords: ["vela", "ai email client", "email client", "AI email", "fast email client"],
   icons: {
-    icon: "/logo.svg",
-    apple: "/logo.svg",
+    icon: "/logo.png",
+    apple: "/logo.png",
   },
   openGraph: {
     title: "Vela | The Fastest AI Email Client",

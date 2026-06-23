@@ -7,6 +7,7 @@ export const useAuthStore = create((set) => ({
   loading: true,
   isCommandPaletteOpen: false,
   chatHistory: [],
+  currentChatId: null,
   savedChats: [],
   inboxEmails: [],
   googleProfile: null,
@@ -17,7 +18,7 @@ export const useAuthStore = create((set) => ({
   openCommandPalette: () => set({ isCommandPaletteOpen: true }),
   addChatMessage: (message) => set((state) => ({ chatHistory: [...state.chatHistory, message] })),
   setChatHistory: (history) => set({ chatHistory: history }),
-  clearChat: () => set({ chatHistory: [] }),
+  clearChat: () => set({ chatHistory: [], currentChatId: null }),
   initSavedChats: async () => {
     const { get } = await import('idb-keyval');
     const chats = await get('savedChats');
@@ -25,14 +26,25 @@ export const useAuthStore = create((set) => ({
   },
   saveCurrentChat: () => set((state) => {
     if (state.chatHistory.length === 0) return state;
-    const newChat = { id: Date.now(), title: state.chatHistory[0].content.substring(0, 30) + '...', messages: [...state.chatHistory] };
-    const newSavedChats = [newChat, ...state.savedChats];
+    
+    let newSavedChats;
+    if (state.currentChatId) {
+      // Update existing chat
+      newSavedChats = state.savedChats.map(c => 
+        c.id === state.currentChatId ? { ...c, messages: [...state.chatHistory] } : c
+      );
+    } else {
+      // Create new chat
+      const newChat = { id: Date.now(), title: state.chatHistory[0].content.substring(0, 30) + '...', messages: [...state.chatHistory] };
+      newSavedChats = [newChat, ...state.savedChats];
+    }
+    
     import('idb-keyval').then(({ set: idbSet }) => idbSet('savedChats', newSavedChats));
-    return { savedChats: newSavedChats, chatHistory: [] };
+    return { savedChats: newSavedChats, chatHistory: [], currentChatId: null };
   }),
   loadChat: (id) => set((state) => {
     const chat = state.savedChats.find(c => c.id === id);
-    return chat ? { chatHistory: chat.messages } : state;
+    return chat ? { chatHistory: chat.messages, currentChatId: id } : state;
   }),
   checkAuth: async () => {
     try {
