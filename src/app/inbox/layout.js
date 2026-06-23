@@ -66,9 +66,8 @@ function SidebarNavigation() {
 
 export default function InboxLayout({ children }) {
   const router = useRouter();
-  const { user, loading, checkAuth, logout, googleProfile } = useAuthStore();
+  const { user, loading, checkAuth, logout, googleProfile, toggleCommandPalette } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     const initAuth = async () => {
@@ -152,7 +151,7 @@ export default function InboxLayout({ children }) {
           )}
           <div className="flex items-center gap-3">
             <button 
-              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              onClick={() => toggleCommandPalette()}
               className="hover:text-gray-800 transition p-1.5 rounded-md hover:bg-[#2b323b]/5"
             >
               <MagnifyingGlass size={18} weight="bold" />
@@ -163,30 +162,7 @@ export default function InboxLayout({ children }) {
           </div>
         </div>
 
-        {isSearchOpen && (
-          <div className="px-5 mb-4">
-            <div className="relative flex items-center">
-              <MagnifyingGlass size={16} className="absolute left-3 text-gray-500" />
-              <input
-                type="text"
-                autoFocus
-                placeholder="Search..."
-                className="w-full bg-[#c7d4ce]/30 text-[13px] text-[#2b323b] placeholder-gray-500 rounded-md pl-9 pr-3 py-1.5 outline-none focus:bg-[#c7d4ce]/50 transition"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && e.target.value.trim()) {
-                    router.push(`/inbox?search=${encodeURIComponent(e.target.value.trim())}`);
-                    setIsSearchOpen(false);
-                  } else if (e.key === 'Enter' && !e.target.value.trim()) {
-                    router.push(`/inbox`);
-                    setIsSearchOpen(false);
-                  } else if (e.key === 'Escape') {
-                    setIsSearchOpen(false);
-                  }
-                }}
-              />
-            </div>
-          </div>
-        )}
+
 
         <Suspense fallback={<nav className="flex-1 space-y-0.5 px-3"></nav>}>
           <SidebarNavigation />
