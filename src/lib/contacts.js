@@ -40,7 +40,7 @@ export async function fetchContacts(tokenOrConnectionId) {
   try {
     const data = await makePeopleRequest(
       tokenOrConnectionId,
-      "https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses,phoneNumbers,organizations,biographies"
+      "https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses,phoneNumbers,organizations,biographies,photos"
     );
     if (data?.error) {
       throw new Error(data.error.message || JSON.stringify(data.error));

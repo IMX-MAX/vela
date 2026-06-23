@@ -1,6 +1,6 @@
 "use server";
 
-import { Composio } from "@composio/core";
+
 
 async function makeGmailRequest(tokenOrConnectionId, url, options = {}) {
   if (tokenOrConnectionId.startsWith("ca_")) {
