@@ -68,9 +68,11 @@ export async function fetchEmails(tokenOrConnectionId, maxResults = 20, label = 
   }
   if (!data || !data.messages) return { messages: [], nextPageToken: null };
 
-  // Fetch details for each message
+  // Fetch metadata-only details for each message to make inbox load lightning fast
   const detailedMessages = await Promise.all(
-    data.messages.map((msg) => fetchEmailDetails(tokenOrConnectionId, msg.id))
+    data.messages.map((msg) =>
+      makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`)
+    )
   );
 
   return { messages: detailedMessages, nextPageToken: data.nextPageToken };
