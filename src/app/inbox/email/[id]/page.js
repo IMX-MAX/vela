@@ -5,7 +5,7 @@ import { useAuthStore } from "@/lib/store";
 import { fetchEmailDetails, sendEmail } from "@/lib/gmail";
 import { parseEmailContent } from "@/lib/emailParser";
 import { summarizeEmailAction, draftReplyAction } from "@/app/actions";
-import { ArrowLeft, Sparkle, PaperPlaneRight, CaretDown } from "@phosphor-icons/react";
+import { ArrowLeft, Sparkle, PaperPlaneRight, CaretDown, CaretUp, Star, Clock, Check, Trash, DotsThree } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
@@ -159,6 +159,30 @@ export default function EmailDetailPage({ params }) {
     }
   }, [email]);
 
+  const handleDone = async () => {
+    if (!resolvedToken) return;
+    const { doneEmail } = await import("@/lib/gmail");
+    await doneEmail(resolvedToken, id);
+    
+    const { inboxEmails, setInboxEmails } = useAuthStore.getState();
+    if (inboxEmails) {
+      setInboxEmails(inboxEmails.filter(e => e.id !== id));
+    }
+    router.push("/inbox");
+  };
+
+  const handleTrash = async () => {
+    if (!resolvedToken) return;
+    const { trashEmail } = await import("@/lib/gmail");
+    await trashEmail(resolvedToken, id);
+    
+    const { inboxEmails, setInboxEmails } = useAuthStore.getState();
+    if (inboxEmails) {
+      setInboxEmails(inboxEmails.filter(e => e.id !== id));
+    }
+    router.push("/inbox");
+  };
+
   const handleSummarize = async () => {
     if (!email) return;
     setIsSummarizing(true);
@@ -280,13 +304,31 @@ export default function EmailDetailPage({ params }) {
   return (
     <div className="flex flex-col h-full bg-[#eeeae6] rounded-2xl relative overflow-y-auto">
       {/* Top Bar */}
-      <div className="h-14 flex items-center px-4 sticky top-0 z-10 rounded-t-2xl">
-        <button 
-          onClick={() => router.back()} 
-          className="p-2 text-gray-500 hover:text-gray-900 transition rounded-md hover:bg-black/5"
-        >
-          <ArrowLeft size={18} />
-        </button>
+      <div className="h-14 flex items-center justify-between px-4 sticky top-0 z-10 rounded-t-2xl bg-[#eeeae6] border-b border-[#e4e3e0]">
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => router.back()} 
+            className="p-2 text-gray-500 hover:text-gray-900 transition rounded-md hover:bg-black/5"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div className="text-[13px] text-gray-400 font-medium ml-2 select-none flex items-center gap-2">
+            <button className="bg-white border border-gray-200 text-gray-500 hover:text-gray-900 transition rounded-md h-7 w-7 flex items-center justify-center">
+               <CaretUp size={14} weight="bold" />
+            </button>
+            <button className="bg-white border border-gray-200 text-gray-500 hover:text-gray-900 transition rounded-md h-7 w-7 flex items-center justify-center">
+               <CaretDown size={14} weight="bold" />
+            </button>
+            <span className="ml-2 font-medium">1 / 9,370</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-4 text-gray-500 pr-2">
+          <button className="hover:text-gray-900 transition"><Star size={18} /></button>
+          <button className="hover:text-gray-900 transition"><Clock size={18} /></button>
+          <button className="hover:text-gray-900 transition" onClick={handleDone}><Check size={18} /></button>
+          <button className="hover:text-gray-900 transition" onClick={handleTrash}><Trash size={18} /></button>
+          <button className="hover:text-gray-900 transition"><DotsThree size={18} weight="bold" /></button>
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto w-full px-8 pb-12 pt-4">
@@ -427,7 +469,7 @@ export default function EmailDetailPage({ params }) {
             {email.htmlBody ? (
               <iframe
                 ref={iframeRef}
-                srcDoc={email.htmlBody}
+                srcDoc={`<base target="_blank" />${email.htmlBody}`}
                 sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin"
                 className="w-full border-none min-h-[300px]"
                 title="Email Content"

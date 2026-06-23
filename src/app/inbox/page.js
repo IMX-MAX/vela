@@ -107,9 +107,7 @@ export default function InboxPage() {
           useAuthStore.getState().setGoogleProfile(profile);
         }
       }
-      if (!useAuthStore.getState().inboxEmails?.length) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
 
     if (session) {

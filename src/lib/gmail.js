@@ -68,9 +68,19 @@ export async function fetchEmails(tokenOrConnectionId, maxResults = 20, label = 
   }
   if (!data || !data.messages) return { messages: [], nextPageToken: null };
 
+  // Group by threadId to prevent showing multiple emails from the same thread
+  const seenThreads = new Set();
+  const uniqueMessages = [];
+  for (const msg of data.messages) {
+    if (!seenThreads.has(msg.threadId)) {
+      seenThreads.add(msg.threadId);
+      uniqueMessages.push(msg);
+    }
+  }
+
   // Fetch metadata-only details for each message to make inbox load lightning fast
   const detailedMessages = await Promise.all(
-    data.messages.map((msg) =>
+    uniqueMessages.map((msg) =>
       makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`)
     )
   );
