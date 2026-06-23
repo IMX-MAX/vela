@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { useAuthStore } from "@/lib/store";
-import { useEffect, useState } from "react";
-import { EnvelopeSimple, Sparkle, Lightning, MagnifyingGlass, ArrowRight } from "@phosphor-icons/react";
+import { useEffect, useState, useRef } from "react";
+import { Sparkle, Lightning, MagnifyingGlass, ArrowRight, Command, EnvelopeSimple, ShieldCheck, Clock } from "@phosphor-icons/react";
 
 export default function LandingPage() {
   const { user, loading, checkAuth } = useAuthStore();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const heroRef = useRef(null);
 
   useEffect(() => {
     checkAuth();
@@ -16,153 +18,243 @@ export default function LandingPage() {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    const handleMouse = (e) => {
+      if (heroRef.current) {
+        const rect = heroRef.current.getBoundingClientRect();
+        setMousePos({
+          x: ((e.clientX - rect.left) / rect.width) * 100,
+          y: ((e.clientY - rect.top) / rect.height) * 100
+        });
+      }
+    };
+    window.addEventListener("mousemove", handleMouse);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("mousemove", handleMouse);
+    };
   }, [checkAuth]);
 
+  const ctaLink = !loading && user ? "/inbox" : "/login";
+  const ctaText = !loading && user ? "Open Inbox" : "Get Started";
+
   return (
-    <div className="min-h-screen bg-[#2b323b] text-white font-[Inter] selection:bg-white selection:text-[#2b323b] overflow-x-hidden">
+    <div className="min-h-screen bg-[#2b323b] text-white font-[Inter] selection:bg-[#50686c] selection:text-white overflow-x-hidden">
       
       {/* Navbar */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-[#2b323b]/80 backdrop-blur-md border-b border-white/10 py-3" : "bg-transparent py-5"}`}>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? "bg-[#2b323b]/90 backdrop-blur-xl border-b border-white/[0.06] py-3" : "bg-transparent py-5"}`}>
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-medium text-lg tracking-tight text-white">
-            <img src="/logo.png" alt="Vela Logo" className="h-6 w-auto rounded-md bg-white p-1" />
-            Vela
+          <div className="flex items-center gap-2.5 font-medium text-base tracking-tight text-white">
+            <img src="/logo.png" alt="Vela Logo" className="h-7 w-auto rounded-lg bg-white p-1 shadow-sm" />
+            <span className="font-semibold">Vela</span>
           </div>
-          <div className="flex items-center gap-4">
-            {!loading && user ? (
-              <Link href="/inbox" className="text-xs font-medium bg-white/10 text-white px-5 py-2 rounded-full hover:bg-white/20 transition backdrop-blur-sm border border-white/10">
-                Go to Inbox
-              </Link>
-            ) : (
-              <Link href="/login" className="text-xs font-medium bg-white/10 text-white px-5 py-2 rounded-full hover:bg-white/20 transition backdrop-blur-sm border border-white/10">
-                Try Vela
-              </Link>
-            )}
+          <div className="flex items-center gap-3">
+            <Link href={ctaLink} className="text-xs font-medium bg-white text-[#2b323b] px-5 py-2 rounded-full hover:bg-gray-100 transition-all duration-200 shadow-sm">
+              {ctaText}
+            </Link>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex flex-col justify-center px-6 max-w-6xl mx-auto">
-        {/* Abstract Gradient Background */}
+      <section ref={heroRef} className="relative min-h-screen flex flex-col justify-center px-6 max-w-6xl mx-auto">
+        {/* Dynamic gradient that follows mouse */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/30 blur-[120px]"></div>
-          <div className="absolute top-[20%] right-[-10%] w-[40%] h-[60%] rounded-full bg-blue-900/20 blur-[120px]"></div>
-          <div className="absolute bottom-[-20%] left-[20%] w-[60%] h-[50%] rounded-full bg-indigo-900/20 blur-[120px]"></div>
-          {/* Gradient fade to bottom */}
-          <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-[#0a0a0a] to-transparent"></div>
+          <div
+            className="absolute w-[600px] h-[600px] rounded-full transition-all duration-[2000ms] ease-out opacity-20"
+            style={{
+              left: `${mousePos.x}%`,
+              top: `${mousePos.y}%`,
+              transform: "translate(-50%, -50%)",
+              background: "radial-gradient(circle, #50686c 0%, transparent 70%)"
+            }}
+          ></div>
+          <div className="absolute top-[-15%] left-[-5%] w-[40%] h-[40%] rounded-full bg-[#50686c]/15 blur-[120px]"></div>
+          <div className="absolute bottom-[-10%] right-[-5%] w-[35%] h-[35%] rounded-full bg-[#50686c]/10 blur-[120px]"></div>
+          {/* Grid overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_at_50%_50%,black_20%,transparent_70%)]"></div>
         </div>
 
         <div className="max-w-3xl pt-20">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 mb-8 animate-fade-in-up backdrop-blur-md">
-            <Sparkle size={14} weight="fill" className="text-purple-400" />
-            Vela Intelligence
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-xs font-medium text-gray-400 mb-10 animate-fade-in-up backdrop-blur-md">
+            <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
+            Now in Beta
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-medium tracking-tight text-white leading-[1.1] mb-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            The email experience<br />you've been waiting for.
+          <h1 className="text-5xl md:text-[5.5rem] font-medium tracking-[-0.03em] text-white leading-[1.05] mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            Email,<br />reimagined.
           </h1>
           
+          <p className="text-lg md:text-xl text-gray-400 max-w-lg leading-relaxed mb-10 animate-fade-in-up font-light" style={{ animationDelay: '0.15s' }}>
+            An AI-native email client built for speed, clarity, and deep focus. Fly through your inbox and reclaim hours of your week.
+          </p>
+          
           <div className="flex flex-wrap items-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            {!loading && user ? (
-              <Link href="/inbox" className="inline-flex items-center gap-2 text-sm font-medium bg-white text-[#2b323b] px-6 py-3 rounded-full hover:bg-gray-200 transition">
-                Open Inbox <ArrowRight size={16} />
-              </Link>
-            ) : (
-              <Link href="/login" className="inline-flex items-center gap-2 text-sm font-medium bg-white text-[#2b323b] px-6 py-3 rounded-full hover:bg-gray-200 transition">
-                Try Vela <ArrowRight size={16} />
-              </Link>
-            )}
+            <Link href={ctaLink} className="group inline-flex items-center gap-2 text-sm font-medium bg-white text-[#2b323b] px-7 py-3.5 rounded-full hover:bg-gray-100 transition-all duration-200 shadow-lg shadow-black/20">
+              {ctaText} <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <span className="text-xs text-gray-500 font-medium">Free during beta</span>
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+          <div className="w-5 h-8 rounded-full border border-white/20 flex justify-center pt-1.5">
+            <div className="w-1 h-2 rounded-full bg-white/40 animate-bounce"></div>
           </div>
         </div>
       </section>
 
-      {/* Features Stack */}
-      <section className="px-6 pb-32 max-w-4xl mx-auto space-y-32">
-        {/* Feature 1: Speed */}
-        <div className="flex flex-col gap-6">
-          <div>
-            <div className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Speed</div>
-            <h3 className="text-2xl font-medium text-white mb-2">Built on a modern stack. Interactions are instantaneous.</h3>
-          </div>
-          <div className="aspect-[21/9] rounded-2xl bg-[#50686c] border border-white/5 relative overflow-hidden flex items-center justify-center group">
-             {/* Abstract visual for speed */}
-             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></div>
-             <div className="flex gap-2 items-center text-gray-600">
-               <Lightning size={32} weight="fill" className="text-yellow-500/50" />
-               <span className="font-mono text-sm">0ms latency</span>
-             </div>
-          </div>
+      {/* Bento Grid Features */}
+      <section className="px-6 pb-32 max-w-5xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-white mb-4">Everything you need, nothing you don't.</h2>
+          <p className="text-gray-400 max-w-lg mx-auto text-sm leading-relaxed">Built from the ground up with a focus on speed, keyboard navigation, and AI intelligence.</p>
         </div>
 
-        {/* Feature 2: Keyboard */}
-        <div className="flex flex-col gap-6">
-          <div>
-            <div className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Keyboard First</div>
-            <h3 className="text-2xl font-medium text-white mb-2">Navigate your entire inbox without ever touching your mouse.</h3>
-          </div>
-          <div className="aspect-[21/9] rounded-2xl bg-[#50686c] border border-white/5 relative overflow-hidden flex items-center justify-center p-8">
-             {/* Abstract visual for keyboard */}
-             <div className="grid grid-cols-10 gap-2 w-full max-w-lg opacity-50">
-               {Array.from({ length: 40 }).map((_, i) => (
-                 <div key={i} className={`h-8 rounded bg-white/5 border border-white/10 ${i === 24 ? 'bg-white/20 border-white/30 text-center text-xs flex items-center justify-center text-white/50 font-mono' : ''}`}>
-                    {i === 24 ? 'J' : ''}
-                 </div>
-               ))}
-               <div className="col-span-10 h-8 rounded bg-white/5 border border-white/10 flex items-center justify-center mt-2">
-                 <span className="text-xs text-white/30 font-mono">Space</span>
-               </div>
-             </div>
-          </div>
-        </div>
-
-        {/* Feature 3: AI */}
-        <div className="flex flex-col gap-6">
-          <div>
-            <div className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Intelligence</div>
-            <h3 className="text-2xl font-medium text-white mb-2">Instantly extract the core message from long email threads.</h3>
-          </div>
-          <div className="aspect-[21/9] rounded-2xl bg-[#50686c] border border-white/5 relative overflow-hidden flex items-center justify-center">
-             <div className="flex gap-3 px-6 py-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                <Sparkle size={20} weight="fill" className="text-purple-400" />
-                <div className="flex flex-col gap-2 w-48">
-                  <div className="h-2 w-full bg-white/20 rounded-full"></div>
-                  <div className="h-2 w-3/4 bg-white/20 rounded-full"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Feature 1: Speed - Large Card */}
+          <div className="group relative rounded-2xl bg-white/[0.03] border border-white/[0.06] p-8 overflow-hidden hover:border-white/[0.12] transition-all duration-500 md:row-span-2">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#50686c]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10 h-full flex flex-col">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-8 w-8 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+                  <Lightning size={18} weight="fill" className="text-yellow-500" />
                 </div>
-             </div>
+              </div>
+              <h3 className="text-lg font-medium text-white mb-2">Blazing Fast</h3>
+              <p className="text-sm text-gray-400 leading-relaxed mb-8">Built on a modern stack. Every interaction is instantaneous — no loading spinners, no waiting.</p>
+              
+              {/* Speed Visual */}
+              <div className="flex-1 flex items-center justify-center">
+                <div className="relative">
+                  <div className="text-6xl font-mono font-light text-white/10 group-hover:text-white/20 transition-colors duration-500">
+                    0<span className="text-[#50686c]">ms</span>
+                  </div>
+                  <div className="absolute -bottom-6 left-0 right-0 text-center text-xs text-gray-600 font-mono">perceived latency</div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Feature 4: Search */}
-        <div className="flex flex-col gap-6">
-          <div>
-            <div className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Deep Search</div>
-            <h3 className="text-2xl font-medium text-white mb-2">Find exactly what you are looking for instantly.</h3>
+          {/* Feature 2: Keyboard */}
+          <div className="group relative rounded-2xl bg-white/[0.03] border border-white/[0.06] p-8 overflow-hidden hover:border-white/[0.12] transition-all duration-500">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#50686c]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                  <Command size={18} weight="bold" className="text-blue-400" />
+                </div>
+              </div>
+              <h3 className="text-lg font-medium text-white mb-2">Keyboard First</h3>
+              <p className="text-sm text-gray-400 leading-relaxed mb-6">Navigate your entire inbox without ever touching your mouse. Every action has a shortcut.</p>
+              
+              {/* Keyboard Keys Visual */}
+              <div className="flex items-center gap-1.5 justify-center">
+                {['J', 'K', 'E', 'R', '#'].map((key) => (
+                  <div key={key} className="h-9 w-9 rounded-lg bg-white/[0.06] border border-white/[0.1] flex items-center justify-center text-xs font-mono text-gray-400 group-hover:border-white/[0.16] transition-all duration-300">
+                    {key}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="aspect-[21/9] rounded-2xl bg-[#50686c] border border-white/5 relative overflow-hidden flex items-center justify-center">
-             <div className="w-64 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center px-4 gap-3 text-gray-500">
-               <MagnifyingGlass size={18} />
-               <div className="h-4 w-[2px] bg-white/50 animate-pulse"></div>
-             </div>
+
+          {/* Feature 3: AI */}
+          <div className="group relative rounded-2xl bg-white/[0.03] border border-white/[0.06] p-8 overflow-hidden hover:border-white/[0.12] transition-all duration-500">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-8 w-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                  <Sparkle size={18} weight="fill" className="text-purple-400" />
+                </div>
+              </div>
+              <h3 className="text-lg font-medium text-white mb-2">AI Intelligence</h3>
+              <p className="text-sm text-gray-400 leading-relaxed mb-6">Instantly extract the core message from long threads. Draft replies in seconds with context-aware AI.</p>
+              
+              {/* AI Visual */}
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.06]">
+                <Sparkle size={16} weight="fill" className="text-purple-400 shrink-0" />
+                <div className="flex flex-col gap-1.5 flex-1">
+                  <div className="h-1.5 w-full bg-white/10 rounded-full"></div>
+                  <div className="h-1.5 w-3/4 bg-white/10 rounded-full"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 4: Search */}
+          <div className="group relative rounded-2xl bg-white/[0.03] border border-white/[0.06] p-8 overflow-hidden hover:border-white/[0.12] transition-all duration-500">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#50686c]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                  <MagnifyingGlass size={18} weight="bold" className="text-emerald-400" />
+                </div>
+              </div>
+              <h3 className="text-lg font-medium text-white mb-2">Deep Search</h3>
+              <p className="text-sm text-gray-400 leading-relaxed mb-6">Find exactly what you're looking for instantly. Search across subjects, senders, and content.</p>
+              
+              {/* Search Visual */}
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.06]">
+                <MagnifyingGlass size={16} className="text-gray-500 shrink-0" />
+                <div className="h-4 w-[2px] bg-white/30 animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 5: Privacy */}
+          <div className="group relative rounded-2xl bg-white/[0.03] border border-white/[0.06] p-8 overflow-hidden hover:border-white/[0.12] transition-all duration-500">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#50686c]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-8 w-8 rounded-lg bg-teal-500/10 flex items-center justify-center">
+                  <ShieldCheck size={18} weight="fill" className="text-teal-400" />
+                </div>
+              </div>
+              <h3 className="text-lg font-medium text-white mb-2">Private by Default</h3>
+              <p className="text-sm text-gray-400 leading-relaxed">Your data stays yours. We never sell your information or train models on your emails.</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Sign Up Section */}
-      <section className="py-32 px-6 text-center border-t border-white/5 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#111] -z-10 pointer-events-none"></div>
-        <h2 className="text-4xl font-medium text-white mb-6">Sign up today.</h2>
-        <p className="text-gray-400 mb-8 max-w-md mx-auto text-sm leading-relaxed">
-          Fly through your inbox and reclaim hours of your week with Vela.
-        </p>
-        <Link href="/login" className="inline-flex items-center gap-2 text-sm font-medium bg-white/10 border border-white/10 text-white px-6 py-3 rounded-full hover:bg-white/20 transition">
-          Get Started
-        </Link>
+      {/* Stats Section */}
+      <section className="px-6 py-24 border-t border-white/[0.04]">
+        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+          {[
+            { value: "< 100ms", label: "Response time" },
+            { value: "100%", label: "Keyboard navigable" },
+            { value: "10x", label: "Faster than Gmail" },
+            { value: "0", label: "Trackers allowed" },
+          ].map((stat, i) => (
+            <div key={i} className="text-center">
+              <div className="text-2xl md:text-3xl font-medium text-white mb-1 tracking-tight">{stat.value}</div>
+              <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-32 px-6 text-center relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#50686c]/10 blur-[120px]"></div>
+        </div>
+        <div className="relative z-10">
+          <h2 className="text-4xl md:text-5xl font-medium text-white mb-4 tracking-tight">Ready to try Vela?</h2>
+          <p className="text-gray-400 mb-10 max-w-md mx-auto text-sm leading-relaxed">
+            Join the beta and experience email the way it should be.
+          </p>
+          <Link href={ctaLink} className="group inline-flex items-center gap-2 text-sm font-medium bg-white text-[#2b323b] px-8 py-4 rounded-full hover:bg-gray-100 transition-all duration-200 shadow-lg shadow-black/20">
+            {ctaText} <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-12 text-sm text-gray-500">
+      <footer className="border-t border-white/[0.04] py-12 text-sm text-gray-500">
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2 font-medium text-gray-400">
             <img src="/logo.png" alt="Vela Logo" className="h-4 w-auto rounded-sm brightness-0 invert opacity-50" />
@@ -180,7 +272,7 @@ export default function LandingPage() {
         @keyframes fadeInUp {
           from {
             opacity: 0;
-            transform: translateY(10px);
+            transform: translateY(16px);
           }
           to {
             opacity: 1;
@@ -189,7 +281,7 @@ export default function LandingPage() {
         }
         .animate-fade-in-up {
           opacity: 0;
-          animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: fadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
       `}</style>
     </div>
