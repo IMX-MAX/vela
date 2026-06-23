@@ -185,60 +185,60 @@ export default function ContactsPage() {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#eceae6] w-full max-w-md rounded-3xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="px-6 py-4 border-b border-gray-200/50 flex justify-between items-center bg-white/40">
-              <h2 className="text-lg font-bold text-gray-800">
+        <div className="fixed inset-0 bg-[#2b323b]/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-[#eceae6] w-full max-w-md rounded-2xl shadow-2xl border border-[#d0cfcb] overflow-hidden flex flex-col transform animate-in slide-in-from-bottom-4 duration-300">
+            <div className="px-6 py-5 border-b border-[#dddcdc] flex justify-between items-center">
+              <h2 className="text-[16px] font-medium text-[#2b323b]">
                 {editingContact ? "Edit Contact" : "Add New Contact"}
               </h2>
               <button 
                 onClick={handleCloseModal}
-                className="p-1 text-gray-500 hover:text-gray-800 hover:bg-gray-200/50 rounded-full transition"
+                className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-200/50 rounded-md transition"
               >
-                <X size={20} weight="bold" />
+                <X size={18} weight="bold" />
               </button>
             </div>
             
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label className="block text-[13px] font-medium text-gray-800 mb-2">Name</label>
                 <div className="relative">
-                  <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" weight="bold" />
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#50686c]/50 focus:border-[#50686c] transition text-gray-800"
+                    className="w-full pl-9 pr-4 py-2.5 bg-transparent border border-[#dddcdc] rounded-lg focus:outline-none focus:border-gray-400 transition text-[14px] text-[#2b323b] placeholder-gray-400"
                     placeholder="Jane Doe"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-[13px] font-medium text-gray-800 mb-2">Email Address</label>
                 <div className="relative">
-                  <EnvelopeSimple size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <EnvelopeSimple size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" weight="bold" />
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#50686c]/50 focus:border-[#50686c] transition text-gray-800"
+                    className="w-full pl-9 pr-4 py-2.5 bg-transparent border border-[#dddcdc] rounded-lg focus:outline-none focus:border-gray-400 transition text-[14px] text-[#2b323b] placeholder-gray-400"
                     placeholder="jane@example.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <label className="block text-[13px] font-medium text-gray-800 mb-2">Phone Number</label>
                 <div className="relative">
-                  <Phone size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" weight="bold" />
                   <input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#50686c]/50 focus:border-[#50686c] transition text-gray-800"
-                    placeholder="+1 234 567 8900"
+                    className="w-full pl-9 pr-4 py-2.5 bg-transparent border border-[#dddcdc] rounded-lg focus:outline-none focus:border-gray-400 transition text-[14px] text-[#2b323b] placeholder-gray-400"
+                    placeholder="+1 (234) 567-8900"
                   />
                 </div>
               </div>
@@ -247,13 +247,13 @@ export default function ContactsPage() {
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl font-medium transition"
+                  className="flex-1 px-4 py-2 bg-transparent border border-[#dddcdc] text-gray-700 hover:bg-gray-100 rounded-lg text-[14px] font-medium transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2.5 bg-[#2b323b] hover:bg-[#3d4651] text-[#eceae6] rounded-xl font-medium transition shadow-sm"
+                  className="flex-1 px-4 py-2 bg-[#2b323b] hover:bg-[#3d4651] text-[#eceae6] rounded-lg text-[14px] font-medium transition shadow-sm"
                 >
                   {editingContact ? "Save Changes" : "Add Contact"}
                 </button>

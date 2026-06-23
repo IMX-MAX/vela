@@ -26,6 +26,7 @@ async function makePeopleRequest(tokenOrConnectionId, url, options = {}) {
   } else {
     const res = await fetch(url, {
       ...options,
+      cache: "no-store",
       headers: {
         ...options.headers,
         Authorization: `Bearer ${tokenOrConnectionId}`,
