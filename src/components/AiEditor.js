@@ -1,19 +1,22 @@
 "use client";
 
-import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react';
+import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Markdown } from 'tiptap-markdown';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { modifyTextAction } from '@/app/actions';
 import { useAuthStore } from '@/lib/store';
-import { Sparkle, MagicWand, Check, CornersOut, TextAa } from '@phosphor-icons/react';
 
 export default function AiEditor({ value, onChange, placeholder = "Write something..." }) {
   const { user } = useAuthStore();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
   const [showCustomPrompt, setShowCustomPrompt] = useState(false);
   const [customPrompt, setCustomPrompt] = useState("");
+  const menuRef = useRef(null);
+  const wrapperRef = useRef(null);
 
   const editor = useEditor({
     extensions: [
@@ -31,6 +34,28 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
     },
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML(), editor.getText());
+    },
+    onSelectionUpdate: ({ editor }) => {
+      const { from, to } = editor.state.selection;
+      if (from !== to) {
+        // Text is selected — show the AI menu
+        const domSelection = window.getSelection();
+        if (domSelection && domSelection.rangeCount > 0) {
+          const range = domSelection.getRangeAt(0);
+          const rect = range.getBoundingClientRect();
+          const wrapperRect = wrapperRef.current?.getBoundingClientRect();
+          if (wrapperRect) {
+            setMenuPos({
+              top: rect.top - wrapperRect.top - 8,
+              left: rect.left - wrapperRect.left + rect.width / 2,
+            });
+          }
+          setShowMenu(true);
+        }
+      } else {
+        setShowMenu(false);
+        setShowCustomPrompt(false);
+      }
     },
   });
 
@@ -69,16 +94,23 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
       setIsProcessing(false);
       setShowCustomPrompt(false);
       setCustomPrompt("");
+      setShowMenu(false);
     }
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col">
-      {editor && (
-        <BubbleMenu 
-          editor={editor} 
-          tippyOptions={{ duration: 100 }}
-          className="flex flex-col bg-white border border-gray-200 shadow-xl rounded-xl overflow-hidden min-w-[200px]"
+    <div className="relative w-full h-full flex flex-col" ref={wrapperRef}>
+      {/* Floating AI Menu */}
+      {showMenu && (
+        <div
+          ref={menuRef}
+          className="absolute z-50 flex flex-col bg-white border border-gray-200 shadow-xl rounded-xl overflow-hidden min-w-[200px]"
+          style={{
+            top: `${menuPos.top}px`,
+            left: `${menuPos.left}px`,
+            transform: 'translate(-50%, -100%)',
+          }}
+          onMouseDown={(e) => e.preventDefault()} // Prevent blur on click
         >
           {showCustomPrompt ? (
             <div className="p-2 flex items-center gap-2 border-b border-gray-100 bg-gray-50/50">
@@ -99,9 +131,9 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
               />
               <button 
                 onClick={() => customPrompt.trim() && handleAiAction(customPrompt.trim())}
-                className="p-1.5 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition"
+                className="p-1.5 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition text-xs font-bold"
               >
-                {isProcessing ? <div className="h-3 w-3 animate-spin rounded-full border-2 border-white/30 border-t-white"></div> : <Check size={14} weight="bold" />}
+                {isProcessing ? <div className="h-3 w-3 animate-spin rounded-full border-2 border-white/30 border-t-white"></div> : "→"}
               </button>
             </div>
           ) : (
@@ -111,7 +143,7 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
                 disabled={isProcessing}
                 className="flex items-center gap-2 px-3 py-1.5 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left disabled:opacity-50"
               >
-                <MagicWand size={16} className="text-blue-500" />
+                <span className="text-blue-500">✦</span>
                 Fix grammar
               </button>
               <button 
@@ -119,7 +151,7 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
                 disabled={isProcessing}
                 className="flex items-center gap-2 px-3 py-1.5 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left disabled:opacity-50"
               >
-                <CornersOut size={16} className="text-green-500" />
+                <span className="text-green-500">↗</span>
                 Expand on this
               </button>
               <button 
@@ -127,7 +159,7 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
                 disabled={isProcessing}
                 className="flex items-center gap-2 px-3 py-1.5 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left disabled:opacity-50"
               >
-                <TextAa size={16} className="text-purple-500" />
+                <span className="text-purple-500">Aa</span>
                 Make professional
               </button>
               <div className="h-px bg-gray-100 my-1 mx-2"></div>
@@ -136,12 +168,12 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
                 disabled={isProcessing}
                 className="flex items-center gap-2 px-3 py-1.5 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left disabled:opacity-50"
               >
-                <Sparkle size={16} className="text-yellow-500" weight="fill" />
+                <span className="text-yellow-500">✨</span>
                 Ask AI...
               </button>
             </div>
           )}
-        </BubbleMenu>
+        </div>
       )}
 
       <div className="flex-1 bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-gray-300 focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-100 transition-all cursor-text flex flex-col">
@@ -149,8 +181,6 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
           <EditorContent editor={editor} className="h-full" />
         </div>
       </div>
-      
-      {/* Tiptap styles usually need to be added globally or via Tailwind Typography plugin */}
     </div>
   );
 }

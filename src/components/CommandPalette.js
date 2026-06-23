@@ -14,7 +14,8 @@ export default function CommandPalette() {
   const { 
     session, user, 
     isCommandPaletteOpen, toggleCommandPalette, closeCommandPalette,
-    chatHistory, setChatHistory, clearChat
+    chatHistory, setChatHistory, clearChat,
+    savedChats, loadChat, saveCurrentChat
   } = useAuthStore();
   
   const [input, setInput] = useState("");
@@ -284,6 +285,38 @@ export default function CommandPalette() {
             </div>
           </div>
         )}
+
+        {/* Saved Chat History (search mode with input) */}
+        {mode === "search" && input.trim() && savedChats.length > 0 && (() => {
+          const q = input.trim().toLowerCase();
+          const matchedChats = savedChats.filter(c => 
+            c.title.toLowerCase().includes(q) || 
+            c.messages?.some(m => m.content?.toLowerCase().includes(q))
+          );
+          if (matchedChats.length === 0) return null;
+          return (
+            <div className="border-t border-[#e4e3e0]/50 px-5 py-3">
+              <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Chat History</div>
+              <div className="flex flex-col gap-1">
+                {matchedChats.slice(0, 5).map((chat) => (
+                  <button
+                    key={chat.id}
+                    onClick={() => {
+                      if (chatHistory.length > 0) saveCurrentChat();
+                      loadChat(chat.id);
+                      setMode("ai");
+                      setInput("");
+                    }}
+                    className="text-left px-3 py-2 rounded-lg hover:bg-[#e4e3e0]/50 transition flex items-center gap-3 text-[13px]"
+                  >
+                    <Sparkle size={14} className="text-gray-400 flex-shrink-0" />
+                    <span className="text-gray-700 truncate">{chat.title}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       <style jsx>{`
