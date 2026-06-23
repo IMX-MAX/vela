@@ -11,7 +11,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab") || "profile";
-  const { user, checkAuth } = useAuthStore();
+  const { user, checkAuth, googleProfile } = useAuthStore();
   
   const [tab, setTab] = useState(initialTab);
   const [userName, setUserName] = useState("");
@@ -130,9 +130,13 @@ export default function SettingsPage() {
             <div className="bg-[#f7f7f6] rounded-xl border border-[#d6d3d1]/60 p-6 mb-10 shadow-sm">
               <div className="mb-6">
                 <label className="block text-[13px] font-medium text-gray-800 mb-2">Profile picture</label>
-                <div className="h-10 w-10 rounded-full bg-[#e7e5e4] flex items-center justify-center text-sm font-semibold text-[#8baba4]">
-                  {user?.name ? user.name.slice(0, 5).toLowerCase() : "usr"}
-                </div>
+                {googleProfile?.picture ? (
+                  <img src={googleProfile.picture} alt="Profile" className="h-10 w-10 rounded-full object-cover" />
+                ) : (
+                  <div className="h-10 w-10 rounded-full bg-[#e7e5e4] flex items-center justify-center text-sm font-semibold text-[#8baba4]">
+                    {user?.name ? user.name.slice(0, 5).toLowerCase() : "usr"}
+                  </div>
+                )}
               </div>
               
               <div className="mb-6">

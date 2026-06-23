@@ -65,7 +65,7 @@ function SidebarNavigation() {
 
 export default function InboxLayout({ children }) {
   const router = useRouter();
-  const { user, loading, checkAuth, logout } = useAuthStore();
+  const { user, loading, checkAuth, logout, googleProfile } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   useEffect(() => {
@@ -100,9 +100,13 @@ export default function InboxLayout({ children }) {
             className="flex items-center gap-2 cursor-pointer bg-[#e4e3e0] hover:bg-[#d0cfcb] px-2 py-1.5 rounded-lg transition"
             onClick={() => setIsProfileOpen(!isProfileOpen)}
           >
-            <div className="h-6 w-6 rounded-full bg-white flex items-center justify-center text-xs font-semibold text-[#8baba4]">
-              {user.name ? user.name.slice(0, 5).toLowerCase() : "usr"}
-            </div>
+            {googleProfile?.picture ? (
+              <img src={googleProfile.picture} alt="Profile" className="h-6 w-6 rounded-full object-cover" />
+            ) : (
+              <div className="h-6 w-6 rounded-full bg-white flex items-center justify-center text-xs font-semibold text-[#8baba4]">
+                {user.name ? user.name.slice(0, 5).toLowerCase() : "usr"}
+              </div>
+            )}
             <span className="icon-cheveron-down text-xs text-gray-500"></span>
           </div>
           

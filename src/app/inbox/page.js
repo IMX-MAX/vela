@@ -75,10 +75,19 @@ export default function InboxPage() {
 
       if (token) {
         setResolvedToken(token);
-        const { parsed, next } = await fetchEmailBatch(token);
+        const { fetchGoogleProfile } = await import("@/lib/gmail");
+        const [{ parsed, next }, profile] = await Promise.all([
+          fetchEmailBatch(token),
+          fetchGoogleProfile(token)
+        ]);
+        
         setEmails(parsed);
         setInboxEmails(parsed);
         setNextPageToken(next);
+        
+        if (profile) {
+          useAuthStore.getState().setGoogleProfile(profile);
+        }
       }
       setLoading(false);
     }

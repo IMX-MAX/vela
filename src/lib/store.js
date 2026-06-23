@@ -10,6 +10,8 @@ export const useAuthStore = create((set) => ({
   chatHistory: [],
   savedChats: [],
   inboxEmails: [],
+  googleProfile: null,
+  setGoogleProfile: (profile) => set({ googleProfile: profile }),
   setInboxEmails: (emails) => set({ inboxEmails: emails }),
   setAiSidebarWidth: (width) => set({ aiSidebarWidth: width }),
   toggleAiSidebar: () => set((state) => ({ isAiSidebarOpen: !state.isAiSidebarOpen })),

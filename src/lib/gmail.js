@@ -35,6 +35,16 @@ async function makeGmailRequest(tokenOrConnectionId, url, options = {}) {
   }
 }
 
+export async function fetchGoogleProfile(tokenOrConnectionId) {
+  try {
+    const data = await makeGmailRequest(tokenOrConnectionId, "https://www.googleapis.com/oauth2/v1/userinfo?alt=json");
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch google profile", error);
+    return null;
+  }
+}
+
 export async function fetchEmails(tokenOrConnectionId, maxResults = 20, label = "inbox", searchQuery = null, pageToken = null) {
   let query = label === "starred" ? "is:starred" 
               : label === "sent" ? "in:sent"
