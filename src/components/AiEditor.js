@@ -23,13 +23,6 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
   const { user } = useAuthStore();
   const [isProcessing, setIsProcessing] = useState(false);
   
-  // Selection/Bubble Menu
-  const [showMenu, setShowMenu] = useState(false);
-  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
-  const [showCustomPrompt, setShowCustomPrompt] = useState(false);
-  const [customPrompt, setCustomPrompt] = useState("");
-  const menuRef = useRef(null);
-
   // Slash Commands Menu
   const [showSlashMenu, setShowSlashMenu] = useState(false);
   const [slashMenuPos, setSlashMenuPos] = useState({ top: 0, left: 0 });
@@ -54,6 +47,7 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
   );
 
   const checkSlashCommand = useCallback((editor) => {
+    if (stateRef.current.showSlashCustomPrompt) return;
     const { selection } = editor.state;
     if (!selection.empty) {
       setShowSlashMenu(false);
@@ -105,9 +99,9 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
     }
 
     setIsProcessing(true);
-    let context = "";
+    let context = `Here is the full text of the email draft for context:\n\n${editor.getText()}\n\n`;
     if (user?.prefs) {
-      context = `Job Title: ${user?.prefs?.jobName || 'Unknown'}, Company: ${user?.prefs?.company || 'Unknown'}`;
+      context += `User details - Job Title: ${user?.prefs?.jobName || 'Unknown'}, Company: ${user?.prefs?.company || 'Unknown'}`;
     }
 
     try {
@@ -134,9 +128,6 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
       setShowSlashCustomPrompt(false);
       setSlashCustomPrompt("");
       setShowSlashMenu(false);
-      setShowMenu(false);
-      setShowCustomPrompt(false);
-      setCustomPrompt("");
     }
   };
 
@@ -162,10 +153,10 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
   }, [runAiAction]);
 
   // Keep Refs updated for Tiptap callback closures
-  const stateRef = useRef({ showSlashMenu, filteredOptions, selectedSlashIndex });
+  const stateRef = useRef({ showSlashMenu, filteredOptions, selectedSlashIndex, showSlashCustomPrompt });
   useEffect(() => {
-    stateRef.current = { showSlashMenu, filteredOptions, selectedSlashIndex };
-  }, [showSlashMenu, filteredOptions, selectedSlashIndex]);
+    stateRef.current = { showSlashMenu, filteredOptions, selectedSlashIndex, showSlashCustomPrompt };
+  }, [showSlashMenu, filteredOptions, selectedSlashIndex, showSlashCustomPrompt]);
 
   const handleSlashOptionSelectRef = useRef(handleSlashOptionSelect);
   useEffect(() => {
@@ -217,28 +208,7 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
       checkSlashCommand(editor);
     },
     onSelectionUpdate: ({ editor }) => {
-      const { from, to } = editor.state.selection;
-      if (from !== to) {
-        // Text is selected — show the AI menu, hide slash menu
-        setShowSlashMenu(false);
-        const domSelection = window.getSelection();
-        if (domSelection && domSelection.rangeCount > 0) {
-          const range = domSelection.getRangeAt(0);
-          const rect = range.getBoundingClientRect();
-          const wrapperRect = wrapperRef.current?.getBoundingClientRect();
-          if (wrapperRect) {
-            setMenuPos({
-              top: rect.top - wrapperRect.top - 8,
-              left: rect.left - wrapperRect.left + rect.width / 2,
-            });
-          }
-          setShowMenu(true);
-        }
-      } else {
-        setShowMenu(false);
-        setShowCustomPrompt(false);
-        checkSlashCommand(editor);
-      }
+      checkSlashCommand(editor);
     },
   });
 
@@ -255,82 +225,6 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
 
   return (
     <div className="relative w-full h-full flex flex-col" ref={wrapperRef}>
-      {/* Floating Selection AI Menu */}
-      {showMenu && (
-        <div
-          ref={menuRef}
-          className="absolute z-50 flex flex-col bg-white border border-gray-200 shadow-xl rounded-xl overflow-hidden min-w-[200px]"
-          style={{
-            top: `${menuPos.top}px`,
-            left: `${menuPos.left}px`,
-            transform: 'translate(-50%, -100%)',
-          }}
-          onMouseDown={(e) => e.preventDefault()}
-        >
-          {showCustomPrompt ? (
-            <div className="p-2 flex items-center gap-2 border-b border-gray-100 bg-gray-50/50">
-              <input 
-                autoFocus
-                type="text"
-                placeholder="Ask AI to modify..."
-                value={customPrompt}
-                onChange={e => setCustomPrompt(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && customPrompt.trim()) {
-                    runAiAction(customPrompt.trim(), true, customPrompt.trim());
-                  } else if (e.key === 'Escape') {
-                    setShowCustomPrompt(false);
-                  }
-                }}
-                className="w-full text-sm bg-white border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gray-400"
-              />
-              <button 
-                onClick={() => customPrompt.trim() && runAiAction(customPrompt.trim(), true, customPrompt.trim())}
-                className="p-1.5 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition text-xs font-bold"
-              >
-                {isProcessing ? <div className="h-3 w-3 animate-spin rounded-full border-2 border-white/30 border-t-white"></div> : "→"}
-              </button>
-            </div>
-          ) : (
-            <div className="flex flex-col p-1">
-              <button 
-                onClick={() => runAiAction("Fix grammar and spelling")}
-                disabled={isProcessing}
-                className="flex items-center gap-2 px-3 py-1.5 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left disabled:opacity-50"
-              >
-                <span className="text-blue-500">✦</span>
-                Fix grammar
-              </button>
-              <button 
-                onClick={() => runAiAction("Expand on this")}
-                disabled={isProcessing}
-                className="flex items-center gap-2 px-3 py-1.5 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left disabled:opacity-50"
-              >
-                <span className="text-green-500">↗</span>
-                Expand on this
-              </button>
-              <button 
-                onClick={() => runAiAction("Make this sound more professional")}
-                disabled={isProcessing}
-                className="flex items-center gap-2 px-3 py-1.5 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left disabled:opacity-50"
-              >
-                <span className="text-purple-500">Aa</span>
-                Make professional
-              </button>
-              <div className="h-px bg-gray-100 my-1 mx-2"></div>
-              <button 
-                onClick={() => setShowCustomPrompt(true)}
-                disabled={isProcessing}
-                className="flex items-center gap-2 px-3 py-1.5 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-lg text-left disabled:opacity-50"
-              >
-                <span className="text-yellow-500">✨</span>
-                Ask AI...
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Slash commands dropdown */}
       {showSlashMenu && (
         <div

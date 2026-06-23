@@ -16,8 +16,12 @@ export default function CommandPalette() {
     session, user, 
     isCommandPaletteOpen, toggleCommandPalette, closeCommandPalette,
     chatHistory, setChatHistory, clearChat,
-    savedChats, loadChat, saveCurrentChat
+    savedChats, loadChat, saveCurrentChat, initSavedChats
   } = useAuthStore();
+
+  useEffect(() => {
+    initSavedChats();
+  }, [initSavedChats]);
   
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -159,6 +163,10 @@ export default function CommandPalette() {
         options.push({ type: 'ai_chat', chat, label: chat.title });
       });
     }
+  } else if (mode === "ai" && chatHistory.length === 0 && !input.trim()) {
+    savedChats.forEach(chat => {
+      options.push({ type: 'ai_chat', chat, label: chat.title });
+    });
   }
 
   const executeOption = async (option) => {
@@ -233,7 +241,9 @@ export default function CommandPalette() {
   };
 
   const handleKeyDown = (e) => {
-    if (mode === "search") {
+    const isShowingOptions = mode === "search" || (mode === "ai" && chatHistory.length === 0 && !input.trim());
+    
+    if (isShowingOptions) {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         setSelectedIndex(prev => Math.min(prev + 1, options.length - 1));
@@ -248,13 +258,13 @@ export default function CommandPalette() {
         e.preventDefault();
         if (options[selectedIndex]) {
           executeOption(options[selectedIndex]);
-        } else if (input.trim()) {
+        } else if (input.trim() && mode === "search") {
           router.push(`/inbox?search=${encodeURIComponent(input.trim())}`);
           closeCommandPalette();
         }
         return;
       }
-      if (e.key === 'Tab') {
+      if (e.key === 'Tab' && mode === "search") {
         e.preventDefault();
         setMode("ai");
         return;
@@ -346,7 +356,7 @@ export default function CommandPalette() {
             className="flex-1 bg-transparent text-[16px] text-gray-900 placeholder-gray-400 outline-none font-medium"
           />
 
-          {mode === "search" && input.trim() && (
+          {mode === "search" && (
             <div className="flex items-center gap-1 text-[11px] text-gray-400 flex-shrink-0 bg-[#e4e3e0] px-2 py-1 rounded-md">
               <span className="font-mono">Tab</span>
               <span>for AI</span>
@@ -412,7 +422,7 @@ export default function CommandPalette() {
         )}
 
         {/* Search Options Area */}
-        {mode === "search" && options.length > 0 && (
+        {(mode === "search" || (mode === "ai" && chatHistory.length === 0)) && options.length > 0 && (
           <div className="border-t border-[#e4e3e0]/50 px-5 py-3">
             <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
               {!input.trim() ? "Recent AI Chats" : "Suggestions"}

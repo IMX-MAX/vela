@@ -17,12 +17,19 @@ export const useAuthStore = create((set) => ({
   openCommandPalette: () => set({ isCommandPaletteOpen: true }),
   addChatMessage: (message) => set((state) => ({ chatHistory: [...state.chatHistory, message] })),
   setChatHistory: (history) => set({ chatHistory: history }),
+  clearChat: () => set({ chatHistory: [] }),
+  initSavedChats: async () => {
+    const { get } = await import('idb-keyval');
+    const chats = await get('savedChats');
+    if (chats) set({ savedChats: chats });
+  },
   saveCurrentChat: () => set((state) => {
     if (state.chatHistory.length === 0) return state;
     const newChat = { id: Date.now(), title: state.chatHistory[0].content.substring(0, 30) + '...', messages: [...state.chatHistory] };
-    return { savedChats: [newChat, ...state.savedChats], chatHistory: [] };
+    const newSavedChats = [newChat, ...state.savedChats];
+    import('idb-keyval').then(({ set: idbSet }) => idbSet('savedChats', newSavedChats));
+    return { savedChats: newSavedChats, chatHistory: [] };
   }),
-  clearChat: () => set({ chatHistory: [] }),
   loadChat: (id) => set((state) => {
     const chat = state.savedChats.find(c => c.id === id);
     return chat ? { chatHistory: chat.messages } : state;
