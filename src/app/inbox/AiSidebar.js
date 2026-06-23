@@ -108,6 +108,7 @@ export default function AiSidebar() {
     } else {
       clearChat();
     }
+    setShowHistory(false);
   };
 
   return (

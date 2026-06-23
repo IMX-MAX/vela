@@ -80,10 +80,9 @@ export default function EmailDetailPage({ params }) {
 
         const targetIndex = parsedMsgs.findIndex(m => m.id === id);
         const mainMsg = targetIndex !== -1 ? parsedMsgs[targetIndex] : parsedMsgs[parsedMsgs.length - 1];
-        const previousMsgs = targetIndex !== -1 ? parsedMsgs.slice(0, targetIndex) : parsedMsgs.slice(0, -1);
 
         setEmail(mainMsg);
-        setThreadMessages(previousMsgs);
+        setThreadMessages(parsedMsgs);
         setResolvedToken(token);
       } catch (error) {
         console.error("Error fetching email:", error);
@@ -238,25 +237,12 @@ export default function EmailDetailPage({ params }) {
         <h1 className="text-2xl font-medium text-gray-900 mb-8 text-center">{email.subject}</h1>
         
         {/* Thread History (Collapsed) */}
-        {threadMessages.map((msg, idx) => (
-          <div key={idx} className="bg-[#f0ece9] rounded-xl shadow-sm border border-[#e4e3e0] overflow-hidden mb-4 p-4 flex items-center justify-between opacity-80 hover:opacity-100 transition cursor-pointer" onClick={() => router.push(`/inbox/email/${msg.id}`)}>
-            <div className="flex items-center gap-3">
-              <div className="font-medium text-[14px] text-gray-900">
-                {msg.senderName}
-              </div>
-              <div className="text-[13px] text-gray-500 truncate max-w-md">
-                {msg.snippet}
-              </div>
-            </div>
-            <div className="text-[13px] text-gray-400">
-              {msg.date ? format(new Date(msg.date), "MMM d") : ""}
-            </div>
-          </div>
-        ))}
+        {threadMessages.map((msg, idx) => {
+          if (msg.id === email.id) {
+            return (
+              <div key={idx} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
 
-        {/* Email Card (Tatem Style) */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
-          
+
           {/* Card Header */}
           <div className="px-8 py-6 flex items-start justify-between border-b border-gray-100">
             <div className="flex items-center gap-3">
@@ -359,6 +345,25 @@ export default function EmailDetailPage({ params }) {
             )}
           </div>
         </div>
+            );
+          } else {
+            return (
+              <div key={idx} className="bg-[#f0ece9] rounded-xl shadow-sm border border-[#e4e3e0] overflow-hidden mb-4 p-4 flex items-center justify-between opacity-80 hover:opacity-100 transition cursor-pointer" onClick={() => router.push(`/inbox/email/${msg.id}`)}>
+                <div className="flex items-center gap-3">
+                  <div className="font-medium text-[14px] text-gray-900">
+                    {msg.senderName}
+                  </div>
+                  <div className="text-[13px] text-gray-500 truncate max-w-md">
+                    {msg.snippet}
+                  </div>
+                </div>
+                <div className="text-[13px] text-gray-400">
+                  {msg.date ? format(new Date(msg.date), "MMM d") : ""}
+                </div>
+              </div>
+            );
+          }
+        })}
 
         {/* Reply Section */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden focus-within:ring-2 focus-within:ring-black/5 focus-within:border-gray-400 transition mb-12">
