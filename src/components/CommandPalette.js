@@ -424,11 +424,14 @@ export default function CommandPalette() {
         {/* Search Options Area */}
         {(mode === "search" || (mode === "ai" && chatHistory.length === 0)) && options.length > 0 && (
           <div className="border-t border-[#e4e3e0]/50 px-5 py-3">
-            <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
-              {!input.trim() ? "Recent AI Chats" : "Suggestions"}
-            </div>
+            {options[0]?.type !== 'ai_chat' && (
+              <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                Suggestions
+              </div>
+            )}
             <div className="flex flex-col gap-1">
               {options.map((option, idx) => {
+                const isFirstAiChat = option.type === 'ai_chat' && (idx === 0 || options[idx-1].type !== 'ai_chat');
                 let Icon = null;
                 if (option.type === 'ai_chat') Icon = Sparkle;
                 else if (option.type === 'search_emails') Icon = MagnifyingGlass;
@@ -453,29 +456,23 @@ export default function CommandPalette() {
                 }
 
                 return (
-                  <button
-                    key={idx}
-                    onClick={() => executeOption(option)}
-                    className={`text-left px-3 py-2 rounded-lg transition flex items-center gap-3 text-[13px] ${
-                      idx === selectedIndex ? 'bg-[#e4e3e0] text-gray-900' : 'hover:bg-[#e4e3e0]/50 text-gray-700'
-                    }`}
-                    onMouseEnter={() => setSelectedIndex(idx)}
-                  >
-                    {Icon && <Icon size={14} className="text-gray-500 flex-shrink-0" />}
-                    <span className="truncate flex-1">{option.label}</span>
-                    
-                    {/* Add keyboard shortcuts to UI if applicable */}
-                    {option.type === 'nav' && option.label.includes('inbox') && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">G then I</span>}
-                    {option.type === 'nav' && option.label.includes('starred') && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">G then S</span>}
-                    {option.type === 'nav' && option.label.includes('sent') && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">G then N</span>}
-                    {option.type === 'nav' && option.label.includes('drafts') && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">G then D</span>}
-                    {option.type === 'nav' && option.label.includes('Compose') && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">C</span>}
-                    
-                    {option.type === 'action' && option.actionType === 'done' && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">E</span>}
-                    {option.type === 'action' && option.actionType === 'star' && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">S</span>}
-                    {option.type === 'action' && option.actionType === 'trash' && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">#</span>}
-                    {option.type === 'action' && option.actionType === 'spam' && <span className="text-[10px] bg-[#e4e3e0] text-gray-500 px-1.5 py-0.5 rounded font-mono">!</span>}
-                  </button>
+                  <div key={idx}>
+                    {isFirstAiChat && (
+                      <div className={`text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1 ${idx > 0 ? 'mt-3' : ''}`}>
+                        Recent AI Chats
+                      </div>
+                    )}
+                    <button
+                      onClick={() => executeOption(option)}
+                      className={`text-left px-3 py-2 rounded-lg transition flex items-center gap-3 text-[13px] w-full ${
+                        idx === selectedIndex ? 'bg-[#e4e3e0] text-gray-900' : 'hover:bg-[#e4e3e0]/50 text-gray-700'
+                      }`}
+                      onMouseEnter={() => setSelectedIndex(idx)}
+                    >
+                      {Icon && <Icon size={14} className="text-gray-500 flex-shrink-0" />}
+                      <span className="truncate flex-1">{option.label}</span>
+                    </button>
+                  </div>
                 );
               })}
             </div>
