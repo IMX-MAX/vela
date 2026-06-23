@@ -50,7 +50,9 @@ export default function EmailDetailPage({ params }) {
     async function load() {
       let token = session?.providerAccessToken;
 
-      if (!token && user) {
+      if (session?.provider === 'google') {
+        // Bypass Composio entirely for Google native login
+      } else if (!token && user) {
         const { checkComposioStatus, getComposioAccessToken } = await import("@/app/composioActions");
         const status = await checkComposioStatus(user.$id);
         if (status.connected) {

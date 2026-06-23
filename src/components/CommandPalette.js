@@ -41,7 +41,7 @@ export default function CommandPalette() {
     async function initToken() {
       if (session?.providerAccessToken) {
         setResolvedToken(session.providerAccessToken);
-      } else if (user) {
+      } else if (user && session?.provider !== 'google') {
         const { checkComposioStatus, getComposioAccessToken } = await import("@/app/composioActions");
         const status = await checkComposioStatus(user.$id);
         if (status.connected) {

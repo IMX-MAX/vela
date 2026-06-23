@@ -57,7 +57,9 @@ export default function InboxPage() {
       setLoading(true);
       let token = session?.providerAccessToken;
 
-      if (!token && user) {
+      if (session?.provider === 'google') {
+        // Bypass Composio entirely for Google native login
+      } else if (!token && user) {
         const status = await checkComposioStatus(user.$id);
         if (status.connected) {
           const compData = await getComposioAccessToken(user.$id);
