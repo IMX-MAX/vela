@@ -47,8 +47,8 @@ export default function LoginPage() {
     <div className="flex h-screen items-center justify-center bg-[#eceae6]">
       <div className="w-full max-w-sm rounded-2xl border border-[#2b323b]/5 bg-[#eceae6] p-8 shadow-sm">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden shadow-md">
-            <img src="/logo.png" alt="Vela Logo" className="h-full w-full object-cover" />
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden shadow-md bg-white p-2">
+            <img src="/logo.png" alt="Vela Logo" className="h-full w-full object-contain" />
           </div>
           <h1 className="text-xl font-semibold text-[#2b323b]">{isLogin ? "Welcome back" : "Create an account"}</h1>
           <p className="mt-1 text-sm text-gray-500">Sign in to continue to Vela</p>

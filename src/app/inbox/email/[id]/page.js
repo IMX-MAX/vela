@@ -402,7 +402,7 @@ export default function EmailDetailPage({ params }) {
           </div>
 
           {/* AI Toolbar within Card */}
-          <div className="px-8 py-4 bg-[#eceae6] border-b border-gray-100 flex flex-col gap-3">
+          <div className="px-8 py-4 bg-white border-b border-gray-100 flex flex-col gap-3">
             <div className="flex items-center gap-3">
               <button 
                 onClick={handleSummarize}
@@ -511,8 +511,8 @@ export default function EmailDetailPage({ params }) {
         })}
 
         {/* Reply Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-visible focus-within:ring-2 focus-within:ring-black/5 focus-within:border-gray-400 transition mb-12">
-          <div className="px-4 py-3 bg-[#eceae6] border-b border-gray-100 flex items-center gap-2 text-[13px] text-gray-600 font-medium rounded-t-xl">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-visible focus-within:ring-2 focus-within:ring-[#c7d4ce]/50 focus-within:border-[#50686c] transition mb-12">
+          <div className="px-4 py-3 bg-[#fbfbfc] border-b border-gray-100 flex items-center gap-2 text-[13px] text-gray-500 font-medium rounded-t-xl">
             <span className="icon-reply"></span>
             Reply to {email.senderName}
           </div>
@@ -527,15 +527,15 @@ export default function EmailDetailPage({ params }) {
               borderless={true}
             />
           </div>
-          <div className="px-4 py-3 bg-[#eceae6] border-t border-gray-100 flex justify-between items-center rounded-b-xl">
+          <div className="px-4 py-3 bg-[#fbfbfc] border-t border-gray-100 flex justify-between items-center rounded-b-xl">
             <div className="flex items-center gap-2 text-gray-400">
-              <button className="hover:text-gray-600"><span className="icon-text-b"></span></button>
-              <button className="hover:text-gray-600"><span className="icon-paperclip"></span></button>
+              <button className="hover:text-[#50686c] transition"><span className="icon-text-b"></span></button>
+              <button className="hover:text-[#50686c] transition"><span className="icon-paperclip"></span></button>
             </div>
             <button 
               onClick={handleSend}
               disabled={!replyText || isSending}
-              className="flex items-center gap-2 bg-[#2b323b] hover:bg-[#2b323b] transition text-white px-4 py-1.5 rounded-md text-[13px] font-medium disabled:opacity-50"
+              className="flex items-center gap-2 bg-[#50686c] hover:opacity-90 transition text-white px-5 py-2 rounded-lg text-[13px] font-medium disabled:opacity-50 shadow-sm"
             >
               {isSending ? "Sending..." : "Send"}
               <PaperPlaneRight size={14} weight="fill" />
