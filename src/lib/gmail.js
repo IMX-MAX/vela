@@ -87,35 +87,30 @@ export async function searchEmailsQuick(tokenOrConnectionId, query, maxResults =
 export async function sendEmail(tokenOrConnectionId, to, subject, body, htmlBody = null) {
   let rawMessage = "";
 
-  if (htmlBody) {
-    const boundary = "boundary_" + Math.random().toString(36).substring(2);
-    rawMessage = [
-      `To: ${to}`,
-      `Subject: ${subject}`,
-      `MIME-Version: 1.0`,
-      `Content-Type: multipart/alternative; boundary="${boundary}"`,
-      "",
-      `--${boundary}`,
-      `Content-Type: text/plain; charset=UTF-8`,
-      "",
-      body,
-      "",
-      `--${boundary}`,
-      `Content-Type: text/html; charset=UTF-8`,
-      "",
-      htmlBody,
-      "",
-      `--${boundary}--`
-    ].join("\n");
-  } else {
-    rawMessage = [
-      `To: ${to}`,
-      `Subject: ${subject}`,
-      `Content-Type: text/plain; charset=UTF-8`,
-      "",
-      body,
-    ].join("\n");
-  }
+  // Make sure we always send HTML to enforce sans-serif font, preventing default serif rendering in clients
+  const htmlContent = htmlBody 
+    ? `<div style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px; color: #222;">${htmlBody}</div>`
+    : `<div style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px; color: #222;">${body.replace(/\n/g, '<br>')}</div>`;
+
+  const boundary = "boundary_" + Math.random().toString(36).substring(2);
+  rawMessage = [
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    `MIME-Version: 1.0`,
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    "",
+    `--${boundary}`,
+    `Content-Type: text/plain; charset=UTF-8`,
+    "",
+    body,
+    "",
+    `--${boundary}`,
+    `Content-Type: text/html; charset=UTF-8`,
+    "",
+    htmlContent,
+    "",
+    `--${boundary}--`
+  ].join("\n");
 
   const encodedMessage = Buffer.from(rawMessage, 'utf-8').toString('base64url');
 

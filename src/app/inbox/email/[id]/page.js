@@ -279,43 +279,87 @@ export default function EmailDetailPage({ params }) {
     );
   }
 
+  const handleStar = async () => {
+    if (!resolvedToken) return;
+    const { starEmail } = await import("@/lib/gmail");
+    await starEmail(resolvedToken, id);
+    // Optional: maybe show a small toast or update local state
+  };
+
+  const handleSnooze = () => {
+    alert("Snooze functionality coming soon.");
+  };
+
+  const handleNext = () => {
+    const currentIndex = inboxEmails?.findIndex(e => e.id === id);
+    if (currentIndex !== -1 && currentIndex < inboxEmails.length - 1) {
+      router.push(`/inbox/email/${inboxEmails[currentIndex + 1].id}`);
+    }
+  };
+
+  const handlePrev = () => {
+    const currentIndex = inboxEmails?.findIndex(e => e.id === id);
+    if (currentIndex > 0) {
+      router.push(`/inbox/email/${inboxEmails[currentIndex - 1].id}`);
+    }
+  };
+
   if (!email) {
     return (
       <div className="p-8">Email not found.</div>
     );
   }
 
+  const currentIndex = inboxEmails?.findIndex(e => e.id === id);
+  const hasPrev = currentIndex > 0;
+  const hasNext = currentIndex !== -1 && currentIndex < inboxEmails?.length - 1;
+
   return (
     <div className="flex flex-col h-full bg-[#eceae6] rounded-2xl relative overflow-y-auto">
       {/* Top Bar */}
       <div className="h-14 flex items-center justify-between px-4 sticky top-0 z-10 rounded-t-2xl bg-[#eceae6] border-b border-[#dddcdc]">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button 
             onClick={() => router.back()} 
-            className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5"
+            title="Back to inbox"
+            className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"
           >
             <ArrowLeft size={18} />
           </button>
-          <div className="text-[13px] text-gray-400 font-medium ml-2 select-none flex items-center gap-2">
-            <button className="bg-white border border-gray-200 text-gray-500 hover:text-[#2b323b] transition rounded-md h-7 w-7 flex items-center justify-center">
-               <CaretUp size={14} weight="bold" />
-            </button>
-            <button className="bg-white border border-gray-200 text-gray-500 hover:text-[#2b323b] transition rounded-md h-7 w-7 flex items-center justify-center">
-               <CaretDown size={14} weight="bold" />
-            </button>
-            <span className="ml-2 font-medium">
-              {inboxEmails && inboxEmails.length > 0 
-                ? `${(inboxEmails.findIndex(e => e.id === id) + 1) || 1} / ${inboxEmails.length}`
-                : "1 / 1"}
-            </span>
-          </div>
+          
+          <div className="w-px h-6 bg-[#dddcdc] mx-1"></div>
+
+          <button 
+            onClick={handlePrev}
+            disabled={!hasPrev}
+            title="Previous (k)"
+            className="p-2 text-gray-500 hover:text-[#2b323b] disabled:opacity-30 disabled:hover:bg-transparent transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"
+          >
+             <CaretUp size={16} weight="bold" />
+          </button>
+          <button 
+            onClick={handleNext}
+            disabled={!hasNext}
+            title="Next (j)"
+            className="p-2 text-gray-500 hover:text-[#2b323b] disabled:opacity-30 disabled:hover:bg-transparent transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"
+          >
+             <CaretDown size={16} weight="bold" />
+          </button>
+          
+          <span className="ml-2 text-[13px] text-gray-500 font-medium select-none">
+            {inboxEmails && inboxEmails.length > 0 
+              ? `${(currentIndex + 1) || 1} / ${inboxEmails.length}`
+              : "1 / 1"}
+          </span>
         </div>
-        <div className="flex items-center gap-4 text-gray-500 pr-2">
-          <button className="hover:text-[#2b323b] transition"><Star size={18} /></button>
-          <button className="hover:text-[#2b323b] transition"><Clock size={18} /></button>
-          <button className="hover:text-[#2b323b] transition" onClick={handleDone}><Check size={18} /></button>
-          <button className="hover:text-[#2b323b] transition" onClick={handleTrash}><Trash size={18} /></button>
-          <button className="hover:text-[#2b323b] transition"><DotsThree size={18} weight="bold" /></button>
+        
+        <div className="flex items-center gap-1 pr-1">
+          <button onClick={handleStar} title="Star" className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"><Star size={18} /></button>
+          <button onClick={handleSnooze} title="Snooze" className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"><Clock size={18} /></button>
+          <button onClick={handleDone} title="Mark as done" className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"><Check size={18} /></button>
+          <button onClick={handleTrash} title="Delete" className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"><Trash size={18} /></button>
+          <div className="w-px h-6 bg-[#dddcdc] mx-1"></div>
+          <button title="More options" className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"><DotsThree size={18} weight="bold" /></button>
         </div>
       </div>
 

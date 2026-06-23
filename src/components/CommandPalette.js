@@ -308,6 +308,16 @@ export default function CommandPalette() {
             }
             return <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline" {...props}>{children}</a>;
           },
+          pre: ({ node, children, ...props }) => {
+            // Check if the pre contains our draft-email
+            const hasDraft = node.children && node.children.some(child => 
+              child.tagName === 'code' && child.properties?.className?.includes('language-draft-email')
+            );
+            if (hasDraft) {
+              return <div className="not-prose my-2">{children}</div>;
+            }
+            return <pre {...props}>{children}</pre>;
+          },
           code: ({ node, inline, className, children, ...props }) => {
             const match = /language-([\w-]+)/.exec(className || '');
             if (!inline && match && match[1] === 'draft-email') {
@@ -320,11 +330,15 @@ export default function CommandPalette() {
                     initialBody={draftData.body}
                     resolvedToken={resolvedToken}
                     onDiscard={() => {
-                      // Optionally we could remove the draft from history, but here we'll just clear the component by tricking state
-                      // Actually, let's update chatHistory to remove this block or replace it.
                       const updatedHistory = [...chatHistory];
                       const msg = updatedHistory[msgIdx];
                       msg.content = msg.content.replace(new RegExp(`\`\`\`draft-email[\\s\\S]*?\`\`\``), "_Draft discarded._");
+                      setChatHistory(updatedHistory);
+                    }}
+                    onSent={(to) => {
+                      const updatedHistory = [...chatHistory];
+                      const msg = updatedHistory[msgIdx];
+                      msg.content = msg.content.replace(new RegExp(`\`\`\`draft-email[\\s\\S]*?\`\`\``), `**✅ Email sent successfully to ${to}!**`);
                       setChatHistory(updatedHistory);
                     }}
                   />

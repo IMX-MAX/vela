@@ -5,13 +5,13 @@ import { PaperPlaneRight, Trash, CircleNotch } from "@phosphor-icons/react";
 import { sendEmail } from "@/lib/gmail";
 import { useAuthStore } from "@/lib/store";
 
-export default function AiComposeBox({ initialTo, initialSubject, initialBody, resolvedToken, onDiscard }) {
+export default function AiComposeBox({ initialTo, initialSubject, initialBody, resolvedToken, onDiscard, onSent }) {
   const { user } = useAuthStore();
   const [to, setTo] = useState(initialTo || "");
   const [subject, setSubject] = useState(initialSubject || "");
   const [body, setBody] = useState(initialBody || "");
   
-  const [status, setStatus] = useState("idle"); // "idle" | "sending" | "sent" | "error"
+  const [status, setStatus] = useState("idle"); // "idle" | "sending" | "error"
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleSend = async () => {
@@ -22,7 +22,6 @@ export default function AiComposeBox({ initialTo, initialSubject, initialBody, r
     
     try {
       await sendEmail(resolvedToken, to, subject, body);
-      setStatus("sent");
       
       // Background Profiling
       if (user) {
@@ -37,23 +36,16 @@ export default function AiComposeBox({ initialTo, initialSubject, initialBody, r
           });
         });
       }
+      
+      if (onSent) {
+        onSent(to);
+      }
     } catch (error) {
       console.error(error);
       setStatus("error");
       setErrorMsg("Failed to send email. Please try again.");
     }
   };
-
-  if (status === "sent") {
-    return (
-      <div className="bg-[#c7d4ce]/20 border border-[#c7d4ce] rounded-xl p-4 text-center mt-2 mb-2">
-        <p className="text-[#50686c] font-medium flex items-center justify-center gap-2">
-          <PaperPlaneRight size={16} weight="fill" />
-          Email sent successfully to {to}!
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mt-4 mb-2 flex flex-col font-sans max-w-2xl w-full">

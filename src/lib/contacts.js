@@ -9,7 +9,12 @@ async function makePeopleRequest(tokenOrConnectionId, url, options = {}) {
     },
     cache: "no-store",
   });
-  return res.json();
+  const data = await res.json();
+  if (data?.error) {
+    console.error("API Error Response:", JSON.stringify(data.error));
+    throw new Error(data.error.message || "Unknown API error");
+  }
+  return data;
 }
 
 export async function fetchContacts(tokenOrConnectionId) {
@@ -29,13 +34,12 @@ export async function fetchContacts(tokenOrConnectionId) {
 }
 
 export async function createContact(tokenOrConnectionId, contactData) {
-  const body = {
-    names: contactData.firstName || contactData.lastName ? [{ givenName: contactData.firstName || "", familyName: contactData.lastName || "" }] : [],
-    emailAddresses: contactData.email ? [{ value: contactData.email }] : [],
-    phoneNumbers: contactData.phone ? [{ value: contactData.phone }] : [],
-    organizations: contactData.company || contactData.jobTitle ? [{ name: contactData.company || "", title: contactData.jobTitle || "" }] : [],
-    biographies: contactData.notes ? [{ value: contactData.notes }] : []
-  };
+  const body = {};
+  if (contactData.firstName || contactData.lastName) body.names = [{ givenName: contactData.firstName || "", familyName: contactData.lastName || "" }];
+  if (contactData.email) body.emailAddresses = [{ value: contactData.email }];
+  if (contactData.phone) body.phoneNumbers = [{ value: contactData.phone }];
+  if (contactData.company || contactData.jobTitle) body.organizations = [{ name: contactData.company || "", title: contactData.jobTitle || "" }];
+  if (contactData.notes) body.biographies = [{ value: contactData.notes }];
 
   try {
     const data = await makePeopleRequest(
@@ -55,19 +59,53 @@ export async function createContact(tokenOrConnectionId, contactData) {
 }
 
 export async function updateContact(tokenOrConnectionId, resourceName, contactData) {
-  const body = {
-    etag: contactData.etag,
-    names: contactData.firstName || contactData.lastName ? [{ givenName: contactData.firstName || "", familyName: contactData.lastName || "" }] : [],
-    emailAddresses: contactData.email ? [{ value: contactData.email }] : [],
-    phoneNumbers: contactData.phone ? [{ value: contactData.phone }] : [],
-    organizations: contactData.company || contactData.jobTitle ? [{ name: contactData.company || "", title: contactData.jobTitle || "" }] : [],
-    biographies: contactData.notes ? [{ value: contactData.notes }] : []
-  };
+  const body = { etag: contactData.etag };
+  const updateFields = [];
+
+  if (contactData.firstName || contactData.lastName) {
+    body.names = [{ givenName: contactData.firstName || "", familyName: contactData.lastName || "" }];
+    updateFields.push("names");
+  } else {
+    body.names = [];
+    updateFields.push("names");
+  }
+
+  if (contactData.email) {
+    body.emailAddresses = [{ value: contactData.email }];
+    updateFields.push("emailAddresses");
+  } else {
+    body.emailAddresses = [];
+    updateFields.push("emailAddresses");
+  }
+
+  if (contactData.phone) {
+    body.phoneNumbers = [{ value: contactData.phone }];
+    updateFields.push("phoneNumbers");
+  } else {
+    body.phoneNumbers = [];
+    updateFields.push("phoneNumbers");
+  }
+
+  if (contactData.company || contactData.jobTitle) {
+    body.organizations = [{ name: contactData.company || "", title: contactData.jobTitle || "" }];
+    updateFields.push("organizations");
+  } else {
+    body.organizations = [];
+    updateFields.push("organizations");
+  }
+
+  if (contactData.notes) {
+    body.biographies = [{ value: contactData.notes }];
+    updateFields.push("biographies");
+  } else {
+    body.biographies = [];
+    updateFields.push("biographies");
+  }
 
   try {
     const data = await makePeopleRequest(
       tokenOrConnectionId,
-      `https://people.googleapis.com/v1/${resourceName}:updateContact?updatePersonFields=names,emailAddresses,phoneNumbers,organizations,biographies`,
+      `https://people.googleapis.com/v1/${resourceName}:updateContact?updatePersonFields=${updateFields.join(",")}`,
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
