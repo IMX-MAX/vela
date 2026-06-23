@@ -244,7 +244,7 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
                 key={opt.id}
                 onClick={() => handleSlashOptionSelect(opt)}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left transition ${
-                  index === selectedSlashIndex ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'
+                  index === selectedSlashIndex ? 'bg-gray-100 text-[#2b323b]' : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
                 <span className="text-[16px] w-5 text-center">{opt.icon}</span>
@@ -288,7 +288,7 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
           <button 
             onClick={() => slashCustomPrompt.trim() && runAiAction(slashCustomPrompt.trim(), true, slashCustomPrompt.trim())}
             disabled={isProcessing || !slashCustomPrompt.trim()}
-            className="bg-gray-800 hover:bg-black text-white rounded px-3 py-1 text-[13px] font-medium transition disabled:opacity-50"
+            className="bg-gray-800 hover:bg-[#2b323b] text-white rounded px-3 py-1 text-[13px] font-medium transition disabled:opacity-50"
           >
             {isProcessing ? "..." : "Draft"}
           </button>

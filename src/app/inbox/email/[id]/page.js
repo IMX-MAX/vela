@@ -275,7 +275,7 @@ export default function EmailDetailPage({ params }) {
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center bg-[#f4f3f0] rounded-2xl">
+      <div className="flex h-full items-center justify-center bg-[#eceae6] rounded-2xl">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-400 border-t-gray-800"></div>
       </div>
     );
@@ -283,11 +283,11 @@ export default function EmailDetailPage({ params }) {
 
   if (authError) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-[#f4f3f0] rounded-2xl p-8">
+      <div className="flex flex-col items-center justify-center h-full bg-[#eceae6] rounded-2xl p-8">
         <p className="text-red-500 font-medium max-w-md text-center">{authError}</p>
         <button 
           onClick={async () => { await useAuthStore.getState().logout(); window.location.href = "/login"; }} 
-          className="mt-6 px-5 py-2.5 bg-gray-900 text-white hover:bg-black transition rounded-lg text-sm font-medium"
+          className="mt-6 px-5 py-2.5 bg-[#2b323b] text-white hover:bg-[#2b323b] transition rounded-lg text-sm font-medium"
         >
           Sign out and re-login
         </button>
@@ -302,37 +302,37 @@ export default function EmailDetailPage({ params }) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#eeeae6] rounded-2xl relative overflow-y-auto">
+    <div className="flex flex-col h-full bg-[#eceae6] rounded-2xl relative overflow-y-auto">
       {/* Top Bar */}
-      <div className="h-14 flex items-center justify-between px-4 sticky top-0 z-10 rounded-t-2xl bg-[#eeeae6] border-b border-[#e4e3e0]">
+      <div className="h-14 flex items-center justify-between px-4 sticky top-0 z-10 rounded-t-2xl bg-[#eceae6] border-b border-[#dddcdc]">
         <div className="flex items-center gap-2">
           <button 
             onClick={() => router.back()} 
-            className="p-2 text-gray-500 hover:text-gray-900 transition rounded-md hover:bg-black/5"
+            className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5"
           >
             <ArrowLeft size={18} />
           </button>
           <div className="text-[13px] text-gray-400 font-medium ml-2 select-none flex items-center gap-2">
-            <button className="bg-white border border-gray-200 text-gray-500 hover:text-gray-900 transition rounded-md h-7 w-7 flex items-center justify-center">
+            <button className="bg-white border border-gray-200 text-gray-500 hover:text-[#2b323b] transition rounded-md h-7 w-7 flex items-center justify-center">
                <CaretUp size={14} weight="bold" />
             </button>
-            <button className="bg-white border border-gray-200 text-gray-500 hover:text-gray-900 transition rounded-md h-7 w-7 flex items-center justify-center">
+            <button className="bg-white border border-gray-200 text-gray-500 hover:text-[#2b323b] transition rounded-md h-7 w-7 flex items-center justify-center">
                <CaretDown size={14} weight="bold" />
             </button>
             <span className="ml-2 font-medium">1 / 9,370</span>
           </div>
         </div>
         <div className="flex items-center gap-4 text-gray-500 pr-2">
-          <button className="hover:text-gray-900 transition"><Star size={18} /></button>
-          <button className="hover:text-gray-900 transition"><Clock size={18} /></button>
-          <button className="hover:text-gray-900 transition" onClick={handleDone}><Check size={18} /></button>
-          <button className="hover:text-gray-900 transition" onClick={handleTrash}><Trash size={18} /></button>
-          <button className="hover:text-gray-900 transition"><DotsThree size={18} weight="bold" /></button>
+          <button className="hover:text-[#2b323b] transition"><Star size={18} /></button>
+          <button className="hover:text-[#2b323b] transition"><Clock size={18} /></button>
+          <button className="hover:text-[#2b323b] transition" onClick={handleDone}><Check size={18} /></button>
+          <button className="hover:text-[#2b323b] transition" onClick={handleTrash}><Trash size={18} /></button>
+          <button className="hover:text-[#2b323b] transition"><DotsThree size={18} weight="bold" /></button>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto w-full px-8 pb-12 pt-4">
-        <h1 className="text-2xl font-medium text-gray-900 mb-8 text-center">{email.subject}</h1>
+        <h1 className="text-2xl font-medium text-[#2b323b] mb-8 text-center">{email.subject}</h1>
         
         {/* Thread History (Collapsed) */}
         {threadMessages.map((msg, idx) => {
@@ -348,7 +348,7 @@ export default function EmailDetailPage({ params }) {
                 {email.senderName ? email.senderName[0].toUpperCase() : "U"}
               </div>
               <div>
-                <div className="font-medium text-[15px] text-gray-900 flex items-center gap-2">
+                <div className="font-medium text-[15px] text-[#2b323b] flex items-center gap-2">
                   {email.senderName}
                   <span className="text-[13px] font-normal text-gray-400">{email.senderEmail}</span>
                 </div>
@@ -371,21 +371,21 @@ export default function EmailDetailPage({ params }) {
                   onClick={() => copyToClipboard(`From: ${email.senderName} <${email.senderEmail}>`)}
                 >
                   <span className="text-gray-500">From:</span>
-                  <span className="text-gray-900">{email.senderName} &lt;{email.senderEmail}&gt;</span>
+                  <span className="text-[#2b323b]">{email.senderName} &lt;{email.senderEmail}&gt;</span>
                 </div>
                 <div 
                   className="grid grid-cols-[60px_1fr] gap-2 py-1.5 hover:bg-gray-50 cursor-pointer rounded px-2 transition-colors"
                   onClick={() => copyToClipboard(`To: ${email.rawTo || "me"}`)}
                 >
                   <span className="text-gray-500">To:</span>
-                  <span className="text-gray-900">{email.rawTo || "me"}</span>
+                  <span className="text-[#2b323b]">{email.rawTo || "me"}</span>
                 </div>
                 <div 
                   className="grid grid-cols-[60px_1fr] gap-2 py-1.5 hover:bg-gray-50 cursor-pointer rounded px-2 transition-colors"
                   onClick={() => copyToClipboard(`Subject: ${email.subject}`)}
                 >
                   <span className="text-gray-500">Subject:</span>
-                  <span className="text-gray-900">{email.subject}</span>
+                  <span className="text-[#2b323b]">{email.subject}</span>
                 </div>
                 <div 
                   className="grid grid-cols-[60px_1fr] gap-2 py-1.5 hover:bg-gray-50 cursor-pointer rounded px-2 transition-colors"
@@ -395,14 +395,14 @@ export default function EmailDetailPage({ params }) {
                   }}
                 >
                   <span className="text-gray-500">Date:</span>
-                  <span className="text-gray-900">{email.date ? format(new Date(email.date), "EEEE, MMMM d, yyyy 'at' h:mm a") : ""}</span>
+                  <span className="text-[#2b323b]">{email.date ? format(new Date(email.date), "EEEE, MMMM d, yyyy 'at' h:mm a") : ""}</span>
                 </div>
               </div>
             )}
           </div>
 
           {/* AI Toolbar within Card */}
-          <div className="px-8 py-4 bg-[#fbfbfc] border-b border-gray-100 flex flex-col gap-3">
+          <div className="px-8 py-4 bg-[#eceae6] border-b border-gray-100 flex flex-col gap-3">
             <div className="flex items-center gap-3">
               <button 
                 onClick={handleSummarize}
@@ -441,7 +441,7 @@ export default function EmailDetailPage({ params }) {
                 <button 
                   onClick={handleDraftReply}
                   disabled={!aiPrompt.trim() || isDrafting}
-                  className="bg-gray-800 hover:bg-black text-white rounded px-3 py-1 text-[13px] font-medium transition disabled:opacity-50"
+                  className="bg-gray-800 hover:bg-[#2b323b] text-white rounded px-3 py-1 text-[13px] font-medium transition disabled:opacity-50"
                 >
                   Draft
                 </button>
@@ -493,9 +493,9 @@ export default function EmailDetailPage({ params }) {
             );
           } else {
             return (
-              <div key={idx} className="bg-[#f0ece9] rounded-xl shadow-sm border border-[#e4e3e0] overflow-hidden mb-4 p-4 flex items-center justify-between opacity-80 hover:opacity-100 transition cursor-pointer" onClick={() => router.push(`/inbox/email/${msg.id}`)}>
+              <div key={idx} className="bg-[#eceae6] rounded-xl shadow-sm border border-[#dddcdc] overflow-hidden mb-4 p-4 flex items-center justify-between opacity-80 hover:opacity-100 transition cursor-pointer" onClick={() => router.push(`/inbox/email/${msg.id}`)}>
                 <div className="flex items-center gap-3">
-                  <div className="font-medium text-[14px] text-gray-900">
+                  <div className="font-medium text-[14px] text-[#2b323b]">
                     {msg.senderName}
                   </div>
                   <div className="text-[13px] text-gray-500 truncate max-w-md">
@@ -512,7 +512,7 @@ export default function EmailDetailPage({ params }) {
 
         {/* Reply Section */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-visible focus-within:ring-2 focus-within:ring-black/5 focus-within:border-gray-400 transition mb-12">
-          <div className="px-4 py-3 bg-[#fbfbfc] border-b border-gray-100 flex items-center gap-2 text-[13px] text-gray-600 font-medium rounded-t-xl">
+          <div className="px-4 py-3 bg-[#eceae6] border-b border-gray-100 flex items-center gap-2 text-[13px] text-gray-600 font-medium rounded-t-xl">
             <span className="icon-reply"></span>
             Reply to {email.senderName}
           </div>
@@ -527,7 +527,7 @@ export default function EmailDetailPage({ params }) {
               borderless={true}
             />
           </div>
-          <div className="px-4 py-3 bg-[#fbfbfc] border-t border-gray-100 flex justify-between items-center rounded-b-xl">
+          <div className="px-4 py-3 bg-[#eceae6] border-t border-gray-100 flex justify-between items-center rounded-b-xl">
             <div className="flex items-center gap-2 text-gray-400">
               <button className="hover:text-gray-600"><span className="icon-text-b"></span></button>
               <button className="hover:text-gray-600"><span className="icon-paperclip"></span></button>
@@ -535,7 +535,7 @@ export default function EmailDetailPage({ params }) {
             <button 
               onClick={handleSend}
               disabled={!replyText || isSending}
-              className="flex items-center gap-2 bg-gray-900 hover:bg-black transition text-white px-4 py-1.5 rounded-md text-[13px] font-medium disabled:opacity-50"
+              className="flex items-center gap-2 bg-[#2b323b] hover:bg-[#2b323b] transition text-white px-4 py-1.5 rounded-md text-[13px] font-medium disabled:opacity-50"
             >
               {isSending ? "Sending..." : "Send"}
               <PaperPlaneRight size={14} weight="fill" />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthStore } from "@/lib/store";
-import { EnvelopeSimple } from "@phosphor-icons/react";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -44,13 +44,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-[#f2f2f1]">
-      <div className="w-full max-w-sm rounded-2xl border border-black/5 bg-[#fdfdfc] p-8 shadow-sm">
+    <div className="flex h-screen items-center justify-center bg-[#eceae6]">
+      <div className="w-full max-w-sm rounded-2xl border border-[#2b323b]/5 bg-[#eceae6] p-8 shadow-sm">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-black text-white shadow-md">
-            <EnvelopeSimple size={24} weight="fill" />
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden shadow-md">
+            <img src="/logo.png" alt="Vela Logo" className="h-full w-full object-cover" />
           </div>
-          <h1 className="text-xl font-semibold text-gray-900">{isLogin ? "Welcome back" : "Create an account"}</h1>
+          <h1 className="text-xl font-semibold text-[#2b323b]">{isLogin ? "Welcome back" : "Create an account"}</h1>
           <p className="mt-1 text-sm text-gray-500">Sign in to continue to Vela</p>
         </div>
 
@@ -68,7 +68,7 @@ export default function LoginPage() {
                 placeholder="Name" 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-[#f9f9f8] text-sm focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-400 transition"
+                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-[#eceae6] text-sm focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-400 transition"
               />
             </div>
           )}
@@ -79,7 +79,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-[#f9f9f8] text-sm focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-400 transition"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-[#eceae6] text-sm focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-400 transition"
             />
           </div>
           <div>
@@ -89,13 +89,13 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-[#f9f9f8] text-sm focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-400 transition"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-[#eceae6] text-sm focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-400 transition"
             />
           </div>
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 disabled:opacity-50 shadow-sm"
+            className="w-full rounded-lg bg-[#2b323b] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#50686c] disabled:opacity-50 shadow-sm"
           >
             {loading ? "Please wait..." : (isLogin ? "Sign In" : "Sign Up")}
           </button>
@@ -106,7 +106,7 @@ export default function LoginPage() {
             <div className="w-full border-t border-gray-200"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-[#fdfdfc] px-2 text-gray-500">Or continue with</span>
+            <span className="bg-[#eceae6] px-2 text-gray-500">Or continue with</span>
           </div>
         </div>
 
@@ -140,7 +140,7 @@ export default function LoginPage() {
           <button 
             type="button" 
             onClick={() => setIsLogin(!isLogin)} 
-            className="font-medium text-black hover:underline"
+            className="font-medium text-[#2b323b] hover:underline"
           >
             {isLogin ? "Sign up" : "Log in"}
           </button>

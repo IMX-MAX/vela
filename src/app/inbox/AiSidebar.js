@@ -113,38 +113,38 @@ export default function AiSidebar() {
 
   return (
     <div 
-      className="border border-[#e4e3e0] bg-[#eeeae6] flex flex-col shadow-sm rounded-2xl m-2 relative z-20 transition-transform duration-300 flex-shrink-0"
+      className="border border-[#dddcdc] bg-[#eceae6] flex flex-col shadow-sm rounded-2xl m-2 relative z-20 transition-transform duration-300 flex-shrink-0"
       style={{ width: `${aiSidebarWidth}px` }}
     >
       {/* Resizer Handle */}
       <div 
-        className="absolute left-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-black/10 transition-colors rounded-l-2xl z-30"
+        className="absolute left-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-[#2b323b]/10 transition-colors rounded-l-2xl z-30"
         onMouseDown={startResizing}
       />
 
-      <div className="h-14 border-b border-[#e4e3e0] flex items-center justify-between px-4 sticky top-0 bg-[#eeeae6]/90 backdrop-blur-sm z-10 rounded-t-2xl">
-        <div className="flex items-center gap-2 text-gray-900 font-medium">
-          <Sparkle size={18} className="text-gray-900" weight="fill" />
+      <div className="h-14 border-b border-[#dddcdc] flex items-center justify-between px-4 sticky top-0 bg-[#eceae6]/90 backdrop-blur-sm z-10 rounded-t-2xl">
+        <div className="flex items-center gap-2 text-[#2b323b] font-medium">
+          <Sparkle size={18} className="text-[#2b323b]" weight="fill" />
           Vela Agent
         </div>
         <div className="flex items-center gap-1">
           <button 
             onClick={() => setShowHistory(!showHistory)}
-            className="p-1.5 text-gray-500 hover:text-gray-900 transition rounded-md hover:bg-black/5"
+            className="p-1.5 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5"
             title="Chat History"
           >
             <ClockCounterClockwise size={16} weight="bold" />
           </button>
           <button 
             onClick={handleNewChat}
-            className="p-1.5 text-gray-500 hover:text-gray-900 transition rounded-md hover:bg-black/5"
+            className="p-1.5 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5"
             title="New Chat"
           >
             <Plus size={16} weight="bold" />
           </button>
           <button 
             onClick={toggleAiSidebar}
-            className="p-1.5 text-gray-500 hover:text-gray-900 transition rounded-md hover:bg-black/5 ml-1"
+            className="p-1.5 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 ml-1"
           >
             <X size={16} weight="bold" />
           </button>
@@ -185,8 +185,8 @@ export default function AiSidebar() {
                 <div 
                   className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[14px] leading-relaxed ${
                     msg.role === "user" 
-                      ? "bg-black text-white rounded-tr-sm" 
-                      : "bg-white text-gray-900 rounded-tl-sm shadow-sm prose prose-sm prose-gray max-w-none"
+                      ? "bg-[#2b323b] text-white rounded-tr-sm" 
+                      : "bg-white text-[#2b323b] rounded-tl-sm shadow-sm prose prose-sm prose-gray max-w-none"
                   }`}
                 >
                   {msg.role === "user" ? (
@@ -214,7 +214,7 @@ export default function AiSidebar() {
       )}
 
       {!showHistory && (
-        <div className="p-4 bg-[#eeeae6] rounded-b-2xl z-10 relative">
+        <div className="p-4 bg-[#eceae6] rounded-b-2xl z-10 relative">
           <div className="relative flex items-center">
             <input 
               type="text" 
@@ -222,12 +222,12 @@ export default function AiSidebar() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              className="w-full bg-white text-[14px] text-gray-900 placeholder-gray-500 rounded-full pl-4 pr-10 py-2.5 outline-none shadow-sm transition"
+              className="w-full bg-white text-[14px] text-[#2b323b] placeholder-gray-500 rounded-full pl-4 pr-10 py-2.5 outline-none shadow-sm transition"
             />
             <button 
               onClick={handleSend}
               disabled={!input.trim() || isLoading}
-              className="absolute right-1.5 p-1.5 bg-gray-900 hover:bg-black text-white rounded-full transition disabled:opacity-50 disabled:hover:bg-gray-900"
+              className="absolute right-1.5 p-1.5 bg-[#2b323b] hover:bg-[#2b323b] text-white rounded-full transition disabled:opacity-50 disabled:hover:bg-[#2b323b]"
             >
               <PaperPlaneRight size={14} weight="fill" />
             </button>

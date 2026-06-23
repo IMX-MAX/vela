@@ -318,23 +318,23 @@ export default function CommandPalette() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] bg-black/40 backdrop-blur-sm"
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] bg-[#2b323b]/40 backdrop-blur-sm"
       style={{ animation: "fadeIn 0.15s ease-out" }}
     >
       <div 
         ref={containerRef}
-        className="w-full max-w-[680px] bg-[#f7f7f6] rounded-2xl shadow-2xl border border-[#d0cfcb] overflow-hidden flex flex-col"
+        className="w-full max-w-[680px] bg-[#eceae6] rounded-2xl shadow-2xl border border-[#d0cfcb] overflow-hidden flex flex-col"
         style={{ 
           maxHeight: chatHistory.length > 0 ? '70vh' : 'auto',
           animation: "slideDown 0.15s ease-out" 
         }}
       >
         {/* Input Area */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-[#e4e3e0]">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-[#dddcdc]">
           {mode === "ai" && (
             <button 
               onClick={handleBack}
-              className="p-1 text-gray-400 hover:text-gray-700 transition rounded-md hover:bg-black/5 flex-shrink-0"
+              className="p-1 text-gray-400 hover:text-gray-700 transition rounded-md hover:bg-[#2b323b]/5 flex-shrink-0"
             >
               <ArrowLeft size={18} weight="bold" />
             </button>
@@ -353,17 +353,17 @@ export default function CommandPalette() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent text-[16px] text-gray-900 placeholder-gray-400 outline-none font-medium"
+            className="flex-1 bg-transparent text-[16px] text-[#2b323b] placeholder-gray-400 outline-none font-medium"
           />
 
           {mode === "search" && (
-            <div className="flex items-center gap-1 text-[11px] text-gray-400 flex-shrink-0 bg-[#e4e3e0] px-2 py-1 rounded-md">
+            <div className="flex items-center gap-1 text-[11px] text-gray-400 flex-shrink-0 bg-[#dddcdc] px-2 py-1 rounded-md">
               <span className="font-mono">Tab</span>
               <span>for AI</span>
             </div>
           )}
           {mode === "ai" && input.trim() && (
-            <div className="flex items-center gap-1 text-[11px] text-gray-400 flex-shrink-0 bg-[#e4e3e0] px-2 py-1 rounded-md">
+            <div className="flex items-center gap-1 text-[11px] text-gray-400 flex-shrink-0 bg-[#dddcdc] px-2 py-1 rounded-md">
               <span className="font-mono">Tab</span>
               <span>or</span>
               <span className="font-mono">↵</span>
@@ -377,7 +377,7 @@ export default function CommandPalette() {
           <div className="flex-1 overflow-y-auto">
             <div className="flex flex-col gap-0">
               {chatHistory.map((msg, idx) => (
-                <div key={idx} className={`px-5 py-4 ${idx > 0 ? 'border-t border-[#e4e3e0]/50' : ''}`}>
+                <div key={idx} className={`px-5 py-4 ${idx > 0 ? 'border-t border-[#dddcdc]/50' : ''}`}>
                   {msg.role === "user" ? (
                     <div className="text-[14px] text-gray-500 font-medium">{msg.content}</div>
                   ) : (
@@ -390,7 +390,7 @@ export default function CommandPalette() {
                 </div>
               ))}
               {isLoading && (
-                <div className="px-5 py-4 border-t border-[#e4e3e0]/50">
+                <div className="px-5 py-4 border-t border-[#dddcdc]/50">
                   <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
                     <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
@@ -405,17 +405,17 @@ export default function CommandPalette() {
 
         {/* Footer hints */}
         {mode === "search" && !input.trim() && options.length === 0 && (
-          <div className="px-5 py-3 border-t border-[#e4e3e0]/50 flex items-center gap-4 text-[12px] text-gray-400">
+          <div className="px-5 py-3 border-t border-[#dddcdc]/50 flex items-center gap-4 text-[12px] text-gray-400">
             <div className="flex items-center gap-1.5">
               <MagnifyingGlass size={13} />
               <span>Search your inbox</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="font-mono text-[11px] bg-[#e4e3e0] px-1.5 py-0.5 rounded">Tab</span>
+              <span className="font-mono text-[11px] bg-[#dddcdc] px-1.5 py-0.5 rounded">Tab</span>
               <span>Switch to AI</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="font-mono text-[11px] bg-[#e4e3e0] px-1.5 py-0.5 rounded">Esc</span>
+              <span className="font-mono text-[11px] bg-[#dddcdc] px-1.5 py-0.5 rounded">Esc</span>
               <span>Close</span>
             </div>
           </div>
@@ -423,7 +423,7 @@ export default function CommandPalette() {
 
         {/* Search Options Area */}
         {(mode === "search" || (mode === "ai" && chatHistory.length === 0)) && options.length > 0 && (
-          <div className="border-t border-[#e4e3e0]/50 px-5 py-3">
+          <div className="border-t border-[#dddcdc]/50 px-5 py-3">
             {options[0]?.type !== 'ai_chat' && (
               <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
                 Suggestions
@@ -465,7 +465,7 @@ export default function CommandPalette() {
                     <button
                       onClick={() => executeOption(option)}
                       className={`text-left px-3 py-2 rounded-lg transition flex items-center gap-3 text-[13px] w-full ${
-                        idx === selectedIndex ? 'bg-[#e4e3e0] text-gray-900' : 'hover:bg-[#e4e3e0]/50 text-gray-700'
+                        idx === selectedIndex ? 'bg-[#dddcdc] text-[#2b323b]' : 'hover:bg-[#dddcdc]/50 text-gray-700'
                       }`}
                       onMouseEnter={() => setSelectedIndex(idx)}
                     >

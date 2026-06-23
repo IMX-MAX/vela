@@ -199,7 +199,7 @@ export default function InboxPage() {
 
   if (needsComposio) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-[#f2f2f1] rounded-2xl relative">
+      <div className="flex flex-col items-center justify-center h-full bg-[#eceae6] rounded-2xl relative">
         <div className="text-center max-w-md p-8 bg-white rounded-2xl border border-gray-200 shadow-sm">
           <div className="h-16 w-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-gray-800">
             <LinkIcon size={32} weight="bold" />
@@ -211,7 +211,7 @@ export default function InboxPage() {
           <button 
             onClick={handleConnectComposio}
             disabled={loading}
-            className="w-full bg-black text-white px-4 py-3 rounded-xl font-medium hover:bg-gray-800 transition disabled:opacity-50"
+            className="w-full bg-[#2b323b] text-white px-4 py-3 rounded-xl font-medium hover:bg-[#50686c] transition disabled:opacity-50"
           >
             {loading ? "Connecting..." : "Connect with Composio"}
           </button>
@@ -221,8 +221,8 @@ export default function InboxPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#f2f2f1] rounded-2xl relative">
-      <div className="h-14 border-b border-[#e4e3e0] flex items-center px-6 sticky top-0 bg-[#f2f2f1]/90 backdrop-blur-sm z-10 rounded-t-2xl">
+    <div className="flex flex-col h-full bg-[#eceae6] rounded-2xl relative">
+      <div className="h-14 border-b border-[#dddcdc] flex items-center px-6 sticky top-0 bg-[#eceae6]/90 backdrop-blur-sm z-10 rounded-t-2xl">
         <div className="flex items-center gap-3">
           <div className="bg-white px-3 py-1.5 rounded-md text-sm font-medium shadow-sm flex items-center gap-2">
             {searchQuery ? `Search: ${searchQuery}` : "Inbox"}
@@ -241,20 +241,20 @@ export default function InboxPage() {
               <div
                 key={email.id}
                 onClick={() => router.push(`/inbox/email/${email.id}`)}
-                className={`group flex items-center px-6 py-2.5 cursor-pointer border-b border-black/5 hover:bg-[#e4e3e0]/50 transition ${
+                className={`group flex items-center px-6 py-2.5 cursor-pointer border-b border-[#2b323b]/5 hover:bg-[#dddcdc]/50 transition ${
                   email.isUnread ? "bg-white" : ""
                 }`}
               >
                 <div className="w-4 flex-shrink-0 flex items-center justify-center">
-                  {email.isUnread && <div className="h-2 w-2 rounded-full bg-gray-900"></div>}
+                  {email.isUnread && <div className="h-2 w-2 rounded-full bg-[#2b323b]"></div>}
                 </div>
                 
-                <div className={`w-48 truncate pr-4 text-[13px] ${email.isUnread ? "font-semibold text-gray-900" : "font-medium text-gray-700"}`}>
+                <div className={`w-48 truncate pr-4 text-[13px] ${email.isUnread ? "font-semibold text-[#2b323b]" : "font-medium text-gray-700"}`}>
                   {email.sender}
                 </div>
                 
                 <div className="flex-1 truncate text-[13px] flex items-center">
-                  <span className={`${email.isUnread ? "font-semibold text-gray-900" : "font-medium text-gray-800"}`}>
+                  <span className={`${email.isUnread ? "font-semibold text-[#2b323b]" : "font-medium text-gray-800"}`}>
                     {email.subject}
                   </span>
                   <span className="text-gray-500 mx-2">&mdash;</span>
@@ -263,10 +263,10 @@ export default function InboxPage() {
                 
                 <div className="flex-shrink-0 ml-4 flex items-center w-24 justify-end">
                   <div className="hidden group-hover:flex items-center gap-2 text-gray-500">
-                    <button onClick={(e) => handleDone(e, email.id)} className="hover:text-gray-900"><Check size={16} /></button>
-                    <button onClick={(e) => handleTrash(e, email.id)} className="hover:text-gray-900"><Trash size={16} /></button>
+                    <button onClick={(e) => handleDone(e, email.id)} className="hover:text-[#2b323b]"><Check size={16} /></button>
+                    <button onClick={(e) => handleTrash(e, email.id)} className="hover:text-[#2b323b]"><Trash size={16} /></button>
                   </div>
-                  <div className={`group-hover:hidden text-[12px] ${email.isUnread ? "font-medium text-gray-900" : "text-gray-500"}`}>
+                  <div className={`group-hover:hidden text-[12px] ${email.isUnread ? "font-medium text-[#2b323b]" : "text-gray-500"}`}>
                     {formatTime(email.dateStr)}
                   </div>
                 </div>
@@ -285,7 +285,7 @@ export default function InboxPage() {
                 <p className="text-red-500 font-medium max-w-md text-center">{authError}</p>
                 <button 
                   onClick={async () => { await useAuthStore.getState().logout(); window.location.href = "/login"; }} 
-                  className="mt-6 px-5 py-2.5 bg-gray-900 text-white hover:bg-black transition rounded-lg text-sm font-medium"
+                  className="mt-6 px-5 py-2.5 bg-[#2b323b] text-white hover:bg-[#2b323b] transition rounded-lg text-sm font-medium"
                 >
                   Sign out and re-login
                 </button>

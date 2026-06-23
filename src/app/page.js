@@ -20,15 +20,13 @@ export default function LandingPage() {
   }, [checkAuth]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white font-[Inter] selection:bg-white selection:text-black overflow-x-hidden">
+    <div className="min-h-screen bg-[#2b323b] text-white font-[Inter] selection:bg-white selection:text-[#2b323b] overflow-x-hidden">
       
       {/* Navbar */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/10 py-3" : "bg-transparent py-5"}`}>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-[#2b323b]/80 backdrop-blur-md border-b border-white/10 py-3" : "bg-transparent py-5"}`}>
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center gap-2 font-medium text-lg tracking-tight text-white">
-            <div className="bg-white text-black p-1.5 rounded-md">
-              <EnvelopeSimple size={18} weight="fill" />
-            </div>
+            <img src="/logo.png" alt="Vela Logo" className="h-6 w-auto rounded-md bg-white p-1" />
             Vela
           </div>
           <div className="flex items-center gap-4">
@@ -68,11 +66,11 @@ export default function LandingPage() {
           
           <div className="flex flex-wrap items-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
             {!loading && user ? (
-              <Link href="/inbox" className="inline-flex items-center gap-2 text-sm font-medium bg-white text-black px-6 py-3 rounded-full hover:bg-gray-200 transition">
+              <Link href="/inbox" className="inline-flex items-center gap-2 text-sm font-medium bg-white text-[#2b323b] px-6 py-3 rounded-full hover:bg-gray-200 transition">
                 Open Inbox <ArrowRight size={16} />
               </Link>
             ) : (
-              <Link href="/login" className="inline-flex items-center gap-2 text-sm font-medium bg-white text-black px-6 py-3 rounded-full hover:bg-gray-200 transition">
+              <Link href="/login" className="inline-flex items-center gap-2 text-sm font-medium bg-white text-[#2b323b] px-6 py-3 rounded-full hover:bg-gray-200 transition">
                 Try Vela <ArrowRight size={16} />
               </Link>
             )}
@@ -88,7 +86,7 @@ export default function LandingPage() {
             <div className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Speed</div>
             <h3 className="text-2xl font-medium text-white mb-2">Built on a modern stack. Interactions are instantaneous.</h3>
           </div>
-          <div className="aspect-[21/9] rounded-2xl bg-[#121212] border border-white/5 relative overflow-hidden flex items-center justify-center group">
+          <div className="aspect-[21/9] rounded-2xl bg-[#50686c] border border-white/5 relative overflow-hidden flex items-center justify-center group">
              {/* Abstract visual for speed */}
              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></div>
              <div className="flex gap-2 items-center text-gray-600">
@@ -104,7 +102,7 @@ export default function LandingPage() {
             <div className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Keyboard First</div>
             <h3 className="text-2xl font-medium text-white mb-2">Navigate your entire inbox without ever touching your mouse.</h3>
           </div>
-          <div className="aspect-[21/9] rounded-2xl bg-[#121212] border border-white/5 relative overflow-hidden flex items-center justify-center p-8">
+          <div className="aspect-[21/9] rounded-2xl bg-[#50686c] border border-white/5 relative overflow-hidden flex items-center justify-center p-8">
              {/* Abstract visual for keyboard */}
              <div className="grid grid-cols-10 gap-2 w-full max-w-lg opacity-50">
                {Array.from({ length: 40 }).map((_, i) => (
@@ -125,7 +123,7 @@ export default function LandingPage() {
             <div className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Intelligence</div>
             <h3 className="text-2xl font-medium text-white mb-2">Instantly extract the core message from long email threads.</h3>
           </div>
-          <div className="aspect-[21/9] rounded-2xl bg-[#121212] border border-white/5 relative overflow-hidden flex items-center justify-center">
+          <div className="aspect-[21/9] rounded-2xl bg-[#50686c] border border-white/5 relative overflow-hidden flex items-center justify-center">
              <div className="flex gap-3 px-6 py-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
                 <Sparkle size={20} weight="fill" className="text-purple-400" />
                 <div className="flex flex-col gap-2 w-48">
@@ -142,7 +140,7 @@ export default function LandingPage() {
             <div className="text-[10px] font-bold tracking-widest text-gray-500 uppercase mb-3">Deep Search</div>
             <h3 className="text-2xl font-medium text-white mb-2">Find exactly what you are looking for instantly.</h3>
           </div>
-          <div className="aspect-[21/9] rounded-2xl bg-[#121212] border border-white/5 relative overflow-hidden flex items-center justify-center">
+          <div className="aspect-[21/9] rounded-2xl bg-[#50686c] border border-white/5 relative overflow-hidden flex items-center justify-center">
              <div className="w-64 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center px-4 gap-3 text-gray-500">
                <MagnifyingGlass size={18} />
                <div className="h-4 w-[2px] bg-white/50 animate-pulse"></div>
@@ -167,7 +165,7 @@ export default function LandingPage() {
       <footer className="border-t border-white/5 py-12 text-sm text-gray-500">
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2 font-medium text-gray-400">
-            <EnvelopeSimple size={16} weight="fill" />
+            <img src="/logo.png" alt="Vela Logo" className="h-4 w-auto rounded-sm brightness-0 invert opacity-50" />
             Vela
           </div>
           <div className="flex items-center gap-6">

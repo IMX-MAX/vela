@@ -39,7 +39,7 @@ export default function ComposePage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-[#f4f3f0] relative overflow-visible p-6">
+    <div className="flex flex-col items-center justify-center h-full bg-[#eceae6] relative overflow-visible p-6">
       <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg border border-gray-200 overflow-visible flex flex-col min-h-[400px]">
         {/* Header Controls */}
         <div className="flex items-center justify-end p-2 gap-1 border-b border-gray-100">
@@ -57,7 +57,7 @@ export default function ComposePage() {
         {/* Input Fields */}
         <div className="flex flex-col flex-1 p-6 space-y-4">
           <div className="flex items-center border-b border-gray-100 pb-2">
-            <span className="text-[13px] font-medium text-gray-900 w-12">To</span>
+            <span className="text-[13px] font-medium text-[#2b323b] w-12">To</span>
             <input 
               type="email"
               value={to}
@@ -105,7 +105,7 @@ export default function ComposePage() {
         )}
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between p-4 bg-[#fbfbfc] border-t border-gray-100 rounded-b-xl">
+        <div className="flex items-center justify-between p-4 bg-[#eceae6] border-t border-gray-100 rounded-b-xl">
           <input 
             type="file" 
             className="hidden" 
@@ -123,14 +123,14 @@ export default function ComposePage() {
           <div className="flex items-center gap-3">
             <button 
               onClick={() => router.back()}
-              className="text-[14px] font-medium text-gray-600 hover:text-gray-900 transition"
+              className="text-[14px] font-medium text-gray-600 hover:text-[#2b323b] transition"
             >
               Discard
             </button>
             <button 
               onClick={handleSend}
               disabled={!to || !body || isSending}
-              className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-900 px-5 py-1.5 rounded-lg text-[14px] font-medium disabled:opacity-50 transition shadow-sm"
+              className="bg-white border border-gray-200 hover:bg-gray-50 text-[#2b323b] px-5 py-1.5 rounded-lg text-[14px] font-medium disabled:opacity-50 transition shadow-sm"
             >
               {isSending ? "Sending..." : "Send"}
             </button>
