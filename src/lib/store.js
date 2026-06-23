@@ -84,7 +84,8 @@ export const useAuthStore = create((set) => ({
         'https://www.googleapis.com/auth/gmail.compose',
         'https://www.googleapis.com/auth/gmail.readonly',
         'https://www.googleapis.com/auth/gmail.drafts.readonly',
-        'https://www.googleapis.com/auth/contacts'
+        'https://www.googleapis.com/auth/contacts',
+        'https://www.googleapis.com/auth/contacts.other.readonly'
       ]
     );
   },

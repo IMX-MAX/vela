@@ -44,8 +44,17 @@ export default function ContactsPage() {
   const loadContacts = async (token) => {
     setIsLoadingContacts(true);
     try {
-      const data = await fetchContacts(token);
-      setContacts(data);
+      const { contacts: data, errors } = await fetchContacts(token);
+      
+      if (errors && errors.length > 0) {
+        console.error("Fetch errors:", errors);
+        // Only alert if we got exactly 0 contacts, so we don't spam them if only one API fails
+        if (data.length === 0) {
+          alert("Error loading contacts: " + errors.join(" | "));
+        }
+      }
+      
+      setContacts(data || []);
     } catch (error) {
       console.error(error);
     } finally {
@@ -81,13 +90,18 @@ export default function ContactsPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingContact) {
-      await updateContact(resolvedToken, formData.resourceName, formData);
-    } else {
-      await createContact(resolvedToken, formData);
+    try {
+      if (editingContact) {
+        await updateContact(resolvedToken, formData.resourceName, formData);
+      } else {
+        await createContact(resolvedToken, formData);
+      }
+      handleCloseModal();
+      loadContacts(resolvedToken);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to save contact: " + error.message);
     }
-    handleCloseModal();
-    loadContacts(resolvedToken);
   };
 
   const handleDelete = async (resourceName) => {

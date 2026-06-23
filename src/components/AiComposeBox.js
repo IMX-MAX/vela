@@ -48,7 +48,7 @@ export default function AiComposeBox({ initialTo, initialSubject, initialBody, r
   };
 
   return (
-    <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mt-4 mb-2 flex flex-col font-sans max-w-2xl w-full">
+    <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden mt-4 mb-2 flex flex-col font-[Inter] max-w-2xl w-full">
       <div className="flex flex-col p-4 space-y-3">
         <div className="flex items-center border-b border-gray-100 pb-2">
           <span className="text-[13px] font-medium text-[#2b323b] w-12">To</span>
