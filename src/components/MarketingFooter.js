@@ -7,7 +7,7 @@ export default function MarketingFooter() {
     <footer className="border-t border-white/[0.04] py-12 text-sm text-gray-500 bg-[#2b323b]">
       <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-2 font-medium text-gray-400">
-          <img src="/logo.png" alt="Vela Logo" className="h-4 w-auto rounded-sm brightness-0 invert opacity-50" />
+          <img src="/logo.svg" alt="Vela Logo" className="h-4 w-auto rounded-sm brightness-0 invert opacity-50" />
           Vela
         </div>
         <div className="flex items-center gap-6">

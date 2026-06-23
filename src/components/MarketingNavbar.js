@@ -40,7 +40,7 @@ export default function MarketingNavbar() {
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2.5 font-medium text-base tracking-tight text-white">
-            <img src="/logo.png" alt="Vela Logo" className="h-7 w-auto rounded-lg bg-white p-1 shadow-sm" />
+            <img src="/logo.svg" alt="Vela Logo" className="h-7 w-auto rounded-lg bg-white p-1 shadow-sm" />
             <span className="font-semibold">Vela</span>
           </Link>
           

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuthStore } from "@/lib/store";
 import { fetchContacts, createContact, updateContact, deleteContact } from "@/lib/contacts";
 import { Plus, PencilSimple, Trash, User, Phone, EnvelopeSimple, X } from "@phosphor-icons/react";
+import { ContactsSkeleton } from "@/components/Skeletons";
 
 export default function ContactsPage() {
   const { user, loading, session } = useAuthStore();
@@ -113,8 +114,15 @@ export default function ContactsPage() {
 
   if (loading || isLoadingContacts) {
     return (
-      <div className="flex h-full items-center justify-center bg-[#eceae6]">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-400 border-t-gray-800"></div>
+      <div className="flex flex-col h-full bg-[#eceae6] relative">
+        <div className="h-14 border-b border-[#dddcdc] flex justify-between items-center px-6 sticky top-0 bg-[#eceae6]/90 backdrop-blur-sm z-10 rounded-t-2xl">
+          <div className="bg-white px-3 py-1.5 rounded-md text-sm font-medium shadow-sm flex items-center gap-2">
+            Contacts
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          <ContactsSkeleton rows={12} />
+        </div>
       </div>
     );
   }

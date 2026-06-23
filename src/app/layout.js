@@ -1,12 +1,13 @@
 import "./app.css";
 
 export const metadata = {
+  metadataBase: new URL("https://vela.nafen.sbs"),
   title: "Vela | The Fastest AI Email Client",
   description: "Vela is a fast, modern AI email client spearheading UI and artificial intelligence in email. Experience the fastest email workflow.",
   keywords: ["vela", "ai email client", "email client", "AI email", "fast email client"],
   icons: {
-    icon: "/favicon.png",
-    apple: "/apple-touch-icon.png",
+    icon: "/logo.svg",
+    apple: "/logo.svg",
   },
   openGraph: {
     title: "Vela | The Fastest AI Email Client",
@@ -16,6 +17,11 @@ export const metadata = {
     locale: "en_US",
     type: "website",
   },
+};
+
+export const viewport = {
+  themeColor: "#2b323b",
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }) {

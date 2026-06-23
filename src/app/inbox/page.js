@@ -7,6 +7,7 @@ import { parseEmailContent } from "@/lib/emailParser";
 import { useAuthStore } from "@/lib/store";
 import { format, isToday } from "date-fns";
 import { Check, Trash, MagnifyingGlass, Command, Link as LinkIcon, Spinner } from "@phosphor-icons/react";
+import { EmailListSkeleton } from "@/components/Skeletons";
 
 
 export default function InboxPage() {
@@ -204,9 +205,7 @@ export default function InboxPage() {
 
       <div className="flex-1 overflow-y-auto pb-24">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-400 border-t-gray-800"></div>
-          </div>
+          <EmailListSkeleton rows={12} />
         ) : (
           <div className="flex flex-col">
             {emails.map((email) => (

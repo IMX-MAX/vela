@@ -6,32 +6,28 @@ import { fetchEmailDetails, sendEmail } from "@/lib/gmail";
 import { parseEmailContent } from "@/lib/emailParser";
 import { summarizeEmailAction, draftReplyAction } from "@/app/actions";
 import { ArrowLeft, Sparkle, PaperPlaneRight, CaretDown, CaretUp, Star, Clock, Check, Trash, DotsThree } from "@phosphor-icons/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import dynamic from "next/dynamic";
+import { EmailDetailSkeleton } from "@/components/Skeletons";
 
 const AiEditor = dynamic(() => import("@/components/AiEditor"), { ssr: false });
 
-export default function EmailDetailPage({ params }) {
-  const { id } = params;
+export default function EmailDetailPage() {
+  const params = useParams();
+  const id = params?.id;
   const router = useRouter();
   const { session, user, inboxEmails, checkAuth } = useAuthStore();
   const iframeRef = useRef(null);
   
-  const [email, setEmail] = useState(() => {
-    const cached = useAuthStore.getState().inboxEmails?.find(e => e.id === id);
-    if (cached) {
-      return {
-        ...cached,
-        senderName: cached.sender,
-        senderEmail: "",
-      };
-    }
-    return null;
+  const [email, setEmail] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [previewSubject, setPreviewSubject] = useState(() => {
+    const cached = useAuthStore.getState().inboxEmails?.find((e) => e.id === id);
+    return cached?.subject || "";
   });
-  const [loading, setLoading] = useState(!email);
   
   const [summary, setSummary] = useState("");
   const [isSummarizing, setIsSummarizing] = useState(false);
@@ -58,6 +54,13 @@ export default function EmailDetailPage({ params }) {
   };
 
   useEffect(() => {
+    const cached = useAuthStore.getState().inboxEmails?.find((e) => e.id === id);
+    setPreviewSubject(cached?.subject || "");
+    setEmail(null);
+    setThreadMessages([]);
+    setAuthError(null);
+    setLoading(true);
+
     async function load() {
       let token = session?.providerAccessToken;
 
@@ -111,9 +114,7 @@ export default function EmailDetailPage({ params }) {
         console.error("Error fetching email:", error);
         setAuthError(`Gmail API Error: ${error.message}. Please ensure you checked all permission boxes during Google sign-in.`);
       } finally {
-        if (email === null) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     }
     if (session) {
@@ -276,11 +277,7 @@ export default function EmailDetailPage({ params }) {
   };
 
   if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center bg-[#eceae6] rounded-2xl">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-400 border-t-gray-800"></div>
-      </div>
-    );
+    return <EmailDetailSkeleton subject={previewSubject} />;
   }
 
   if (authError) {
@@ -519,8 +516,10 @@ export default function EmailDetailPage({ params }) {
             {email.htmlBody ? (
               <iframe
                 ref={iframeRef}
-                srcDoc={`<base target="_blank" />${email.htmlBody}`}
+                srcDoc={`<base target="_blank" /><meta name="referrer" content="no-referrer" />${email.htmlBody}`}
                 sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin"
+                referrerPolicy="no-referrer"
+                loading="lazy"
                 className="w-full border-none min-h-[300px]"
                 title="Email Content"
                 style={{ overflow: 'hidden' }}

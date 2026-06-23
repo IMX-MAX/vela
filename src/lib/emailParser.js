@@ -1,3 +1,27 @@
+// Decodes Gmail's base64url-encoded part data. Hardened so a single malformed
+// part never throws and breaks rendering of the whole message.
+function decodeBase64Url(data) {
+  if (!data || typeof data !== "string") return "";
+  try {
+    const normalized = data.replace(/-/g, "+").replace(/_/g, "/");
+    const binary = atob(normalized);
+    try {
+      const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+      return new TextDecoder("utf-8").decode(bytes);
+    } catch {
+      // Legacy fallback for environments without TextDecoder
+      try {
+        return decodeURIComponent(escape(binary));
+      } catch {
+        return binary;
+      }
+    }
+  } catch (error) {
+    console.error("Failed to decode email part:", error);
+    return "";
+  }
+}
+
 export function parseEmailContent(message) {
   if (!message || !message.payload) return { subject: "No Subject", from: "Unknown", body: "", htmlBody: "", date: "" };
 
@@ -12,9 +36,9 @@ export function parseEmailContent(message) {
   function extractParts(parts) {
     for (const part of parts) {
       if (part.mimeType === "text/plain" && part.body && part.body.data) {
-        body = decodeURIComponent(escape(atob(part.body.data.replace(/-/g, "+").replace(/_/g, "/"))));
+        body = decodeBase64Url(part.body.data);
       } else if (part.mimeType === "text/html" && part.body && part.body.data) {
-        htmlBody = decodeURIComponent(escape(atob(part.body.data.replace(/-/g, "+").replace(/_/g, "/"))));
+        htmlBody = decodeBase64Url(part.body.data);
       } else if (part.parts) {
         extractParts(part.parts);
       }
@@ -25,9 +49,9 @@ export function parseEmailContent(message) {
     extractParts(message.payload.parts);
   } else if (message.payload.body && message.payload.body.data) {
     if (message.payload.mimeType === "text/html") {
-      htmlBody = decodeURIComponent(escape(atob(message.payload.body.data.replace(/-/g, "+").replace(/_/g, "/"))));
+      htmlBody = decodeBase64Url(message.payload.body.data);
     } else {
-      body = decodeURIComponent(escape(atob(message.payload.body.data.replace(/-/g, "+").replace(/_/g, "/"))));
+      body = decodeBase64Url(message.payload.body.data);
     }
   }
 

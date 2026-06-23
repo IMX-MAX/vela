@@ -1,9 +1,22 @@
+import 'dotenv/config';
 import { Client, Databases } from 'node-appwrite';
 
+const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || 'https://cloud.appwrite.io/v1';
+const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
+const apiKey = process.env.APPWRITE_API_KEY;
+
+if (!projectId || !apiKey) {
+    console.error(
+        'Missing Appwrite credentials. Set NEXT_PUBLIC_APPWRITE_PROJECT_ID and APPWRITE_API_KEY ' +
+        '(and optionally NEXT_PUBLIC_APPWRITE_ENDPOINT) in your .env.local before running this script.'
+    );
+    process.exit(1);
+}
+
 const client = new Client()
-    .setEndpoint('https://tor.cloud.appwrite.io/v1')
-    .setProject('69bdb28e003c4db80f0a')
-    .setKey('standard_8c341adee1b04da707b3b849591270f0a14b492618a0e169517e00a35a9fd73a89e7b1ec907138d34d93adaa2d7794c16860cdc39ca35995f199c6b3f917f96ba5a699f7b663c2bc94e7d4019d3361c568353394db026e209fac026d38c2ead87322181beead655e9b68d56664661f4d02142a63d685099df828cff2d6905aa7');
+    .setEndpoint(endpoint)
+    .setProject(projectId)
+    .setKey(apiKey);
 
 const databases = new Databases(client);
 

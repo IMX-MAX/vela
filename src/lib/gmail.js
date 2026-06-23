@@ -29,6 +29,7 @@ export async function fetchEmails(tokenOrConnectionId, maxResults = 20, label = 
               : label === "drafts" ? "in:drafts"
               : label === "trash" ? "in:trash"
               : label === "spam" ? "in:spam"
+              : label === "done" ? "-in:inbox -in:trash -in:spam -in:drafts -in:sent"
               : "is:inbox";
 
   if (searchQuery) {

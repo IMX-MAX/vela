@@ -10,9 +10,21 @@ function getMistralClient() {
   return new Mistral({ apiKey: process.env.MISTRAL_API_KEY });
 }
 
+// Defensive caps so a malicious/oversized payload can't run up unbounded LLM costs.
+const MAX_CONTENT_CHARS = 24000;
+const MAX_CONTEXT_CHARS = 2000;
+const MAX_PROMPT_CHARS = 4000;
+
+function clamp(value, max) {
+  if (typeof value !== "string") return "";
+  return value.length > max ? value.slice(0, max) : value;
+}
+
 export async function summarizeEmailAction(emailContent, userContext = "") {
   try {
     const mistral = getMistralClient();
+    emailContent = clamp(emailContent, MAX_CONTENT_CHARS);
+    userContext = clamp(userContext, MAX_CONTEXT_CHARS);
     const systemPrompt = userContext ? `You are a helpful AI assistant. User Context: ${userContext}` : "";
     
     const messages = [];
@@ -36,6 +48,9 @@ export async function summarizeEmailAction(emailContent, userContext = "") {
 export async function draftReplyAction(emailContent, userPrompt, userContext = "") {
   try {
     const mistral = getMistralClient();
+    emailContent = clamp(emailContent, MAX_CONTENT_CHARS);
+    userPrompt = clamp(userPrompt, MAX_PROMPT_CHARS);
+    userContext = clamp(userContext, MAX_CONTEXT_CHARS);
     const systemPrompt = userContext ? `You are a helpful AI assistant. User Context: ${userContext}` : "";
     
     const messages = [];
@@ -59,6 +74,9 @@ export async function draftReplyAction(emailContent, userPrompt, userContext = "
 export async function modifyTextAction(selectedText, instruction, userContext = "") {
   try {
     const mistral = getMistralClient();
+    selectedText = clamp(selectedText, MAX_CONTENT_CHARS);
+    instruction = clamp(instruction, MAX_PROMPT_CHARS);
+    userContext = clamp(userContext, MAX_CONTENT_CHARS);
     const systemPrompt = `You are a helpful AI writing assistant.${userContext ? ` User Context: ${userContext}` : ""} Your task is to modify the given text according to the user's instructions. Return ONLY the modified text, without any conversational filler, markdown formatting blocks (like \`\`\`), or explanations.`;
     
     const messages = [
@@ -80,7 +98,15 @@ export async function modifyTextAction(selectedText, instruction, userContext = 
 export async function chatWithAiAction(messages, tokenOrConnectionId, userContext = "") {
   try {
     const mistral = getMistralClient();
-    
+    userContext = clamp(userContext, MAX_CONTEXT_CHARS);
+
+    // Cap individual user/assistant message lengths to bound LLM cost.
+    if (Array.isArray(messages)) {
+      messages = messages.map((m) =>
+        typeof m?.content === "string" ? { ...m, content: clamp(m.content, MAX_CONTENT_CHARS) } : m
+      );
+    }
+
     // Inject system prompt if there is user context, but only if we haven't already
     let updatedMessages = [...messages];
     const systemContent = `You are Vela AI, a helpful email assistant. Be concise. When referencing specific emails from search results, always format them as markdown links like [Subject or description](/inbox/email/MESSAGE_ID) so the user can click to view them.${userContext ? ` User Context: ${userContext}` : ""}`;
@@ -176,9 +202,9 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
         ], tokenOrConnectionId, userContext);
       } else if (toolCall.function.name === "search_contacts") {
         const { fetchContacts } = await import("@/lib/contacts");
-        const contacts = await fetchContacts(tokenOrConnectionId);
+        const { contacts } = await fetchContacts(tokenOrConnectionId);
         
-        const q = args.query.toLowerCase();
+        const q = (args.query || "").toLowerCase();
         const matched = contacts.filter(c => {
           const name = c.names?.[0]?.givenName?.toLowerCase() || "";
           const email = c.emailAddresses?.[0]?.value?.toLowerCase() || "";
@@ -216,6 +242,8 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
 export async function analyzeWritingStyleAction(emailBody, currentStyle = "") {
   try {
     const mistral = getMistralClient();
+    emailBody = clamp(emailBody, MAX_CONTENT_CHARS);
+    currentStyle = clamp(currentStyle, MAX_CONTEXT_CHARS);
     const systemPrompt = `You are an AI profiling assistant. Your job is to analyze the user's email writing style.
 You will be given the user's newly sent email, and their current writing style profile (if any).
 Update the writing style profile to reflect any new insights (tone, formatting, signature, capitalization, greetings/sign-offs, length, directness).

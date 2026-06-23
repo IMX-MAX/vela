@@ -60,7 +60,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden bg-white p-2 shadow-lg shadow-black/20">
-            <img src="/logo.png" alt="Vela Logo" className="h-full w-full object-contain" />
+            <img src="/logo.svg" alt="Vela Logo" className="h-full w-full object-contain" />
           </div>
         </div>
 

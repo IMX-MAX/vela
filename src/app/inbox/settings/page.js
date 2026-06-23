@@ -273,8 +273,8 @@ export default function SettingsPage() {
                 </div>
               </div>
               
-              {/* Pro Plan */}
-              <div className={`bg-[#eceae6] rounded-xl border p-6 shadow-sm cursor-pointer transition ${plan === 'pro' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-[#dddcdc]/60 hover:border-gray-400'}`} onClick={() => handleSetPlan('pro')}>
+              {/* Pro Plan — selection disabled during beta (billing not yet live) */}
+              <div className={`bg-[#eceae6] rounded-xl border p-6 shadow-sm transition ${plan === 'pro' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-[#dddcdc]/60 opacity-80 cursor-not-allowed'}`}>
                 <div className="font-semibold text-lg text-gray-800 mb-2">Pro Plan</div>
                 <div className="text-sm text-gray-600 mb-4">For power users.</div>
                 <div className="text-2xl font-bold text-[#2b323b] mb-4">$12 <span className="text-sm font-normal text-gray-500">/mo</span></div>
