@@ -40,7 +40,7 @@ function shouldResetUsage(plan, lastResetIso) {
 export function getUsageStatus(user) {
   const prefs = user?.prefs || {};
   const plan = prefs.plan === "pro" ? "pro" : "free";
-  const limit = plan === "pro" ? 50 : 50; // Both are 50, but frequency differs
+  const limit = plan === "pro" ? 40 : 10;
   let current = prefs.aiUsageCount || 0;
   
   if (shouldResetUsage(plan, prefs.lastUsageReset)) {
@@ -71,7 +71,9 @@ export async function incrementAiUsage(user, checkAuth) {
     lastReset = new Date().toISOString();
   }
 
-  if (current >= 50) {
+  const limit = plan === "pro" ? 40 : 10;
+
+  if (current >= limit) {
     throw new Error(`AI action limit reached for your ${plan} plan.`);
   }
 
