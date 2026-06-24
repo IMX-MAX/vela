@@ -17,7 +17,17 @@ export const useAuthStore = create((set) => ({
   ],
   googleProfile: null,
   setGoogleProfile: (profile) => set({ googleProfile: profile }),
-  setInboxEmails: (emails) => set({ inboxEmails: emails }),
+  setInboxEmails: (emails) => {
+    set({ inboxEmails: emails });
+    import('./db').then(({ saveCachedInbox }) => saveCachedInbox(emails));
+  },
+  loadCachedInbox: async () => {
+    const { getCachedInbox } = await import('./db');
+    const cached = await getCachedInbox();
+    if (cached && cached.length > 0) {
+      set({ inboxEmails: cached, loading: false });
+    }
+  },
   setInboxSplits: (splits) => {
     set({ inboxSplits: splits });
     import('idb-keyval').then(({ set: idbSet }) => idbSet('inboxSplits', splits));

@@ -85,7 +85,7 @@ export default function InboxPage() {
 
   const fetchEmailBatch = async (token, pageToken = null) => {
     try {
-      const data = await fetchEmails(token, 20, filter, searchQuery, pageToken);
+      const data = await fetchEmails(token, 30, filter, searchQuery, pageToken);
       const parsed = data.messages.map((msg) => {
         const parsedContent = parseEmailContent(msg);
         const isUnread = msg.labelIds && msg.labelIds.includes("UNREAD");
@@ -113,6 +113,7 @@ export default function InboxPage() {
 
   useEffect(() => {
     async function initInbox() {
+      await useAuthStore.getState().loadCachedInbox();
       const currentInbox = useAuthStore.getState().inboxEmails;
       if (currentInbox && currentInbox.length > 0) {
         setEmails(currentInbox);
@@ -176,6 +177,32 @@ export default function InboxPage() {
     setLoadingMore(false);
   }, [loadingMore, nextPageToken, resolvedToken, filter, searchQuery, setInboxEmails]);
 
+  const prefetchEmailBody = useCallback(async (id) => {
+    if (!resolvedToken) return;
+    try {
+      const { getCachedEmailBody, saveCachedEmailBody } = await import("@/lib/db");
+      const cached = await getCachedEmailBody(id);
+      if (cached) return;
+      
+      const { fetchEmailDetails } = await import("@/lib/gmail");
+      const { parseEmailContent } = await import("@/lib/emailParser");
+      const rawMsg = await fetchEmailDetails(resolvedToken, id);
+      const parsed = parseEmailContent(rawMsg);
+      await saveCachedEmailBody(id, parsed);
+    } catch (e) {
+      console.error("Prefetch error:", e);
+    }
+  }, [resolvedToken]);
+
+  useEffect(() => {
+    if (emails.length > 0 && resolvedToken) {
+      const topEmails = emails.slice(0, 20);
+      topEmails.forEach((email) => {
+        prefetchEmailBody(email.id);
+      });
+    }
+  }, [emails, resolvedToken, prefetchEmailBody]);
+
   const handleDone = async (e, id) => {
     e.stopPropagation();
     setEmails(emails.filter(email => email.id !== id));
@@ -216,7 +243,7 @@ export default function InboxPage() {
           handleLoadMore();
         }
       },
-      { threshold: 1.0 }
+      { threshold: 0, rootMargin: '400px' }
     );
 
     if (observerTarget.current) {
@@ -313,7 +340,7 @@ export default function InboxPage() {
               <div
                 key={email.id}
                 onClick={() => router.push(`/inbox/email/${email.id}`)}
-                onMouseEnter={() => setHoveredEmailId(email.id)}
+                onMouseEnter={() => { setHoveredEmailId(email.id); prefetchEmailBody(email.id); }}
                 onMouseLeave={() => setHoveredEmailId(null)}
                 className={`group flex flex-col md:flex-row md:items-center px-4 md:px-6 py-3 md:py-2.5 cursor-pointer border-b border-[#2b323b]/5 hover:bg-[#dddcdc]/50 transition gap-0.5 md:gap-0 ${
                   email.isUnread ? "bg-white" : ""
@@ -357,7 +384,7 @@ export default function InboxPage() {
             ))}
             
             {/* Infinite Scroll Target */}
-            {nextPageToken && (
+            {nextPageToken && filteredEmails.length > 0 && (
               <div ref={observerTarget} className="py-8 flex justify-center">
                 {loadingMore && <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-400 border-t-gray-800"></div>}
               </div>
@@ -375,9 +402,18 @@ export default function InboxPage() {
               </div>
             )}
             
-            {!authError && emails.length === 0 && (
+            {!authError && filteredEmails.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-                <p>{searchQuery ? "No emails found" : "No messages in Inbox"}</p>
+                <p>{searchQuery ? "No emails found" : "No messages match this view"}</p>
+                {nextPageToken && (
+                  <button 
+                    onClick={handleLoadMore} 
+                    disabled={loadingMore} 
+                    className="mt-4 px-4 py-2 bg-white border border-gray-200 shadow-sm rounded-lg text-[13px] font-medium text-[#2b323b] hover:bg-gray-50 transition disabled:opacity-50"
+                  >
+                    {loadingMore ? "Searching older messages..." : "Search older messages"}
+                  </button>
+                )}
               </div>
             )}
           </div>

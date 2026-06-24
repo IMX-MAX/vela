@@ -53,6 +53,7 @@ export default function EmailDetailPage() {
   const [authError, setAuthError] = useState(null);
   
   const [showDetails, setShowDetails] = useState(false);
+  const [fullThreadLoaded, setFullThreadLoaded] = useState(false);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -66,6 +67,7 @@ export default function EmailDetailPage() {
     setThreadMessages([]);
     setAuthError(null);
     setLoading(true);
+    setFullThreadLoaded(false);
 
     async function load() {
       let token = session?.providerAccessToken;
@@ -77,23 +79,23 @@ export default function EmailDetailPage() {
       }
 
       try {
-        const rawMsg = await fetchEmailDetails(token, id);
-        const { fetchThreadDetails, markEmailAsRead } = await import("@/lib/gmail");
+        const { getCachedEmailBody } = await import("@/lib/db");
+        const cachedBody = await getCachedEmailBody(id);
         
-        // Mark as read if it is unread
-        if (rawMsg.labelIds && rawMsg.labelIds.includes("UNREAD")) {
-          await markEmailAsRead(token, id);
-          // Update global store to reflect this
-          const { inboxEmails, setInboxEmails } = useAuthStore.getState();
-          if (inboxEmails) {
-            setInboxEmails(inboxEmails.map(e => e.id === id ? { ...e, isUnread: false } : e));
-          }
-        }
+        let mainMsg;
+        let tId;
 
-        const threadData = await fetchThreadDetails(token, rawMsg.threadId);
-        
-        const parsedMsgs = (threadData.messages || [rawMsg]).map(msg => {
-          const parsed = parseEmailContent(msg);
+        if (cachedBody) {
+          mainMsg = cachedBody;
+          tId = cachedBody.threadId;
+          setEmail(mainMsg);
+          setThreadMessages([mainMsg]);
+          setLoading(false); // Instant render
+        } else {
+          const rawMsg = await fetchEmailDetails(token, id);
+          const { parseEmailContent } = await import("@/lib/emailParser");
+          const parsed = parseEmailContent(rawMsg);
+          
           let senderName = parsed.from;
           let senderEmail = "";
           if (senderName && senderName.includes("<")) {
@@ -101,25 +103,41 @@ export default function EmailDetailPage() {
             senderName = parts[0].replace(/"/g, "").trim();
             senderEmail = parts[1].replace(">", "").trim();
           }
-          return {
+          
+          mainMsg = {
             ...parsed,
             senderName,
             senderEmail: senderEmail || parsed.from,
             rawTo: parsed.from,
-            isStarred: (msg.labelIds || []).includes("STARRED"),
-            id: msg.id
+            isStarred: (rawMsg.labelIds || []).includes("STARRED"),
+            id: rawMsg.id,
+            threadId: rawMsg.threadId
           };
-        });
+          tId = rawMsg.threadId;
 
-        const targetIndex = parsedMsgs.findIndex(m => m.id === id);
-        const mainMsg = targetIndex !== -1 ? parsedMsgs[targetIndex] : parsedMsgs[parsedMsgs.length - 1];
+          setEmail(mainMsg);
+          setThreadMessages([mainMsg]);
+          setLoading(false);
+          
+          const { saveCachedEmailBody } = await import("@/lib/db");
+          saveCachedEmailBody(id, mainMsg);
+        }
 
-        setEmail(mainMsg);
-        setThreadMessages(parsedMsgs);
+        // Mark as read in background
+        const cachedInbox = useAuthStore.getState().inboxEmails;
+        const currentEmailInStore = cachedInbox?.find(e => e.id === id);
+        if (currentEmailInStore && currentEmailInStore.isUnread) {
+          const { markEmailAsRead } = await import("@/lib/gmail");
+          markEmailAsRead(token, id).catch(console.error);
+          useAuthStore.getState().setInboxEmails(
+            cachedInbox.map(e => e.id === id ? { ...e, isUnread: false } : e)
+          );
+        }
+        
         setResolvedToken(token);
       } catch (error) {
         console.error("Error fetching email:", error);
-        setAuthError(`Gmail API Error: ${error.message}. Please ensure you checked all permission boxes during Google sign-in.`);
+        setAuthError(`Gmail API Error: ${error.message}.`);
       } finally {
         setLoading(false);
       }
@@ -531,6 +549,47 @@ export default function EmailDetailPage() {
       <div className="max-w-4xl mx-auto w-full px-8 pb-12 pt-4">
         <h1 className="text-2xl font-medium text-[#2b323b] mb-8 text-center">{email.subject}</h1>
         
+        {/* Load Thread Button */}
+        {!fullThreadLoaded && (
+          <div className="flex justify-center mb-6">
+            <button
+              onClick={async () => {
+                if (!resolvedToken || !email.threadId) return;
+                const { fetchThreadDetails } = await import("@/lib/gmail");
+                const { parseEmailContent } = await import("@/lib/emailParser");
+                try {
+                  const threadData = await fetchThreadDetails(resolvedToken, email.threadId);
+                  const parsedMsgs = (threadData.messages || []).map(msg => {
+                    const parsed = parseEmailContent(msg);
+                    let senderName = parsed.from;
+                    let senderEmail = "";
+                    if (senderName && senderName.includes("<")) {
+                      const parts = senderName.split("<");
+                      senderName = parts[0].replace(/"/g, "").trim();
+                      senderEmail = parts[1].replace(">", "").trim();
+                    }
+                    return {
+                      ...parsed,
+                      senderName,
+                      senderEmail: senderEmail || parsed.from,
+                      rawTo: parsed.from,
+                      isStarred: (msg.labelIds || []).includes("STARRED"),
+                      id: msg.id
+                    };
+                  });
+                  setThreadMessages(parsedMsgs);
+                  setFullThreadLoaded(true);
+                } catch (e) {
+                  console.error("Failed to load thread:", e);
+                }
+              }}
+              className="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg text-[13px] font-medium text-gray-600 shadow-sm transition"
+            >
+              Load full thread history
+            </button>
+          </div>
+        )}
+
         {/* Thread History (Collapsed) */}
         {threadMessages.map((msg, idx) => {
           if (msg.id === email.id) {
