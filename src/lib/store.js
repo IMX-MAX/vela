@@ -17,15 +17,17 @@ export const useAuthStore = create((set) => ({
   ],
   googleProfile: null,
   setGoogleProfile: (profile) => set({ googleProfile: profile }),
-  setInboxEmails: (emails) => {
+  setInboxEmails: (emails, filter = 'inbox') => {
     set({ inboxEmails: emails });
-    import('./db').then(({ saveCachedInbox }) => saveCachedInbox(emails));
+    import('./db').then(({ saveCachedInbox }) => saveCachedInbox(emails, filter));
   },
-  loadCachedInbox: async () => {
+  loadCachedInbox: async (filter = 'inbox') => {
     const { getCachedInbox } = await import('./db');
-    const cached = await getCachedInbox();
+    const cached = await getCachedInbox(filter);
     if (cached && cached.length > 0) {
       set({ inboxEmails: cached, loading: false });
+    } else {
+      set({ inboxEmails: [] });
     }
   },
   setInboxSplits: (splits) => {

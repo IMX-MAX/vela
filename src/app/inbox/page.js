@@ -119,7 +119,7 @@ export default function InboxPage() {
 
   useEffect(() => {
     async function initInbox() {
-      await useAuthStore.getState().loadCachedInbox();
+      await useAuthStore.getState().loadCachedInbox(filter);
       const currentInbox = useAuthStore.getState().inboxEmails;
       if (currentInbox && currentInbox.length > 0) {
         setEmails(currentInbox);
@@ -154,7 +154,7 @@ export default function InboxPage() {
           setAuthError(`Gmail API Error: ${error}. Please ensure you checked all permission boxes during Google sign-in.`);
         } else {
           setEmails(parsed);
-          setInboxEmails(parsed);
+          setInboxEmails(parsed, filter);
           setNextPageToken(next);
         }
         
@@ -176,7 +176,7 @@ export default function InboxPage() {
     const { parsed, next } = await fetchEmailBatch(resolvedToken, nextPageToken);
     setEmails((prev) => {
       const newEmails = [...prev, ...parsed];
-      setInboxEmails(newEmails);
+      setInboxEmails(newEmails, filter);
       return newEmails;
     });
     setNextPageToken(next);
@@ -219,7 +219,7 @@ export default function InboxPage() {
   const handleDone = async (e, id) => {
     e.stopPropagation();
     setEmails(emails.filter(email => email.id !== id));
-    setInboxEmails(emails.filter(email => email.id !== id));
+    setInboxEmails(emails.filter(email => email.id !== id), filter);
     const { doneEmail } = await import("@/lib/gmail");
     await doneEmail(resolvedToken, id);
   };
@@ -227,7 +227,7 @@ export default function InboxPage() {
   const handleTrash = async (e, id) => {
     if (e) e.stopPropagation();
     setEmails(emails.filter(email => email.id !== id));
-    setInboxEmails(emails.filter(email => email.id !== id));
+    setInboxEmails(emails.filter(email => email.id !== id), filter);
     const { trashEmail } = await import("@/lib/gmail");
     await trashEmail(resolvedToken, id);
   };

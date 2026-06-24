@@ -34,18 +34,18 @@ export async function saveCachedEmailBody(emailId, data) {
   }
 }
 
-export async function getCachedInbox() {
+export async function getCachedInbox(filter = 'inbox') {
   try {
-    return await get(`inbox_emails_cache`);
+    return await get(`inbox_emails_cache_${filter}`);
   } catch (error) {
     console.error("IndexedDB get error:", error);
     return null;
   }
 }
 
-export async function saveCachedInbox(emails) {
+export async function saveCachedInbox(emails, filter = 'inbox') {
   try {
-    await set(`inbox_emails_cache`, emails);
+    await set(`inbox_emails_cache_${filter}`, emails);
   } catch (error) {
     console.error("IndexedDB set error:", error);
   }
