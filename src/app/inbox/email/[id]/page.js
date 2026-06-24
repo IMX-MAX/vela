@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, startTransition } from "react";
 import { useAuthStore } from "@/lib/store";
 import { fetchEmailDetails, sendEmail } from "@/lib/gmail";
 import { parseEmailContent } from "@/lib/emailParser";
@@ -666,13 +666,13 @@ export default function EmailDetailPage() {
         {/* Reply Section */}
         {!replyType ? (
           <div className="flex items-center gap-1 bg-[#eceae6] border border-[#dddcdc] rounded-[10px] p-1 w-fit mb-12 shadow-sm">
-            <button onClick={() => setReplyType('reply')} className="p-1.5 hover:bg-white hover:shadow-sm rounded-lg transition text-gray-600">
+            <button onClick={() => startTransition(() => setReplyType('reply'))} className="p-1.5 hover:bg-white hover:shadow-sm rounded-lg transition text-gray-600">
               <ArrowBendUpLeft size={16} weight="bold" />
             </button>
-            <button onClick={() => setReplyType('replyAll')} className="p-1.5 hover:bg-white hover:shadow-sm rounded-lg transition text-gray-600">
+            <button onClick={() => startTransition(() => setReplyType('replyAll'))} className="p-1.5 hover:bg-white hover:shadow-sm rounded-lg transition text-gray-600">
                <ArrowBendDoubleUpLeft size={16} weight="bold" />
             </button>
-            <button onClick={() => setReplyType('forward')} className="p-1.5 hover:bg-white hover:shadow-sm rounded-lg transition text-gray-600">
+            <button onClick={() => startTransition(() => setReplyType('forward'))} className="p-1.5 hover:bg-white hover:shadow-sm rounded-lg transition text-gray-600">
                <ArrowBendUpRight size={16} weight="bold" />
             </button>
             <button onClick={() => {
@@ -686,13 +686,13 @@ export default function EmailDetailPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-visible transition mb-12">
             <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-4">
               <div className="flex items-center gap-1 bg-[#eceae6] rounded-lg p-0.5 w-fit">
-                <button onClick={() => setReplyType('reply')} className={`p-1.5 rounded-md transition ${replyType === 'reply' ? 'bg-white shadow-sm text-[#2b323b]' : 'text-gray-500 hover:text-[#2b323b]'}`}>
+                <button onClick={() => startTransition(() => setReplyType('reply'))} className={`p-1.5 rounded-md transition ${replyType === 'reply' ? 'bg-white shadow-sm text-[#2b323b]' : 'text-gray-500 hover:text-[#2b323b]'}`}>
                   <ArrowBendUpLeft size={14} weight="bold" />
                 </button>
-                <button onClick={() => setReplyType('replyAll')} className={`p-1.5 rounded-md transition ${replyType === 'replyAll' ? 'bg-white shadow-sm text-[#2b323b]' : 'text-gray-500 hover:text-[#2b323b]'}`}>
+                <button onClick={() => startTransition(() => setReplyType('replyAll'))} className={`p-1.5 rounded-md transition ${replyType === 'replyAll' ? 'bg-white shadow-sm text-[#2b323b]' : 'text-gray-500 hover:text-[#2b323b]'}`}>
                    <ArrowBendDoubleUpLeft size={14} weight="bold" />
                 </button>
-                <button onClick={() => setReplyType('forward')} className={`p-1.5 rounded-md transition ${replyType === 'forward' ? 'bg-white shadow-sm text-[#2b323b]' : 'text-gray-500 hover:text-[#2b323b]'}`}>
+                <button onClick={() => startTransition(() => setReplyType('forward'))} className={`p-1.5 rounded-md transition ${replyType === 'forward' ? 'bg-white shadow-sm text-[#2b323b]' : 'text-gray-500 hover:text-[#2b323b]'}`}>
                    <ArrowBendUpRight size={14} weight="bold" />
                 </button>
                 <button onClick={() => {
@@ -742,10 +742,12 @@ export default function EmailDetailPage() {
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => {
-                    setReplyType(null);
-                    setReplyText("");
-                    setReplyHtml("");
-                    setForwardTo("");
+                    startTransition(() => {
+                      setReplyType(null);
+                      setReplyText("");
+                      setReplyHtml("");
+                      setForwardTo("");
+                    });
                   }}
                   className="px-2 text-[14px] font-medium text-[#2b323b] hover:text-black transition"
                 >
