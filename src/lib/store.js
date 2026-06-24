@@ -15,6 +15,8 @@ export const useAuthStore = create((set) => ({
     { id: 'team', name: 'Team', desc: 'All emails from your team, grouped together.', enabled: false },
     { id: 'calendar', name: 'Calendar', desc: 'All your invites and reminders, in one place.', enabled: false }
   ],
+  showUpgradeModal: false,
+  setShowUpgradeModal: (show) => set({ showUpgradeModal: show }),
   googleProfile: null,
   setGoogleProfile: (profile) => set({ googleProfile: profile }),
   setInboxEmails: (emails, filter = 'inbox') => {

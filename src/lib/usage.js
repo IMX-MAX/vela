@@ -1,4 +1,5 @@
 import { account } from "./appwrite";
+import { useAuthStore } from "./store";
 
 /**
  * Returns the current NYC date as an object with year, month, and day.
@@ -74,6 +75,7 @@ export async function incrementAiUsage(user, checkAuth) {
   const limit = plan === "pro" ? 40 : 10;
 
   if (current >= limit) {
+    useAuthStore.getState().setShowUpgradeModal(true);
     throw new Error(`AI action limit reached for your ${plan} plan.`);
   }
 

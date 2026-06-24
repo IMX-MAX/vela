@@ -102,7 +102,7 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
       const { incrementAiUsage } = await import("@/lib/usage");
       await incrementAiUsage(user, checkAuth);
     } catch (error) {
-      alert(error.message);
+      if (!error.message?.includes("limit reached")) alert(error.message);
       setShowSlashCustomPrompt(false);
       setSlashCustomPrompt("");
       setShowSlashMenu(false);

@@ -240,7 +240,7 @@ export default function EmailDetailPage() {
       const { incrementAiUsage } = await import("@/lib/usage");
       await incrementAiUsage(user, checkAuth);
     } catch (error) {
-      alert(error.message);
+      if (!error.message?.includes("limit reached")) alert(error.message);
       return;
     }
 
@@ -308,7 +308,7 @@ export default function EmailDetailPage() {
       const { incrementAiUsage } = await import("@/lib/usage");
       await incrementAiUsage(user, checkAuth);
     } catch (error) {
-      alert(error.message);
+      if (!error.message?.includes("limit reached")) alert(error.message);
       return;
     }
 

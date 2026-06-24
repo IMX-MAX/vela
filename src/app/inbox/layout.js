@@ -23,6 +23,7 @@ import {
 import dynamic from "next/dynamic";
 
 const CommandPalette = dynamic(() => import("@/components/CommandPalette"), { ssr: false });
+const UpgradeModal = dynamic(() => import("@/components/UpgradeModal"), { ssr: false });
 
 function SidebarNavigation() {
   const searchParams = useSearchParams();
@@ -78,7 +79,7 @@ function RouteChangeListener({ onChange }) {
 
 export default function InboxLayout({ children }) {
   const router = useRouter();
-  const { user, loading, checkAuth, logout, googleProfile, toggleCommandPalette } = useAuthStore();
+  const { user, loading, checkAuth, logout, googleProfile, toggleCommandPalette, showUpgradeModal, setShowUpgradeModal } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -248,6 +249,9 @@ export default function InboxLayout({ children }) {
 
       {/* Command Palette (Ctrl+K / Bottom Pill) */}
       <CommandPalette />
+
+      {/* Upgrade Modal */}
+      {showUpgradeModal && <UpgradeModal onClose={() => setShowUpgradeModal(false)} />}
     </div>
   );
 }

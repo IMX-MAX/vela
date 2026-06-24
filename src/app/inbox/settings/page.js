@@ -297,7 +297,7 @@ export default function SettingsPage() {
             <div className="bg-[#eceae6] rounded-xl border border-[#dddcdc]/60 p-6 mb-10 shadow-sm">
               <div className="flex justify-between items-end mb-4">
                 <div>
-                  <div className="text-3xl font-semibold text-[#2b323b]">{usageStatus.current} <span className="text-lg font-normal text-gray-500">/ {usageStatus.limit} actions</span></div>
+                  <div className="text-3xl font-semibold text-[#2b323b]">{Math.round((usageStatus.current / usageStatus.limit) * 100)}% <span className="text-lg font-normal text-gray-500">used</span></div>
                   <div className="text-[13px] text-gray-600 mt-1">
                     Your {usageStatus.plan} plan limits you to {usageStatus.limit} actions per {usageStatus.plan === 'pro' ? 'day' : 'month'}.
                   </div>

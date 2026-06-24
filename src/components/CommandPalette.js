@@ -236,7 +236,11 @@ export default function CommandPalette() {
         const { incrementAiUsage } = await import("@/lib/usage");
         await incrementAiUsage(user, checkAuth);
       } catch (usageError) {
-        setChatHistory([...newHistory, { role: "assistant", content: `Error: ${usageError.message}` }]);
+        if (!usageError.message?.includes("limit reached")) {
+          setChatHistory([...newHistory, { role: "assistant", content: `Error: ${usageError.message}` }]);
+        } else {
+          setChatHistory(newHistory);
+        }
         setIsLoading(false);
         return;
       }
