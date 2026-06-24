@@ -203,18 +203,17 @@ export default function InboxLayout({ children }) {
                 Settings
                 <span className="text-gray-400 text-xs">G then G</span>
               </Link>
-              <button 
-                onClick={() => {}}
-                className="w-full text-left px-4 py-2.5 hover:bg-[#eceae6] transition flex items-center justify-between"
-              >
-                Help
-                <span className="text-gray-400 text-xs">?</span>
-              </button>
               
               <div className="h-px bg-[#dddcdc] my-1 mx-4"></div>
               
               <button 
-                onClick={() => {}}
+                onClick={() => {
+                  import('idb-keyval').then(({ clear }) => {
+                    clear().then(() => {
+                      handleSignOut();
+                    });
+                  });
+                }}
                 className="w-full text-left px-4 py-2.5 hover:bg-[#eceae6] transition"
               >
                 Reset local data

@@ -18,7 +18,12 @@ export const useAuthStore = create((set) => ({
   showUpgradeModal: false,
   setShowUpgradeModal: (show) => set({ showUpgradeModal: show }),
   googleProfile: null,
-  setGoogleProfile: (profile) => set({ googleProfile: profile }),
+  setGoogleProfile: (profile) => {
+    set({ googleProfile: profile });
+    if (profile) {
+      import('idb-keyval').then(({ set: idbSet }) => idbSet('googleProfile', profile));
+    }
+  },
   setInboxEmails: (emails, filter = 'inbox') => {
     set({ inboxEmails: emails });
     import('./db').then(({ saveCachedInbox }) => saveCachedInbox(emails, filter));
@@ -77,7 +82,11 @@ export const useAuthStore = create((set) => ({
     try {
       const user = await account.get();
       const session = await account.getSession('current');
-      set({ user, session, loading: false });
+      
+      const { get } = await import('idb-keyval');
+      const cachedProfile = await get('googleProfile');
+
+      set({ user, session, googleProfile: cachedProfile, loading: false });
     } catch (error) {
       set({ user: null, session: null, loading: false });
     }
