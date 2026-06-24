@@ -10,9 +10,18 @@ export const useAuthStore = create((set) => ({
   currentChatId: null,
   savedChats: [],
   inboxEmails: [],
+  inboxSplits: [
+    { id: 'important', name: 'Important & Other', desc: 'Messages that matter, front and center. Built by Tatem.', enabled: false },
+    { id: 'team', name: 'Team', desc: 'All emails from your team, grouped together. Built by Tatem.', enabled: false },
+    { id: 'calendar', name: 'Calendar', desc: 'All your invites and reminders, in one place. Built by Tatem.', enabled: false }
+  ],
   googleProfile: null,
   setGoogleProfile: (profile) => set({ googleProfile: profile }),
   setInboxEmails: (emails) => set({ inboxEmails: emails }),
+  setInboxSplits: (splits) => {
+    set({ inboxSplits: splits });
+    import('idb-keyval').then(({ set: idbSet }) => idbSet('inboxSplits', splits));
+  },
   toggleCommandPalette: () => set((state) => ({ isCommandPaletteOpen: !state.isCommandPaletteOpen })),
   closeCommandPalette: () => set({ isCommandPaletteOpen: false }),
   openCommandPalette: () => set({ isCommandPaletteOpen: true }),
@@ -21,8 +30,12 @@ export const useAuthStore = create((set) => ({
   clearChat: () => set({ chatHistory: [], currentChatId: null }),
   initSavedChats: async () => {
     const { get } = await import('idb-keyval');
-    const chats = await get('savedChats');
+    const [chats, splits] = await Promise.all([
+      get('savedChats'),
+      get('inboxSplits')
+    ]);
     if (chats) set({ savedChats: chats });
+    if (splits) set({ inboxSplits: splits });
   },
   saveCurrentChat: () => set((state) => {
     if (state.chatHistory.length === 0) return state;

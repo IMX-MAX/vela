@@ -164,6 +164,16 @@ export async function starEmail(tokenOrConnectionId, messageId) {
   });
 }
 
+export async function unstarEmail(tokenOrConnectionId, messageId) {
+  return await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}/modify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ removeLabelIds: ["STARRED"] })
+  });
+}
+
 export async function spamEmail(tokenOrConnectionId, messageId) {
   return await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}/modify`, {
     method: "POST",

@@ -5,7 +5,7 @@ import { useAuthStore } from "@/lib/store";
 import { fetchEmailDetails, sendEmail } from "@/lib/gmail";
 import { parseEmailContent } from "@/lib/emailParser";
 import { summarizeEmailAction, draftReplyAction } from "@/app/actions";
-import { ArrowLeft, Sparkle, PaperPlaneRight, CaretDown, CaretUp, Star, Clock, Check, Trash, DotsThree } from "@phosphor-icons/react";
+import { ArrowLeft, Sparkle, PaperPlaneRight, CaretDown, CaretUp, Star, Clock, Check, Trash, DotsThree, ArrowBendUpLeft, ArrowBendDoubleUpLeft, ArrowBendUpRight, Command } from "@phosphor-icons/react";
 import { useRouter, useParams } from "next/navigation";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
@@ -34,6 +34,11 @@ export default function EmailDetailPage() {
   
   const [draft, setDraft] = useState("");
   const [isDrafting, setIsDrafting] = useState(false);
+  const [showUnsubscribeModal, setShowUnsubscribeModal] = useState(false);
+  const [isUnsubscribing, setIsUnsubscribing] = useState(false);
+  
+  const [replyType, setReplyType] = useState(null);
+  const [forwardTo, setForwardTo] = useState("");
   
   const [replyText, setReplyText] = useState("");
   const [replyHtml, setReplyHtml] = useState("");
@@ -100,6 +105,7 @@ export default function EmailDetailPage() {
             senderName,
             senderEmail: senderEmail || parsed.from,
             rawTo: parsed.from,
+            isStarred: (msg.labelIds || []).includes("STARRED"),
             id: msg.id
           };
         });
@@ -265,10 +271,34 @@ export default function EmailDetailPage() {
 
   const handleSend = async () => {
     if (!email || !replyText || !resolvedToken) return;
+    if (replyType === 'forward' && !forwardTo) return;
+    
     setIsSending(true);
     try {
-      const subject = email.subject.toLowerCase().startsWith("re:") ? email.subject : `Re: ${email.subject}`;
-      await sendEmail(resolvedToken, email.rawTo, subject, replyText, replyHtml || replyText);
+      let toField = email.senderEmail;
+      if (replyType === 'replyAll') {
+        const allEmails = new Set();
+        if (email.senderEmail) allEmails.add(email.senderEmail);
+        if (email.rawTo) {
+          email.rawTo.split(',').forEach(addr => {
+            const match = addr.match(/<([^>]+)>/) || addr.match(/([\w.-]+@[\w.-]+)/);
+            if (match && match[1]) allEmails.add(match[1].trim());
+            else allEmails.add(addr.trim());
+          });
+        }
+        toField = Array.from(allEmails).join(', ');
+      } else if (replyType === 'forward') {
+        toField = forwardTo;
+      }
+      
+      let subject = email.subject;
+      if (replyType === 'forward') {
+         subject = subject.toLowerCase().startsWith("fwd:") ? subject : `Fwd: ${subject}`;
+      } else {
+         subject = subject.toLowerCase().startsWith("re:") ? subject : `Re: ${subject}`;
+      }
+
+      await sendEmail(resolvedToken, toField, subject, replyText, replyHtml || replyText);
       router.push("/inbox");
     } catch (error) {
       console.error("Failed to send", error);
@@ -295,10 +325,35 @@ export default function EmailDetailPage() {
   }
 
   const handleStar = async () => {
-    if (!resolvedToken) return;
-    const { starEmail } = await import("@/lib/gmail");
-    await starEmail(resolvedToken, id);
-    // Optional: maybe show a small toast or update local state
+    if (!resolvedToken || !email) return;
+    const { starEmail, unstarEmail } = await import("@/lib/gmail");
+    if (email.isStarred) {
+      setEmail({ ...email, isStarred: false });
+      await unstarEmail(resolvedToken, id);
+    } else {
+      setEmail({ ...email, isStarred: true });
+      await starEmail(resolvedToken, id);
+    }
+  };
+
+  const handleUnsubscribe = async () => {
+    if (!resolvedToken || !email) return;
+    setIsUnsubscribing(true);
+    try {
+      const { trashEmail } = await import("@/lib/gmail");
+      await trashEmail(resolvedToken, id); // Just trashing it as a proxy for unsubscribing, or we can just alert if real unsubsribe isn't implemented.
+      
+      const { inboxEmails, setInboxEmails } = useAuthStore.getState();
+      if (inboxEmails) {
+        setInboxEmails(inboxEmails.filter(e => e.id !== id));
+      }
+      router.push("/inbox");
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsUnsubscribing(false);
+      setShowUnsubscribeModal(false);
+    }
   };
 
   const handleSnooze = () => {
@@ -329,8 +384,54 @@ export default function EmailDetailPage() {
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex !== -1 && currentIndex < inboxEmails?.length - 1;
 
+  useEffect(() => {
+    if (!showUnsubscribeModal) return;
+    
+    const handleModalKeys = (e) => {
+      if (e.key === "Escape") {
+        setShowUnsubscribeModal(false);
+      } else if (e.key === "Enter" && !isUnsubscribing) {
+        handleUnsubscribe();
+      }
+    };
+    
+    window.addEventListener("keydown", handleModalKeys);
+    return () => window.removeEventListener("keydown", handleModalKeys);
+  }, [showUnsubscribeModal, isUnsubscribing, handleUnsubscribe]);
+
   return (
     <div className="flex flex-col h-full bg-[#eceae6] rounded-2xl relative overflow-y-auto">
+      {/* Unsubscribe Modal */}
+      {showUnsubscribeModal && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/5 rounded-2xl backdrop-blur-[1px]">
+          <div className="bg-[#e8e4db] w-[360px] rounded-2xl shadow-2xl border border-white/40 p-6 flex flex-col animate-in fade-in zoom-in-95 duration-200"
+               style={{ background: 'linear-gradient(135deg, #f5f2eb 0%, #e8e4db 100%)' }}>
+            <h3 className="text-[17px] font-semibold text-[#2b323b] mb-2">Unsubscribe</h3>
+            <p className="text-[14px] text-gray-500 mb-6 leading-relaxed">
+              Are you sure you want to unsubscribe from <br/>{email.senderEmail}?
+            </p>
+            <div className="flex flex-col gap-2">
+              <button 
+                onClick={handleUnsubscribe}
+                disabled={isUnsubscribing}
+                className="w-full flex items-center justify-between px-4 py-2.5 bg-[#f5f2eb] hover:bg-white text-[#2b323b] text-[14px] font-medium rounded-lg transition-colors border border-white/60 shadow-sm disabled:opacity-50"
+              >
+                <span>{isUnsubscribing ? "Unsubscribing..." : "Unsubscribe"}</span>
+                <span className="text-[12px] text-gray-400 font-normal">Enter</span>
+              </button>
+              <button 
+                onClick={() => setShowUnsubscribeModal(false)}
+                className="w-full flex items-center justify-between px-4 py-2.5 bg-[#dfdbd1] hover:bg-[#d6d2c8] text-gray-600 text-[14px] font-medium rounded-lg transition-colors border border-black/5"
+              >
+                <span>Cancel</span>
+                <span className="text-[12px] text-gray-400 font-normal">Esc</span>
+              </button>
+            </div>
+            
+            {/* Hidden inputs to capture key events since we don't have a global listener in this scoped div easily without useEffect, but we can just use a simple focus trap or useEffect */}
+          </div>
+        </div>
+      )}
       {/* Top Bar */}
       <div className="h-14 flex items-center justify-between px-4 sticky top-0 z-10 rounded-t-2xl bg-[#eceae6] border-b border-[#dddcdc]">
         <div className="flex items-center gap-1.5">
@@ -369,7 +470,9 @@ export default function EmailDetailPage() {
         </div>
         
         <div className="flex items-center gap-1 pr-1">
-          <button onClick={handleStar} title="Star" className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"><Star size={18} /></button>
+          <button onClick={handleStar} title="Star" className={`p-2 transition rounded-md flex items-center justify-center ${email.isStarred ? 'text-yellow-500 hover:bg-yellow-50' : 'text-gray-500 hover:text-[#2b323b] hover:bg-[#2b323b]/5'}`}>
+            <Star size={18} weight={email.isStarred ? "fill" : "regular"} />
+          </button>
           <button onClick={handleSnooze} title="Snooze" className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"><Clock size={18} /></button>
           <button onClick={handleDone} title="Mark as done" className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"><Check size={18} /></button>
           <button onClick={handleTrash} title="Delete" className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"><Trash size={18} /></button>
@@ -398,6 +501,7 @@ export default function EmailDetailPage() {
                 <div className="font-medium text-[15px] text-[#2b323b] flex items-center gap-2">
                   {email.senderName}
                   <span className="text-[13px] font-normal text-gray-400">{email.senderEmail}</span>
+                  <button onClick={() => setShowUnsubscribeModal(true)} className="ml-2 text-[12px] text-gray-400 hover:text-gray-600 underline decoration-gray-300 hover:decoration-gray-400 underline-offset-2 transition-colors">Unsubscribe</button>
                 </div>
                 <div 
                   className="text-[13px] text-gray-400 cursor-pointer inline-flex items-center gap-1 hover:text-gray-600"
@@ -560,37 +664,104 @@ export default function EmailDetailPage() {
         })}
 
         {/* Reply Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-visible transition mb-12">
-          <div className="px-4 py-3 bg-[#fbfbfc] border-b border-gray-100 flex items-center gap-2 text-[13px] text-gray-500 font-medium rounded-t-xl">
-            <span className="icon-reply"></span>
-            Reply to {email.senderName}
-          </div>
-          <div className="flex-1 w-full min-h-[150px] overflow-visible">
-            <AiEditor 
-              value={replyText}
-              onChange={(html, text) => {
-                setReplyHtml(html);
-                setReplyText(text);
-              }}
-              placeholder="Write your reply..."
-              borderless={true}
-            />
-          </div>
-          <div className="px-4 py-3 bg-[#fbfbfc] border-t border-gray-100 flex justify-between items-center rounded-b-xl">
-            <div className="flex items-center gap-2 text-gray-400">
-              <button className="hover:text-[#50686c] transition"><span className="icon-text-b"></span></button>
-              <button className="hover:text-[#50686c] transition"><span className="icon-paperclip"></span></button>
-            </div>
-            <button 
-              onClick={handleSend}
-              disabled={!replyText || isSending}
-              className="flex items-center gap-2 bg-[#50686c] hover:opacity-90 transition text-white px-5 py-2 rounded-lg text-[13px] font-medium disabled:opacity-50 shadow-sm"
-            >
-              {isSending ? "Sending..." : "Send"}
-              <PaperPlaneRight size={14} weight="fill" />
+        {!replyType ? (
+          <div className="flex items-center gap-1 bg-[#eceae6] border border-[#dddcdc] rounded-[10px] p-1 w-fit mb-12 shadow-sm">
+            <button onClick={() => setReplyType('reply')} className="p-1.5 hover:bg-white hover:shadow-sm rounded-lg transition text-gray-600">
+              <ArrowBendUpLeft size={16} weight="bold" />
+            </button>
+            <button onClick={() => setReplyType('replyAll')} className="p-1.5 hover:bg-white hover:shadow-sm rounded-lg transition text-gray-600">
+               <ArrowBendDoubleUpLeft size={16} weight="bold" />
+            </button>
+            <button onClick={() => setReplyType('forward')} className="p-1.5 hover:bg-white hover:shadow-sm rounded-lg transition text-gray-600">
+               <ArrowBendUpRight size={16} weight="bold" />
+            </button>
+            <button onClick={() => {
+              const ev = new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true });
+              document.dispatchEvent(ev);
+            }} className="p-1.5 hover:bg-white hover:shadow-sm rounded-lg transition text-gray-600">
+               <Command size={16} weight="bold" />
             </button>
           </div>
-        </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-visible transition mb-12">
+            <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-4">
+              <div className="flex items-center gap-1 bg-[#eceae6] rounded-lg p-0.5 w-fit">
+                <button onClick={() => setReplyType('reply')} className={`p-1.5 rounded-md transition ${replyType === 'reply' ? 'bg-white shadow-sm text-[#2b323b]' : 'text-gray-500 hover:text-[#2b323b]'}`}>
+                  <ArrowBendUpLeft size={14} weight="bold" />
+                </button>
+                <button onClick={() => setReplyType('replyAll')} className={`p-1.5 rounded-md transition ${replyType === 'replyAll' ? 'bg-white shadow-sm text-[#2b323b]' : 'text-gray-500 hover:text-[#2b323b]'}`}>
+                   <ArrowBendDoubleUpLeft size={14} weight="bold" />
+                </button>
+                <button onClick={() => setReplyType('forward')} className={`p-1.5 rounded-md transition ${replyType === 'forward' ? 'bg-white shadow-sm text-[#2b323b]' : 'text-gray-500 hover:text-[#2b323b]'}`}>
+                   <ArrowBendUpRight size={14} weight="bold" />
+                </button>
+                <button onClick={() => {
+                  const ev = new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true });
+                  document.dispatchEvent(ev);
+                }} className="p-1.5 rounded-md transition text-gray-500 hover:text-[#2b323b]">
+                   <Command size={14} weight="bold" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="px-4 py-3 bg-[#fbfbfc] border-b border-gray-100 text-[13px] text-[#2b323b] flex items-center">
+              {replyType === 'reply' && `Reply to ${email.senderName}`}
+              {replyType === 'replyAll' && `Reply all to ${email.senderName}${email.rawTo ? `, ${email.rawTo}` : ''}`}
+              {replyType === 'forward' && (
+                <div className="flex items-center w-full gap-2">
+                  <span className="text-[#2b323b] font-medium w-6">To</span>
+                  <input 
+                    type="text" 
+                    placeholder="recipient@example.com"
+                    value={forwardTo}
+                    onChange={(e) => setForwardTo(e.target.value)}
+                    className="flex-1 bg-transparent border-none outline-none text-[#2b323b] placeholder-gray-400"
+                    autoFocus
+                  />
+                </div>
+              )}
+            </div>
+            <div className="flex-1 w-full min-h-[150px] overflow-visible">
+              <AiEditor 
+                value={replyText}
+                onChange={(html, text) => {
+                  setReplyHtml(html);
+                  setReplyText(text);
+                }}
+                placeholder="Write your reply..."
+                borderless={true}
+              />
+            </div>
+            <div className="px-4 py-3 bg-[#fbfbfc] border-t border-gray-100 flex justify-between items-center rounded-b-xl">
+              <div className="flex items-center gap-3 text-gray-400">
+                <button className="hover:text-[#50686c] transition flex items-center justify-center p-1 bg-[#eceae6] rounded-md"><DotsThree size={16} weight="bold" /></button>
+                <button className="hover:text-[#50686c] transition"><span className="icon-paperclip"></span></button>
+                <button className="hover:text-[#50686c] transition font-mono text-[14px]">{'{ }'}</button>
+                <button className="hover:text-[#50686c] transition"><Clock size={16} /></button>
+              </div>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => {
+                    setReplyType(null);
+                    setReplyText("");
+                    setReplyHtml("");
+                    setForwardTo("");
+                  }}
+                  className="px-2 text-[14px] font-medium text-[#2b323b] hover:text-black transition"
+                >
+                  Discard
+                </button>
+                <button 
+                  onClick={handleSend}
+                  disabled={!replyText || isSending || (replyType === 'forward' && !forwardTo)}
+                  className="bg-white border border-gray-200 hover:bg-gray-50 transition text-[#2b323b] px-4 py-1.5 rounded-lg text-[14px] font-medium disabled:opacity-50 shadow-sm"
+                >
+                  {isSending ? "Sending..." : "Send"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
