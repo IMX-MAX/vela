@@ -286,19 +286,19 @@ export default function InboxPage() {
 
   if (needsGoogleConnect) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-[#eceae6] rounded-2xl relative">
-        <div className="text-center max-w-md p-8 bg-white rounded-2xl border border-gray-200 shadow-sm">
-          <div className="h-16 w-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-gray-800">
+      <div className="flex flex-col items-center justify-center h-full bg-transparent rounded-2xl relative">
+        <div className="text-center max-w-md p-8 glass-modal rounded-2xl">
+          <div className="h-16 w-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-white">
             <LinkIcon size={32} weight="bold" />
           </div>
-          <h2 className="text-2xl font-semibold mb-3">Connect your Gmail</h2>
-          <p className="text-gray-500 mb-8 text-sm">
+          <h2 className="text-2xl font-semibold mb-3 text-white">Connect your Gmail</h2>
+          <p className="text-slate-400 mb-8 text-sm">
             To use Vela's powerful AI features, you need to connect your Google account securely.
           </p>
           <button 
             onClick={handleConnectGoogle}
             disabled={loading}
-            className="w-full bg-[#2b323b] text-white px-4 py-3 rounded-xl font-medium hover:bg-[#50686c] transition disabled:opacity-50"
+            className="w-full bg-vela-accent text-white px-4 py-3 rounded-xl font-medium hover:bg-vela-accent-hover transition-colors shadow-lg shadow-vela-accent/20 disabled:opacity-50"
           >
             {loading ? "Connecting..." : "Connect Google Account"}
           </button>
@@ -308,21 +308,21 @@ export default function InboxPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#eceae6] rounded-2xl relative">
-      <div className="h-14 border-b border-[#dddcdc] flex items-center px-6 sticky top-0 bg-[#eceae6]/90 backdrop-blur-sm z-10 rounded-t-2xl">
+    <div className="flex flex-col h-full bg-transparent rounded-2xl relative">
+      <div className="h-14 border-b border-white/5 flex items-center px-6 sticky top-0 glass-panel z-10 rounded-t-2xl shadow-sm">
         <div className="flex items-center gap-3">
           {searchQuery || filter !== 'inbox' ? (
-            <div className="bg-white px-3 py-1.5 rounded-md text-sm font-medium shadow-sm flex items-center gap-2 text-[#2b323b]">
+            <div className="bg-white/10 px-3 py-1.5 rounded-md text-sm font-medium shadow-sm flex items-center gap-2 text-white ring-1 ring-white/10">
               {searchQuery ? `Search: ${searchQuery}` : filter.charAt(0).toUpperCase() + filter.slice(1)}
             </div>
           ) : (
             <div className="flex items-center gap-1">
-              <div className="flex items-center gap-0.5">
+              <div className="flex items-center gap-0.5 p-1 bg-black/20 rounded-lg ring-1 ring-white/5">
                 {tabs.map(tab => (
                   <button 
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`px-3 py-1.5 rounded-md text-[14px] transition font-medium ${activeTab === tab ? 'bg-white shadow-sm text-[#2b323b]' : 'text-gray-500 hover:text-[#2b323b]'}`}
+                    className={`px-3 py-1.5 rounded-md text-[13px] transition-all duration-300 font-medium ${activeTab === tab ? 'bg-white/15 text-white shadow-sm ring-1 ring-white/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
                   >
                     {tab}
                   </button>
@@ -331,11 +331,11 @@ export default function InboxPage() {
               <div className="relative group flex items-center ml-1">
                 <button 
                   onClick={() => setShowSettingsModal(true)}
-                  className="p-1.5 text-gray-500 hover:text-[#2b323b] hover:bg-[#dcdada] rounded-md transition"
+                  className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-md transition-colors"
                 >
                   <FadersHorizontal size={16} weight="bold" />
                 </button>
-                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1 w-max px-3 py-1.5 bg-[#fbfbfc] shadow-md rounded-md text-[13px] font-medium text-[#2b323b] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 border border-gray-100">
+                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1 w-max px-3 py-1.5 glass-panel shadow-lg rounded-md text-[13px] font-medium text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20">
                   Split inbox settings
                 </div>
               </div>
@@ -355,41 +355,41 @@ export default function InboxPage() {
                 onClick={() => router.push(`/inbox/email/${email.id}`)}
                 onMouseEnter={() => { setHoveredEmailId(email.id); prefetchEmailBody(email.id); }}
                 onMouseLeave={() => setHoveredEmailId(null)}
-                className={`group flex flex-col md:flex-row md:items-center px-4 md:px-6 py-3 md:py-2.5 cursor-pointer border-b border-[#2b323b]/5 hover:bg-[#dddcdc]/50 transition gap-0.5 md:gap-0 ${
-                  email.isUnread ? "bg-white" : ""
+                className={`group flex flex-col md:flex-row md:items-center px-4 md:px-6 py-3 md:py-2.5 cursor-pointer border-b border-white/5 email-row gap-0.5 md:gap-0 ${
+                  email.isUnread ? "bg-white/[0.02]" : ""
                 }`}
               >
                 <div className="flex items-center justify-between md:w-auto w-full">
                   <div className="flex items-center flex-1 min-w-0">
                     <div className="w-4 flex-shrink-0 flex items-center justify-center">
-                      {email.isUnread && <div className="h-2 w-2 rounded-full bg-[#2b323b]"></div>}
+                      {email.isUnread && <div className="h-2 w-2 rounded-full glow-dot"></div>}
                     </div>
                     
-                    <div className={`md:w-48 truncate pr-4 text-[14px] md:text-[13px] ${email.isUnread ? "font-semibold text-[#2b323b]" : "font-medium text-gray-700"}`}>
+                    <div className={`md:w-48 truncate pr-4 text-[14px] md:text-[13px] ${email.isUnread ? "font-semibold text-white" : "font-medium text-slate-300"}`}>
                       {email.sender}
                     </div>
                   </div>
-                  <div className="md:hidden text-[12px] text-gray-500 flex-shrink-0 ml-2">
+                  <div className="md:hidden text-[12px] text-slate-500 flex-shrink-0 ml-2">
                     {formatTime(email.dateStr)}
                   </div>
                 </div>
                 
                 <div className="flex-1 flex flex-col md:flex-row md:items-center pl-4 md:pl-0 min-w-0">
-                  <div className={`truncate text-[13px] ${email.isUnread ? "font-semibold text-[#2b323b]" : "font-medium text-gray-800"}`}>
+                  <div className={`truncate text-[13px] ${email.isUnread ? "font-semibold text-white" : "font-medium text-slate-300"}`}>
                     {email.subject}
                   </div>
-                  <span className="text-gray-500 mx-2 hidden md:inline">&mdash;</span>
-                  <div className="text-gray-500 truncate text-[13px] md:flex-1">
+                  <span className="text-slate-500 mx-2 hidden md:inline">&mdash;</span>
+                  <div className="text-slate-400 truncate text-[13px] md:flex-1">
                     {email.snippet}
                   </div>
                 </div>
                 
                 <div className="hidden md:flex flex-shrink-0 ml-4 items-center w-24 justify-end">
-                  <div className="hidden group-hover:flex items-center gap-2 text-gray-500">
-                    {filter !== "done" && <button onClick={(e) => handleDone(e, email.id)} className="hover:text-[#2b323b]"><Check size={16} /></button>}
-                    {filter !== "trash" && <button onClick={(e) => handleTrash(e, email.id)} className="hover:text-[#2b323b]"><Trash size={16} /></button>}
+                  <div className="hidden group-hover:flex items-center gap-2 text-slate-400">
+                    {filter !== "done" && <button onClick={(e) => handleDone(e, email.id)} className="hover:text-vela-accent"><Check size={16} /></button>}
+                    {filter !== "trash" && <button onClick={(e) => handleTrash(e, email.id)} className="hover:text-red-400"><Trash size={16} /></button>}
                   </div>
-                  <div className={`group-hover:hidden text-[12px] ${email.isUnread ? "font-medium text-[#2b323b]" : "text-gray-500"}`}>
+                  <div className={`group-hover:hidden text-[12px] ${email.isUnread ? "font-medium text-vela-accent" : "text-slate-500"}`}>
                     {formatTime(email.dateStr)}
                   </div>
                 </div>
@@ -404,11 +404,11 @@ export default function InboxPage() {
             )}
             
             {authError && (
-              <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-                <p className="text-red-500 font-medium max-w-md text-center">{authError}</p>
+              <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+                <p className="text-red-400 font-medium max-w-md text-center">{authError}</p>
                 <button 
                   onClick={async () => { await useAuthStore.getState().logout(); window.location.href = "/login"; }} 
-                  className="mt-6 px-5 py-2.5 bg-[#2b323b] text-white hover:bg-[#2b323b] transition rounded-lg text-sm font-medium"
+                  className="mt-6 px-5 py-2.5 bg-white/10 text-white hover:bg-white/20 transition-colors rounded-lg text-sm font-medium"
                 >
                   Sign out and re-login
                 </button>
@@ -416,13 +416,13 @@ export default function InboxPage() {
             )}
             
             {!authError && filteredEmails.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+              <div className="flex flex-col items-center justify-center py-20 text-slate-400">
                 <p>{searchQuery ? "No emails found" : "No messages match this view"}</p>
                 {nextPageToken && (
                   <button 
                     onClick={handleLoadMore} 
                     disabled={loadingMore} 
-                    className="mt-4 px-4 py-2 bg-white border border-gray-200 shadow-sm rounded-lg text-[13px] font-medium text-[#2b323b] hover:bg-gray-50 transition disabled:opacity-50"
+                    className="mt-4 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-[13px] font-medium text-white hover:bg-white/10 transition-colors disabled:opacity-50"
                   >
                     {loadingMore ? "Searching older messages..." : "Search older messages"}
                   </button>
@@ -434,40 +434,40 @@ export default function InboxPage() {
       </div>
 
       {showSettingsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm" onClick={() => setShowSettingsModal(false)}>
-          <div className="bg-[#fbfbfc] rounded-2xl w-[500px] shadow-xl overflow-hidden border border-gray-200" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md" onClick={() => setShowSettingsModal(false)}>
+          <div className="glass-modal rounded-2xl w-[500px] shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
                <div className="flex items-center gap-2">
-                 <button onClick={() => setShowSettingsModal(false)} className="text-gray-400 hover:text-gray-600"><X size={16} weight="bold"/></button>
-                 <h2 className="font-semibold text-[#2b323b]">Split inbox</h2>
+                 <button onClick={() => setShowSettingsModal(false)} className="text-slate-400 hover:text-white transition-colors"><X size={16} weight="bold"/></button>
+                 <h2 className="font-semibold text-white">Split inbox</h2>
                </div>
             </div>
             <div className="p-2 max-h-[400px] overflow-y-auto">
               {inboxSplits.map(split => (
-                <div key={split.id} className="flex items-center justify-between p-4 hover:bg-[#eceae6] rounded-xl transition">
+                <div key={split.id} className="flex items-center justify-between p-4 hover:bg-white/5 rounded-xl transition-colors">
                   <div>
-                    <div className="font-medium text-[#2b323b] text-[14px] mb-0.5">{split.name}</div>
-                    <div className="text-[13px] text-gray-500">{split.desc?.replace(' Built by Tatem.', '')}</div>
+                    <div className="font-medium text-white text-[14px] mb-0.5">{split.name}</div>
+                    <div className="text-[13px] text-slate-400">{split.desc?.replace(' Built by Tatem.', '')}</div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button onClick={() => {
                        const newSplits = inboxSplits.map(s => s.id === split.id ? { ...s, enabled: !s.enabled } : s);
                        setInboxSplits(newSplits);
                     }}>
-                      {split.enabled ? <ToggleRight size={32} weight="fill" className="text-[#3b82f6]" /> : <ToggleLeft size={32} className="text-gray-300" />}
+                      {split.enabled ? <ToggleRight size={32} weight="fill" className="text-vela-accent" /> : <ToggleLeft size={32} className="text-slate-600" />}
                     </button>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="p-4 border-t border-gray-100 flex justify-between items-center bg-[#eceae6]">
-               <button className="px-4 py-2 bg-[#dcdada] hover:bg-[#cfcdcd] rounded-lg text-[13px] font-medium text-[#2b323b] transition">
+            <div className="p-4 border-t border-white/10 flex justify-between items-center bg-black/20">
+               <button className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-[13px] font-medium text-slate-200 transition-colors">
                  Watch demo
                </button>
                <button onClick={() => {
                  setShowSettingsModal(false);
                  setShowCreateSplitModal(true);
-               }} className="px-4 py-2 bg-white hover:bg-gray-50 rounded-lg text-[13px] font-medium text-[#2b323b] shadow-sm border border-gray-200 transition">
+               }} className="px-4 py-2 bg-vela-accent hover:bg-vela-accent-hover rounded-lg text-[13px] font-medium text-white shadow-lg shadow-vela-accent/20 transition-all">
                  Create new split
                </button>
             </div>
@@ -476,58 +476,58 @@ export default function InboxPage() {
       )}
 
       {showCreateSplitModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm" onClick={() => setShowCreateSplitModal(false)}>
-          <div className="bg-[#eceae6] rounded-2xl w-[500px] shadow-xl overflow-hidden border border-gray-200" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md" onClick={() => setShowCreateSplitModal(false)}>
+          <div className="glass-modal rounded-2xl w-[500px] shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
                <div className="flex items-center gap-2">
-                 <button onClick={() => setShowCreateSplitModal(false)} className="text-gray-400 hover:text-gray-600"><X size={16} weight="bold"/></button>
-                 <h2 className="font-semibold text-[#2b323b]">Create new split inbox</h2>
+                 <button onClick={() => setShowCreateSplitModal(false)} className="text-slate-400 hover:text-white transition-colors"><X size={16} weight="bold"/></button>
+                 <h2 className="font-semibold text-white">Create new split inbox</h2>
                </div>
             </div>
             <div className="p-6 max-h-[500px] overflow-y-auto space-y-6">
                <div>
-                 <label className="block text-[13px] font-medium text-[#2b323b] mb-1.5">Split inbox name</label>
-                 <input type="text" value={newSplit.name} onChange={e => setNewSplit({...newSplit, name: e.target.value})} placeholder="Split inbox name" className="w-full bg-[#fbfbfc] border border-gray-200 rounded-lg px-3 py-2 text-[14px] outline-none focus:border-[#3b82f6]" />
+                 <label className="block text-[13px] font-medium text-slate-300 mb-1.5">Split inbox name</label>
+                 <input type="text" value={newSplit.name} onChange={e => setNewSplit({...newSplit, name: e.target.value})} placeholder="Split inbox name" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-[14px] text-white outline-none focus:border-vela-accent focus:ring-1 focus:ring-vela-accent transition-all placeholder-slate-500" />
                </div>
                <div>
-                 <label className="block text-[13px] font-medium text-[#2b323b] mb-1.5">Split description</label>
-                 <input type="text" value={newSplit.desc} onChange={e => setNewSplit({...newSplit, desc: e.target.value})} placeholder="Add a short description" className="w-full bg-[#fbfbfc] border border-gray-200 rounded-lg px-3 py-2 text-[14px] outline-none focus:border-[#3b82f6]" />
+                 <label className="block text-[13px] font-medium text-slate-300 mb-1.5">Split description</label>
+                 <input type="text" value={newSplit.desc} onChange={e => setNewSplit({...newSplit, desc: e.target.value})} placeholder="Add a short description" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-[14px] text-white outline-none focus:border-vela-accent focus:ring-1 focus:ring-vela-accent transition-all placeholder-slate-500" />
                </div>
                
                <div>
-                 <label className="block text-[13px] font-medium text-[#2b323b] mb-3">Split rules</label>
+                 <label className="block text-[13px] font-medium text-slate-300 mb-3">Split rules</label>
                  <div className="space-y-3">
                    <div className="flex items-center gap-4">
-                     <span className="text-[13px] font-medium text-[#2b323b] w-16">Domain</span>
-                     <input type="text" value={newSplit.rules.domain} onChange={e => setNewSplit({...newSplit, rules: {...newSplit.rules, domain: e.target.value}})} placeholder="email.com" className="flex-1 bg-[#fbfbfc] border border-gray-200 rounded-lg px-3 py-1.5 text-[14px] outline-none focus:border-[#3b82f6]" />
+                     <span className="text-[13px] font-medium text-slate-400 w-16">Domain</span>
+                     <input type="text" value={newSplit.rules.domain} onChange={e => setNewSplit({...newSplit, rules: {...newSplit.rules, domain: e.target.value}})} placeholder="email.com" className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-[14px] text-white outline-none focus:border-vela-accent focus:ring-1 focus:ring-vela-accent transition-all placeholder-slate-500" />
                    </div>
                    <div className="flex items-center gap-4">
-                     <span className="text-[13px] font-medium text-[#2b323b] w-16">Sender</span>
-                     <input type="text" value={newSplit.rules.sender} onChange={e => setNewSplit({...newSplit, rules: {...newSplit.rules, sender: e.target.value}})} placeholder="name@email.com" className="flex-1 bg-[#fbfbfc] border border-gray-200 rounded-lg px-3 py-1.5 text-[14px] outline-none focus:border-[#3b82f6]" />
+                     <span className="text-[13px] font-medium text-slate-400 w-16">Sender</span>
+                     <input type="text" value={newSplit.rules.sender} onChange={e => setNewSplit({...newSplit, rules: {...newSplit.rules, sender: e.target.value}})} placeholder="name@email.com" className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-[14px] text-white outline-none focus:border-vela-accent focus:ring-1 focus:ring-vela-accent transition-all placeholder-slate-500" />
                    </div>
                    <div className="flex items-center gap-4">
-                     <span className="text-[13px] font-medium text-[#2b323b] w-16">Recipient</span>
-                     <input type="text" value={newSplit.rules.recipient} onChange={e => setNewSplit({...newSplit, rules: {...newSplit.rules, recipient: e.target.value}})} placeholder="name@email.com" className="flex-1 bg-[#fbfbfc] border border-gray-200 rounded-lg px-3 py-1.5 text-[14px] outline-none focus:border-[#3b82f6]" />
+                     <span className="text-[13px] font-medium text-slate-400 w-16">Recipient</span>
+                     <input type="text" value={newSplit.rules.recipient} onChange={e => setNewSplit({...newSplit, rules: {...newSplit.rules, recipient: e.target.value}})} placeholder="name@email.com" className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-[14px] text-white outline-none focus:border-vela-accent focus:ring-1 focus:ring-vela-accent transition-all placeholder-slate-500" />
                    </div>
                    <div className="flex items-center gap-4">
-                     <span className="text-[13px] font-medium text-[#2b323b] w-16">Subject</span>
-                     <input type="text" value={newSplit.rules.subject} onChange={e => setNewSplit({...newSplit, rules: {...newSplit.rules, subject: e.target.value}})} placeholder="Weekly design updates" className="flex-1 bg-[#fbfbfc] border border-gray-200 rounded-lg px-3 py-1.5 text-[14px] outline-none focus:border-[#3b82f6]" />
+                     <span className="text-[13px] font-medium text-slate-400 w-16">Subject</span>
+                     <input type="text" value={newSplit.rules.subject} onChange={e => setNewSplit({...newSplit, rules: {...newSplit.rules, subject: e.target.value}})} placeholder="Weekly design updates" className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-[14px] text-white outline-none focus:border-vela-accent focus:ring-1 focus:ring-vela-accent transition-all placeholder-slate-500" />
                    </div>
                    <div className="flex items-center gap-4">
-                     <span className="text-[13px] font-medium text-[#2b323b] w-16">Custom</span>
-                     <input type="text" value={newSplit.rules.custom} onChange={e => setNewSplit({...newSplit, rules: {...newSplit.rules, custom: e.target.value}})} placeholder="has:attachment" className="flex-1 bg-[#fbfbfc] border border-gray-200 rounded-lg px-3 py-1.5 text-[14px] outline-none focus:border-[#3b82f6]" />
+                     <span className="text-[13px] font-medium text-slate-400 w-16">Custom</span>
+                     <input type="text" value={newSplit.rules.custom} onChange={e => setNewSplit({...newSplit, rules: {...newSplit.rules, custom: e.target.value}})} placeholder="has:attachment" className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-[14px] text-white outline-none focus:border-vela-accent focus:ring-1 focus:ring-vela-accent transition-all placeholder-slate-500" />
                    </div>
                  </div>
                </div>
                
-               <div className="flex items-center justify-between pt-4 border-t border-gray-200/50">
-                 <span className="text-[14px] font-medium text-[#2b323b]">Show in Important/Other</span>
+               <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                 <span className="text-[14px] font-medium text-slate-200">Show in Important/Other</span>
                  <button onClick={() => setNewSplit({...newSplit, showInImportant: !newSplit.showInImportant})}>
-                   {newSplit.showInImportant ? <ToggleRight size={32} weight="fill" className="text-[#3b82f6]" /> : <ToggleLeft size={32} className="text-gray-300" />}
+                   {newSplit.showInImportant ? <ToggleRight size={32} weight="fill" className="text-vela-accent" /> : <ToggleLeft size={32} className="text-slate-600" />}
                  </button>
                </div>
             </div>
-            <div className="p-4 border-t border-gray-200/50 flex justify-end">
+            <div className="p-4 border-t border-white/10 flex justify-end bg-black/20">
                <button 
                  onClick={() => {
                    if (!newSplit.name) return;
@@ -537,7 +537,7 @@ export default function InboxPage() {
                    setNewSplit({ name: "", desc: "", rules: { domain: "", sender: "", recipient: "", subject: "", custom: "" }, showInImportant: false });
                  }}
                  disabled={!newSplit.name}
-                 className="px-5 py-2 bg-white hover:bg-gray-50 rounded-lg text-[14px] font-medium text-[#2b323b] shadow-sm border border-gray-200 transition disabled:opacity-50"
+                 className="px-5 py-2 bg-vela-accent hover:bg-vela-accent-hover rounded-lg text-[14px] font-medium text-white shadow-lg shadow-vela-accent/20 transition-all disabled:opacity-50"
                >
                  Create split
                </button>

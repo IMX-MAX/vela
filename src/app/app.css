@@ -1,6 +1,18 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@theme {
+  --color-vela-bg: #090a0f;
+  --color-vela-sidebar: #0e1015;
+  --color-vela-accent: #6366f1;
+  --color-vela-border: rgba(255, 255, 255, 0.06);
+}
+
+body {
+  background-color: var(--color-vela-bg);
+  color: #f8fafc;
+}
+
 summary::-webkit-details-marker {
   display: none
 }
@@ -42,4 +54,42 @@ summary::-webkit-details-marker {
 
 .ai-dust {
   animation: dustFadeIn 0.8s ease-out forwards;
+}
+
+/* Premium UI Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-modal {
+  background: rgba(14, 16, 21, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.email-row {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.email-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px) scale(1.002);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  position: relative;
+  border-radius: 0.75rem;
+}
+
+.glow-dot {
+  background-color: var(--color-vela-accent);
+  box-shadow: 0 0 12px 2px rgba(99, 102, 241, 0.6);
+}
+
+.glow-text {
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
 }
