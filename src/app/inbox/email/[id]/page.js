@@ -103,6 +103,9 @@ export default function EmailDetailPage() {
              mainMsg.senderName = mainMsg.from;
              mainMsg.senderEmail = mainMsg.from;
           }
+          if (!mainMsg.id) {
+             mainMsg.id = id;
+          }
           tId = cachedBody.threadId;
           setEmail(mainMsg);
           setThreadMessages([mainMsg]);
