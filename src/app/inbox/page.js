@@ -119,7 +119,8 @@ export default function InboxPage() {
         const currentPrimary = Array.isArray(token) ? token[0] : token;
         if (newToken && newToken !== currentPrimary) {
           const additionalAccounts = useAuthStore.getState().user?.prefs?.connectedAccounts || [];
-          const newAllTokens = [newToken, ...additionalAccounts.map(a => a.token)].filter(Boolean);
+          const validSecondaryTokens = additionalAccounts.filter(a => !a.isPaused).map(a => a.token);
+          const newAllTokens = [newToken, ...validSecondaryTokens].filter(Boolean);
           setResolvedToken(newAllTokens);
           return fetchEmailBatch(newAllTokens, pageToken, true);
         }
@@ -155,8 +156,44 @@ export default function InboxPage() {
       }
 
       if (token) {
-        const additionalAccounts = useAuthStore.getState().user?.prefs?.connectedAccounts || [];
-        const allTokens = [token, ...additionalAccounts.map(a => a.token)].filter(Boolean);
+        let additionalAccounts = useAuthStore.getState().user?.prefs?.connectedAccounts || [];
+        let updatedAccounts = false;
+        
+        additionalAccounts = await Promise.all(additionalAccounts.map(async (acc) => {
+          if (acc.isPaused) return acc;
+          if (acc.tokenExpiry && new Date(acc.tokenExpiry) < new Date(Date.now() + 5 * 60000)) { // 5 mins buffer
+            if (!acc.refreshToken) {
+              updatedAccounts = true;
+              return { ...acc, isPaused: true };
+            }
+            try {
+              const res = await fetch('/api/oauth/google/refresh', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refresh_token: acc.refreshToken })
+              });
+              if (!res.ok) throw new Error('Refresh failed');
+              const data = await res.json();
+              updatedAccounts = true;
+              return { ...acc, token: data.access_token, tokenExpiry: data.expiry_date, isPaused: false };
+            } catch (err) {
+              console.error("Failed to refresh token for", acc.email, err);
+              updatedAccounts = true;
+              return { ...acc, isPaused: true };
+            }
+          }
+          return acc;
+        }));
+
+        if (updatedAccounts && user) {
+          try {
+            const { account } = await import("@/lib/appwrite");
+            await account.updatePrefs({ ...user?.prefs, connectedAccounts: additionalAccounts });
+          } catch(e) { console.error("Error saving refreshed tokens", e); }
+        }
+
+        const validSecondaryTokens = additionalAccounts.filter(a => !a.isPaused).map(a => a.token);
+        const allTokens = [token, ...validSecondaryTokens].filter(Boolean);
         setResolvedToken(allTokens);
         const { fetchGoogleProfile } = await import("@/lib/gmail");
         const [{ parsed, next, error }, profile] = await Promise.all([

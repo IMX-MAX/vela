@@ -46,6 +46,68 @@ export default function SettingsPage() {
     }
   };
 
+  const handleConnectAccount = (reconnectIdx = null) => {
+    if (plan !== 'pro') {
+      useAuthStore.getState().setShowUpgradeModal(true);
+      return;
+    }
+    const currentAccounts = user?.prefs?.connectedAccounts || [];
+    if (reconnectIdx === null && currentAccounts.length >= 2) return;
+
+    const width = 500;
+    const height = 600;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+    const popup = window.open('/api/oauth/google', 'Google OAuth', `width=${width},height=${height},left=${left},top=${top}`);
+
+    const messageListener = async (event) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data.type === 'OAUTH_SUCCESS') {
+        window.removeEventListener('message', messageListener);
+        const { tokens, profile } = event.data.payload;
+        
+        let newAccounts = [...currentAccounts];
+        
+        if (reconnectIdx !== null) {
+          if (profile.email !== currentAccounts[reconnectIdx].email) {
+            alert("You must reconnect with the same email account: " + currentAccounts[reconnectIdx].email);
+            return;
+          }
+          newAccounts[reconnectIdx] = {
+            ...newAccounts[reconnectIdx],
+            token: tokens.access_token,
+            refreshToken: tokens.refresh_token,
+            tokenExpiry: tokens.expiry_date,
+            isPaused: false
+          };
+        } else {
+          // Duplicate check
+          if (profile.email === user?.email || currentAccounts.some(a => a.email === profile.email)) {
+            alert("This account is already connected.");
+            return;
+          }
+          newAccounts.push({
+            name: profile.name,
+            email: profile.email,
+            picture: profile.picture,
+            token: tokens.access_token,
+            refreshToken: tokens.refresh_token,
+            tokenExpiry: tokens.expiry_date,
+            isPaused: false
+          });
+        }
+        
+        await account.updatePrefs({ ...user?.prefs, connectedAccounts: newAccounts });
+        await checkAuth();
+      } else if (event.data.type === 'OAUTH_ERROR') {
+        window.removeEventListener('message', messageListener);
+        console.error("OAuth Error:", event.data.payload);
+        alert("Failed to connect account: " + event.data.payload);
+      }
+    };
+    window.addEventListener('message', messageListener);
+  };
+
   const handleSetPlan = async (newPlan) => {
     if (plan === 'pro' && newPlan === 'free') {
       setShowDowngradeModal(true);
@@ -269,8 +331,24 @@ export default function SettingsPage() {
                           <div className="text-[13px] text-gray-500">{acc.email} &middot; Secondary account</div>
                         </div>
                       </td>
-                      <td className="py-4 px-6 text-gray-700">Active</td>
-                      <td className="py-4 px-6 text-right">
+                      <td className="py-4 px-6">
+                        {acc.isPaused ? (
+                          <span className="text-orange-500 font-medium text-[13px] flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-orange-500"></span> Paused
+                          </span>
+                        ) : (
+                          <span className="text-gray-700">Active</span>
+                        )}
+                      </td>
+                      <td className="py-4 px-6 text-right flex items-center justify-end gap-3">
+                        {acc.isPaused && (
+                          <button 
+                            onClick={() => handleConnectAccount(idx)}
+                            className="text-[#2b323b] hover:text-black transition text-[13px] font-medium border border-gray-300 px-2 py-1 rounded-md"
+                          >
+                            Reconnect
+                          </button>
+                        )}
                         <button 
                           onClick={async () => {
                             const newAccounts = [...(user?.prefs?.connectedAccounts || [])];
@@ -291,24 +369,7 @@ export default function SettingsPage() {
 
             <div className="flex justify-end">
               <button 
-                onClick={async () => {
-                  if (plan !== 'pro') {
-                     useAuthStore.getState().setShowUpgradeModal(true);
-                     return;
-                  }
-                  const currentAccounts = user?.prefs?.connectedAccounts || [];
-                  if (currentAccounts.length >= 2) return;
-                  
-                  // Mock adding a secondary account
-                  const newAccounts = [...currentAccounts, {
-                    name: "Mock Secondary",
-                    email: `secondary${currentAccounts.length + 1}@example.com`,
-                    picture: "",
-                    token: "mock-token-" + Date.now() // Note: this mock token will fail gracefully in fetchEmails
-                  }];
-                  await account.updatePrefs({ ...user?.prefs, connectedAccounts: newAccounts });
-                  await checkAuth();
-                }}
+                onClick={() => handleConnectAccount(null)}
                 disabled={(user?.prefs?.connectedAccounts || []).length >= 2 && plan === 'pro'}
                 className={`px-4 py-2 rounded-lg font-medium text-[13px] transition ${
                   (user?.prefs?.connectedAccounts || []).length >= 2 && plan === 'pro'
