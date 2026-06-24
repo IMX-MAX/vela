@@ -564,10 +564,10 @@ export default function EmailDetailPage() {
 
 
 
-  const executeSnooze = async (hours) => {
+  const executeSnooze = async (hours, absoluteTimestamp = null) => {
     if (!resolvedToken || !email || !user) return;
     try {
-      const until = Date.now() + (hours * 60 * 60 * 1000);
+      const until = absoluteTimestamp ? absoluteTimestamp : Date.now() + (hours * 60 * 60 * 1000);
       const currentSnoozed = user.prefs?.snoozedEmails || [];
       const newSnoozed = [...currentSnoozed, { id, emailAddress: email.receiverEmail || user.email, until }];
       
@@ -697,10 +697,28 @@ export default function EmailDetailPage() {
               <Clock size={18} />
             </button>
             {showSnoozeMenu && (
-              <div className="absolute right-0 top-full mt-1 w-40 bg-[#fbfbfc] shadow-md rounded-md py-1 border border-gray-100 z-50">
-                <button onClick={() => executeSnooze(4)} className="w-full text-left px-3 py-2 hover:bg-[#eceae6] transition text-[13px] text-gray-700">Later Today</button>
-                <button onClick={() => executeSnooze(24)} className="w-full text-left px-3 py-2 hover:bg-[#eceae6] transition text-[13px] text-gray-700">Tomorrow</button>
-                <button onClick={() => executeSnooze(24 * 7)} className="w-full text-left px-3 py-2 hover:bg-[#eceae6] transition text-[13px] text-gray-700">Next Week</button>
+              <div className="absolute right-0 top-full mt-1 w-56 bg-[#fbfbfc] shadow-md rounded-md py-1 border border-gray-100 z-50">
+                <button onClick={() => executeSnooze(4)} className="w-full text-left px-3 py-2 hover:bg-[#eceae6] transition text-[13px] text-gray-700">Later Today (+4h)</button>
+                <button onClick={() => executeSnooze(24)} className="w-full text-left px-3 py-2 hover:bg-[#eceae6] transition text-[13px] text-gray-700">Tomorrow (+24h)</button>
+                <button onClick={() => executeSnooze(24 * 7)} className="w-full text-left px-3 py-2 hover:bg-[#eceae6] transition text-[13px] text-gray-700">Next Week (+7d)</button>
+                
+                <div className="px-3 py-2 border-t border-gray-100 mt-1">
+                  <div className="text-[11px] text-gray-400 font-medium mb-2 uppercase tracking-wider">Custom Date & Time</div>
+                  <input 
+                    type="datetime-local" 
+                    className="w-full text-[12px] p-1.5 border border-gray-200 rounded outline-none focus:border-[#2b323b] mb-1 bg-white text-gray-700"
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        const date = new Date(e.target.value);
+                        if (!isNaN(date.getTime()) && date.getTime() > Date.now()) {
+                           executeSnooze(null, date.getTime());
+                        } else if (!isNaN(date.getTime()) && date.getTime() <= Date.now()) {
+                           alert("Please select a future time.");
+                        }
+                      }
+                    }}
+                  />
+                </div>
               </div>
             )}
           </div>
