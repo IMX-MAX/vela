@@ -377,7 +377,7 @@ export default function EmailDetailPage() {
          subject = subject.toLowerCase().startsWith("re:") ? subject : `Re: ${subject}`;
       }
 
-      await sendEmail(resolvedToken, toField, subject, replyText, replyHtml || replyText, attachments);
+      await sendEmail(resolvedToken, toField, subject, replyText, replyHtml || replyText, attachments, email.threadId, email.messageId, email.references);
       router.push("/inbox");
     } catch (error) {
       console.error("Failed to send", error);

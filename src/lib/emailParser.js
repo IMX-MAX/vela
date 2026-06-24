@@ -29,6 +29,8 @@ export function parseEmailContent(message) {
   const subject = headers.find((h) => h.name.toLowerCase() === "subject")?.value || "No Subject";
   const from = headers.find((h) => h.name.toLowerCase() === "from")?.value || "Unknown";
   const date = headers.find((h) => h.name.toLowerCase() === "date")?.value || "";
+  const messageId = headers.find((h) => h.name.toLowerCase() === "message-id")?.value || "";
+  const references = headers.find((h) => h.name.toLowerCase() === "references")?.value || "";
 
   let body = "";
   let htmlBody = "";
@@ -68,5 +70,5 @@ export function parseEmailContent(message) {
     htmlBody = message.snippet;
   }
 
-  return { subject, from, body, htmlBody, date, snippet: message.snippet };
+  return { subject, from, body, htmlBody, date, snippet: message.snippet, messageId, references, threadId: message.threadId };
 }

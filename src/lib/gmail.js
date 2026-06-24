@@ -85,7 +85,7 @@ export async function searchEmailsQuick(tokenOrConnectionId, query, maxResults =
   return details;
 }
 
-export async function sendEmail(tokenOrConnectionId, to, subject, body, htmlBody = null, attachments = []) {
+export async function sendEmail(tokenOrConnectionId, to, subject, body, htmlBody = null, attachments = [], threadId = null, replyToMessageId = null, references = null) {
   const boundaryMixed = "mixed_" + Math.random().toString(36).substring(2);
   const boundaryAlt = "alt_" + Math.random().toString(36).substring(2);
 
@@ -97,6 +97,10 @@ export async function sendEmail(tokenOrConnectionId, to, subject, body, htmlBody
   let parts = [];
   parts.push(`To: ${to}`);
   parts.push(`Subject: ${subject}`);
+  if (replyToMessageId) {
+    parts.push(`In-Reply-To: ${replyToMessageId}`);
+    parts.push(`References: ${references ? references + ' ' + replyToMessageId : replyToMessageId}`);
+  }
   parts.push(`MIME-Version: 1.0`);
   
   if (attachments && attachments.length > 0) {
@@ -136,12 +140,17 @@ export async function sendEmail(tokenOrConnectionId, to, subject, body, htmlBody
 
   const encodedMessage = Buffer.from(rawMessage, 'utf-8').toString('base64url');
 
+  const payload = { raw: encodedMessage };
+  if (threadId) {
+    payload.threadId = threadId;
+  }
+
   return await makeGmailRequest(tokenOrConnectionId, "https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ raw: encodedMessage }),
+    body: JSON.stringify(payload),
   });
 }
 
