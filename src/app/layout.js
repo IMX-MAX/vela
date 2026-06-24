@@ -1,7 +1,7 @@
 import "./app.css";
 
 export const metadata = {
-  metadataBase: new URL("https://vela.nafen.sbs"),
+  metadataBase: new URL("https://getvela.email"),
   title: "Vela | The Fastest AI Email Client",
   description: "Vela is a fast, modern AI email client spearheading UI and artificial intelligence in email. Experience the fastest email workflow.",
   keywords: ["vela", "ai email client", "email client", "AI email", "fast email client"],
@@ -12,10 +12,24 @@ export const metadata = {
   openGraph: {
     title: "Vela | The Fastest AI Email Client",
     description: "Vela is a fast, modern AI email client spearheading UI and artificial intelligence in email.",
-    url: "https://vela.nafen.sbs",
+    url: "https://getvela.email",
     siteName: "Vela",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Vela - The Fastest AI Email Client",
+      },
+    ],
     locale: "en_US",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Vela | The Fastest AI Email Client",
+    description: "Vela is a fast, modern AI email client spearheading UI and artificial intelligence in email.",
+    images: ["/og-image.png"],
   },
 };
 
