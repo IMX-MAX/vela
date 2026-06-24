@@ -325,17 +325,7 @@ export default function EmailDetailPage() {
     e.preventDefault();
     if (!email) return;
     
-    const historyHtml = `
-      <br><br>
-      <div class="gmail_quote">
-        <div dir="ltr" class="gmail_attr">
-          On ${email.date ? format(new Date(email.date), "MMM d, yyyy, h:mm a") : ""} ${email.senderName} &lt;<a href="mailto:${email.senderEmail}">${email.senderEmail}</a>&gt; wrote:<br>
-        </div>
-        <blockquote class="gmail_quote" style="margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-          ${email.body || email.snippet}
-        </blockquote>
-      </div>
-    `;
+    const historyHtml = `<br><br><div class="gmail_quote"><div dir="ltr" class="gmail_attr">On ${email.date ? format(new Date(email.date), "MMM d, yyyy, h:mm a") : ""} ${email.senderName} &lt;<a href="mailto:${email.senderEmail}">${email.senderEmail}</a>&gt; wrote:<br></div><blockquote class="gmail_quote" style="margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">${email.body || email.snippet}</blockquote></div>`;
     
     setReplyHtml(prev => prev + historyHtml);
     setReplyText(prev => prev + "\n\nOn ... wrote:\n" + (email.snippet || ""));
