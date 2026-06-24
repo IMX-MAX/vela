@@ -7,16 +7,10 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeSlash } from "@phosphor-icons/react";
 
 export default function LoginPage() {
-  const { loginWithGoogle, loginWithEmail, registerWithEmail, user } = useAuthStore();
+  const { loginWithGoogle, user } = useAuthStore();
   const router = useRouter();
   
-  const [isLogin, setIsLogin] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -24,26 +18,6 @@ export default function LoginPage() {
       router.push("/inbox");
     }
   }, [user, router]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    let res;
-    if (isLogin) {
-      res = await loginWithEmail(email, password);
-    } else {
-      res = await registerWithEmail(email, password, name || email.split("@")[0]);
-    }
-
-    if (!res.success) {
-      setError(res.error || "An error occurred");
-      setLoading(false);
-    } else {
-      router.push("/inbox");
-    }
-  };
 
   return (
     <div className="flex h-screen items-center justify-center bg-[#2b323b] relative overflow-hidden">
@@ -66,19 +40,11 @@ export default function LoginPage() {
 
         {/* Title */}
         <h1 className="text-center text-2xl font-semibold text-white mb-2">
-          {isLogin ? "Sign in to Vela" : "Create a Vela account"}
+          Sign in to Vela
         </h1>
 
-        {/* Toggle Link */}
         <p className="text-center text-sm text-gray-400 mb-8">
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
-          <button 
-            type="button" 
-            onClick={() => setIsLogin(!isLogin)} 
-            className="font-medium text-white hover:underline"
-          >
-            {isLogin ? "Sign up" : "Log in."}
-          </button>
+          Welcome back to the fastest AI email client.
         </p>
 
         {error && (
@@ -111,73 +77,9 @@ export default function LoginPage() {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            Log in with Google
+            Sign in with Google
           </button>
         </div>
-
-        {/* Divider */}
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-white/[0.1]"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="bg-[#2b323b] px-4 text-gray-500">or</span>
-          </div>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {!isLogin && (
-            <div>
-              <label className="block text-sm font-medium text-[#50686c] mb-1.5">Name</label>
-              <input 
-                type="text" 
-                placeholder="Your name" 
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#50686c]/50 focus:border-[#50686c]/50 transition"
-              />
-            </div>
-          )}
-          <div>
-            <label className="block text-sm font-medium text-[#50686c] mb-1.5">Email</label>
-            <input 
-              type="email" 
-              placeholder="alan.turing@example.com" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-3 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#50686c]/50 focus:border-[#50686c]/50 transition"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[#50686c] mb-1.5">Password</label>
-            <div className="relative">
-              <input 
-                type={showPassword ? "text" : "password"} 
-                placeholder="••••••••••••" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#50686c]/50 focus:border-[#50686c]/50 transition pr-12"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition"
-              >
-                {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-          </div>
-          <button 
-            type="submit" 
-            disabled={loading}
-            className="w-full rounded-lg bg-white/[0.08] border border-white/[0.1] px-4 py-3 text-sm font-medium text-gray-300 transition hover:bg-white/[0.14] hover:text-white disabled:opacity-50"
-          >
-            {loading ? "Please wait..." : (isLogin ? "Sign in" : "Create account")}
-          </button>
-        </form>
 
         {/* Terms */}
         <div className="mt-8 text-center text-xs text-gray-500 leading-relaxed">
