@@ -6,7 +6,7 @@ import { fetchEmailDetails, sendEmail } from "@/lib/gmail";
 import { parseEmailContent } from "@/lib/emailParser";
 import { summarizeEmailAction, draftReplyAction } from "@/app/actions";
 import { ArrowLeft, Sparkle, PaperPlaneRight, CaretDown, CaretUp, Star, Clock, Check, Trash, DotsThree, ArrowBendUpLeft, ArrowBendDoubleUpLeft, ArrowBendUpRight, Command } from "@phosphor-icons/react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -19,8 +19,29 @@ export default function EmailDetailPage() {
   const params = useParams();
   const id = params?.id;
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { session, user, inboxEmails, checkAuth } = useAuthStore();
   const iframeRef = useRef(null);
+  
+  const filter = searchParams.get('filter');
+  const searchQ = searchParams.get('search');
+  
+  const getBackUrl = () => {
+    let url = '/inbox';
+    const params = new URLSearchParams();
+    if (filter) params.set('filter', filter);
+    if (searchQ) params.set('search', searchQ);
+    const qs = params.toString();
+    return qs ? `${url}?${qs}` : url;
+  };
+
+  const getEmailUrl = (emailId) => {
+    const params = new URLSearchParams();
+    if (filter) params.set('filter', filter);
+    if (searchQ) params.set('search', searchQ);
+    const qs = params.toString();
+    return `/inbox/email/${emailId}${qs ? `?${qs}` : ''}`;
+  };
   
   const [email, setEmail] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -257,7 +278,7 @@ export default function EmailDetailPage() {
     if (inboxEmails) {
       setInboxEmails(inboxEmails.filter(e => e.id !== id));
     }
-    router.push("/inbox");
+    router.push(getBackUrl());
   };
 
   const handleTrash = async () => {
@@ -269,7 +290,7 @@ export default function EmailDetailPage() {
     if (inboxEmails) {
       setInboxEmails(inboxEmails.filter(e => e.id !== id));
     }
-    router.push("/inbox");
+    router.push(getBackUrl());
   };
 
   const handleUnsubscribe = async () => {
@@ -283,7 +304,7 @@ export default function EmailDetailPage() {
       if (inboxEmails) {
         setInboxEmails(inboxEmails.filter(e => e.id !== id));
       }
-      router.push("/inbox");
+      router.push(getBackUrl());
     } catch (e) {
       console.error(e);
     } finally {
@@ -366,12 +387,12 @@ export default function EmailDetailPage() {
       if (e.key === "j") {
         e.preventDefault();
         if (currentIndex < inboxEmails.length - 1) {
-          router.push(`/inbox/email/${inboxEmails[currentIndex + 1].id}`);
+          router.push(getEmailUrl(inboxEmails[currentIndex + 1].id));
         }
       } else if (e.key === "k") {
         e.preventDefault();
         if (currentIndex > 0) {
-          router.push(`/inbox/email/${inboxEmails[currentIndex - 1].id}`);
+          router.push(getEmailUrl(inboxEmails[currentIndex - 1].id));
         }
       }
     };
@@ -550,7 +571,7 @@ export default function EmailDetailPage() {
     await saveInlineDraft();
     const currentIndex = inboxEmails?.findIndex(e => e.id === id);
     if (currentIndex !== -1 && currentIndex < inboxEmails.length - 1) {
-      router.push(`/inbox/email/${inboxEmails[currentIndex + 1].id}`);
+      router.push(getEmailUrl(inboxEmails[currentIndex + 1].id));
     }
   };
 
@@ -558,7 +579,7 @@ export default function EmailDetailPage() {
     await saveInlineDraft();
     const currentIndex = inboxEmails?.findIndex(e => e.id === id);
     if (currentIndex > 0) {
-      router.push(`/inbox/email/${inboxEmails[currentIndex - 1].id}`);
+      router.push(getEmailUrl(inboxEmails[currentIndex - 1].id));
     }
   };
 
@@ -612,7 +633,7 @@ export default function EmailDetailPage() {
           <button 
             onClick={async () => {
               await saveInlineDraft();
-              router.push('/inbox');
+              router.push(getBackUrl());
             }} 
             title="Back to inbox"
             className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"
