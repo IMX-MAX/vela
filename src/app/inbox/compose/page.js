@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import { sendEmail } from "@/lib/gmail";
 import { Paperclip, X, ArrowsOutSimple } from "@phosphor-icons/react";
@@ -16,7 +16,53 @@ export default function ComposePage() {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [bodyText, setBodyText] = useState("");
+  const searchParams = useSearchParams();
+  const draftMessageId = searchParams.get('draft');
+  const [draftId, setDraftId] = useState(null);
+  
   const [isSending, setIsSending] = useState(false);
+  
+  React.useEffect(() => {
+    async function loadDraft() {
+      if (!draftMessageId || !session?.providerAccessToken) return;
+      try {
+        const { fetchEmailDetails, getDraftIdByMessageId } = await import("@/lib/gmail");
+        const { parseEmailContent } = await import("@/lib/emailParser");
+        
+        const dId = await getDraftIdByMessageId(session.providerAccessToken, draftMessageId);
+        setDraftId(dId);
+        
+        const rawMsg = await fetchEmailDetails(session.providerAccessToken, draftMessageId);
+        const parsed = parseEmailContent(rawMsg);
+        setTo(parsed.to || "");
+        setSubject(parsed.subject || "");
+        setBody(parsed.htmlBody || parsed.body || "");
+        setBodyText(parsed.body || "");
+      } catch (e) {
+        console.error("Failed to load draft", e);
+      }
+    }
+    loadDraft();
+  }, [draftMessageId, session]);
+
+  React.useEffect(() => {
+    if (!to && !subject && !bodyText && !body) return;
+    
+    const timeoutId = setTimeout(async () => {
+      if (!session?.providerAccessToken) return;
+      try {
+        const { saveDraft } = await import("@/lib/gmail");
+        const result = await saveDraft(session.providerAccessToken, draftId, to, subject, bodyText || body, body);
+        if (!draftId && result.id) {
+          setDraftId(result.id);
+        }
+      } catch (e) {
+        console.error("Auto-save draft failed", e);
+      }
+    }, 3000);
+    
+    return () => clearTimeout(timeoutId);
+  }, [to, subject, bodyText, body, draftId, session]);
   
   const [attachments, setAttachments] = useState([]);
   const fileInputRef = React.useRef(null);
@@ -31,6 +77,11 @@ export default function ComposePage() {
     setIsSending(true);
     try {
       await sendEmail(session.providerAccessToken, to, subject, bodyText || body, body);
+      
+      if (draftId) {
+        const { deleteDraft } = await import("@/lib/gmail");
+        await deleteDraft(session.providerAccessToken, draftId).catch(() => {});
+      }
       
       // Background Profiling
       const user = useAuthStore.getState().user;
@@ -63,7 +114,13 @@ export default function ComposePage() {
             <ArrowsOutSimple size={16} />
           </button>
           <button 
-            onClick={() => router.back()}
+            onClick={async () => {
+              if (draftId && session?.providerAccessToken) {
+                const { deleteDraft } = await import("@/lib/gmail");
+                await deleteDraft(session.providerAccessToken, draftId).catch(() => {});
+              }
+              router.back();
+            }}
             className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded transition"
           >
             <X size={16} />
@@ -138,7 +195,13 @@ export default function ComposePage() {
 
           <div className="flex items-center gap-3">
             <button 
-              onClick={() => router.back()}
+              onClick={async () => {
+                if (draftId && session?.providerAccessToken) {
+                  const { deleteDraft } = await import("@/lib/gmail");
+                  await deleteDraft(session.providerAccessToken, draftId).catch(() => {});
+                }
+                router.back();
+              }}
               className="text-[14px] font-medium text-gray-600 hover:text-[#2b323b] transition"
             >
               Discard

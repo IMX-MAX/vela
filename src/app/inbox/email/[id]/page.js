@@ -45,6 +45,61 @@ export default function EmailDetailPage() {
   const [attachments, setAttachments] = useState([]);
   const [isSending, setIsSending] = useState(false);
   const [resolvedToken, setResolvedToken] = useState(null);
+  const [replyDraftId, setReplyDraftId] = useState(null);
+
+  useEffect(() => {
+    if (!replyType || !email) return;
+    if (!replyText && !replyHtml && !draft) return;
+    
+    const timeoutId = setTimeout(async () => {
+      if (!resolvedToken) return;
+      try {
+        const { saveDraft } = await import("@/lib/gmail");
+        let toField = email.senderEmail;
+        if (replyType === 'replyAll') {
+          const allEmails = new Set();
+          if (email.senderEmail) allEmails.add(email.senderEmail);
+          if (email.rawTo) {
+            email.rawTo.split(',').forEach(addr => {
+              const match = addr.match(/<([^>]+)>/) || addr.match(/([\w.-]+@[\w.-]+)/);
+              if (match && match[1]) allEmails.add(match[1].trim());
+              else allEmails.add(addr.trim());
+            });
+          }
+          toField = Array.from(allEmails).join(', ');
+        } else if (replyType === 'forward') {
+          toField = forwardTo;
+        }
+        
+        let subject = email.subject || "";
+        if (replyType === 'forward') {
+           subject = subject.toLowerCase().startsWith("fwd:") ? subject : `Fwd: ${subject}`;
+        } else {
+           subject = subject.toLowerCase().startsWith("re:") ? subject : `Re: ${subject}`;
+        }
+
+        const result = await saveDraft(
+          resolvedToken, 
+          replyDraftId, 
+          toField, 
+          subject, 
+          replyText || draft, 
+          replyHtml || draft, 
+          attachments, 
+          email.threadId, 
+          email.messageId, 
+          email.references
+        );
+        if (!replyDraftId && result.id) {
+          setReplyDraftId(result.id);
+        }
+      } catch (e) {
+        console.error("Auto-save inline reply draft failed", e);
+      }
+    }, 3000);
+    
+    return () => clearTimeout(timeoutId);
+  }, [replyText, replyHtml, draft, replyDraftId, resolvedToken, replyType, email, attachments, forwardTo]);
 
   const [aiPrompt, setAiPrompt] = useState("");
   const [showAiPrompt, setShowAiPrompt] = useState(false);
@@ -85,12 +140,22 @@ export default function EmailDetailPage() {
         let mainMsg;
         let tId;
 
-        const fetchThreadBackground = async (tkn, threadIdToFetch) => {
+        const fetchThreadBackground = async (tkn, threadIdToFetch, isRetry = false) => {
           if (!threadIdToFetch) return;
           try {
             const { fetchThreadDetails } = await import("@/lib/gmail");
             const { parseEmailContent } = await import("@/lib/emailParser");
             const threadData = await fetchThreadDetails(tkn, threadIdToFetch);
+            if (threadData.error && (threadData.error.code === 401 || threadData.error.status === 'UNAUTHENTICATED')) {
+              if (!isRetry) {
+                await checkAuth();
+                const newToken = useAuthStore.getState().session?.providerAccessToken;
+                if (newToken && newToken !== tkn) {
+                  return fetchThreadBackground(newToken, threadIdToFetch, true);
+                }
+              }
+              throw new Error("401 Unauthorized");
+            }
             const parsedMsgs = (threadData.messages || []).map(msg => parseEmailContent(msg));
             setThreadMessages(parsedMsgs);
             setFullThreadLoaded(true);
@@ -112,7 +177,16 @@ export default function EmailDetailPage() {
           setLoading(false); // Instant render
           fetchThreadBackground(token, tId);
         } else {
-          const rawMsg = await fetchEmailDetails(token, id);
+          let rawMsg = await fetchEmailDetails(token, id);
+          if (rawMsg.error && (rawMsg.error.code === 401 || rawMsg.error.status === 'UNAUTHENTICATED')) {
+            await checkAuth();
+            const newToken = useAuthStore.getState().session?.providerAccessToken;
+            if (newToken && newToken !== token) {
+              token = newToken;
+              setResolvedToken(token);
+              rawMsg = await fetchEmailDetails(token, id);
+            }
+          }
           const { parseEmailContent } = await import("@/lib/emailParser");
           mainMsg = parseEmailContent(rawMsg);
           
@@ -400,7 +474,31 @@ export default function EmailDetailPage() {
       }
 
       await sendEmail(resolvedToken, toField, subject, replyText, replyHtml || replyText, attachments, email.threadId, email.messageId, email.references);
-      router.push("/inbox");
+      
+      if (replyDraftId) {
+        const { deleteDraft } = await import("@/lib/gmail");
+        await deleteDraft(resolvedToken, replyDraftId).catch(() => {});
+        setReplyDraftId(null);
+      }
+      
+      // Update UI seamlessly instead of routing away
+      setReplyType(null);
+      setReplyText("");
+      setReplyHtml("");
+      setDraft("");
+      setAttachments([]);
+      setIsSending(false);
+      
+      // Re-fetch the thread to show the new message
+      if (email.threadId) {
+        const { fetchThreadDetails } = await import("@/lib/gmail");
+        const { parseEmailContent } = await import("@/lib/emailParser");
+        const threadData = await fetchThreadDetails(resolvedToken, email.threadId);
+        if (!threadData.error) {
+          const parsedMsgs = (threadData.messages || []).map(msg => parseEmailContent(msg));
+          setThreadMessages(parsedMsgs);
+        }
+      }
     } catch (error) {
       console.error("Failed to send", error);
       setIsSending(false);
@@ -505,7 +603,7 @@ export default function EmailDetailPage() {
       <div className="h-14 flex items-center justify-between px-4 sticky top-0 z-10 rounded-t-2xl bg-[#eceae6] border-b border-[#dddcdc]">
         <div className="flex items-center gap-1.5">
           <button 
-            onClick={() => router.back()} 
+            onClick={() => router.push('/inbox')} 
             title="Back to inbox"
             className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"
           >
@@ -843,7 +941,12 @@ export default function EmailDetailPage() {
               </div>
               <div className="flex items-center gap-3">
                 <button 
-                  onClick={() => {
+                  onClick={async () => {
+                    if (replyDraftId && resolvedToken) {
+                      const { deleteDraft } = await import("@/lib/gmail");
+                      await deleteDraft(resolvedToken, replyDraftId).catch(() => {});
+                      setReplyDraftId(null);
+                    }
                     startTransition(() => {
                       setReplyType(null);
                       setReplyText("");

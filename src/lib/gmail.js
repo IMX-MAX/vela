@@ -85,18 +85,17 @@ export async function searchEmailsQuick(tokenOrConnectionId, query, maxResults =
   return details;
 }
 
-export async function sendEmail(tokenOrConnectionId, to, subject, body, htmlBody = null, attachments = [], threadId = null, replyToMessageId = null, references = null) {
+function buildMimeMessage(to, subject, body, htmlBody, attachments, replyToMessageId, references) {
   const boundaryMixed = "mixed_" + Math.random().toString(36).substring(2);
   const boundaryAlt = "alt_" + Math.random().toString(36).substring(2);
 
-  // Make sure we always send HTML to enforce sans-serif font, preventing default serif rendering in clients
   const htmlContent = htmlBody 
     ? `<div style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px; color: #222;">${htmlBody}</div>`
     : `<div style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px; color: #222;">${body.replace(/\n/g, '<br>')}</div>`;
 
   let parts = [];
-  parts.push(`To: ${to}`);
-  parts.push(`Subject: ${subject}`);
+  if (to) parts.push(`To: ${to}`);
+  if (subject) parts.push(`Subject: ${subject}`);
   if (replyToMessageId) {
     parts.push(`In-Reply-To: ${replyToMessageId}`);
     parts.push(`References: ${references ? references + ' ' + replyToMessageId : replyToMessageId}`);
@@ -137,9 +136,11 @@ export async function sendEmail(tokenOrConnectionId, to, subject, body, htmlBody
   }
 
   const rawMessage = parts.join('\r\n');
+  return Buffer.from(rawMessage, 'utf-8').toString('base64url');
+}
 
-  const encodedMessage = Buffer.from(rawMessage, 'utf-8').toString('base64url');
-
+export async function sendEmail(tokenOrConnectionId, to, subject, body, htmlBody = null, attachments = [], threadId = null, replyToMessageId = null, references = null) {
+  const encodedMessage = buildMimeMessage(to, subject, body, htmlBody, attachments, replyToMessageId, references);
   const payload = { raw: encodedMessage };
   if (threadId) {
     payload.threadId = threadId;
@@ -152,6 +153,39 @@ export async function sendEmail(tokenOrConnectionId, to, subject, body, htmlBody
     },
     body: JSON.stringify(payload),
   });
+}
+
+export async function saveDraft(tokenOrConnectionId, draftId, to, subject, body, htmlBody = null, attachments = [], threadId = null, replyToMessageId = null, references = null) {
+  const encodedMessage = buildMimeMessage(to, subject, body, htmlBody, attachments, replyToMessageId, references);
+  const payload = { message: { raw: encodedMessage } };
+  if (threadId) {
+    payload.message.threadId = threadId;
+  }
+
+  const url = draftId 
+    ? `https://gmail.googleapis.com/gmail/v1/users/me/drafts/${draftId}`
+    : `https://gmail.googleapis.com/gmail/v1/users/me/drafts`;
+    
+  return await makeGmailRequest(tokenOrConnectionId, url, {
+    method: draftId ? "PUT" : "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteDraft(tokenOrConnectionId, draftId) {
+  return await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/drafts/${draftId}`, {
+    method: "DELETE"
+  });
+}
+
+export async function getDraftIdByMessageId(tokenOrConnectionId, messageId) {
+  const data = await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/drafts`);
+  if (!data || !data.drafts) return null;
+  const draft = data.drafts.find(d => d.message && d.message.id === messageId);
+  return draft ? draft.id : null;
 }
 
 export async function fetchThreadDetails(tokenOrConnectionId, threadId) {

@@ -89,7 +89,7 @@ export default function InboxPage() {
     return true;
   });
 
-  const fetchEmailBatch = async (token, pageToken = null) => {
+  const fetchEmailBatch = async (token, pageToken = null, isRetry = false) => {
     try {
       const data = await fetchEmails(token, 30, filter, searchQuery, pageToken);
       const parsed = data.messages.map((msg) => {
@@ -112,6 +112,14 @@ export default function InboxPage() {
       });
       return { parsed, next: data.nextPageToken, error: null };
     } catch (error) {
+      if (!isRetry && (error.message.includes("401") || error.message.includes("Request had invalid authentication credentials") || error.message.includes("Invalid Credentials"))) {
+        await useAuthStore.getState().checkAuth();
+        const newToken = useAuthStore.getState().session?.providerAccessToken;
+        if (newToken && newToken !== token) {
+          setResolvedToken(newToken);
+          return fetchEmailBatch(newToken, pageToken, true);
+        }
+      }
       console.error("Error fetching emails:", error);
       return { parsed: [], next: null, error: error.message || "Failed to fetch emails" };
     }
@@ -352,7 +360,7 @@ export default function InboxPage() {
             {filteredEmails.map((email) => (
               <div
                 key={email.id}
-                onClick={() => router.push(`/inbox/email/${email.id}`)}
+                onClick={() => filter === 'drafts' ? router.push(`/inbox/compose?draft=${email.id}`) : router.push(`/inbox/email/${email.id}`)}
                 onMouseEnter={() => { setHoveredEmailId(email.id); prefetchEmailBody(email.id); }}
                 onMouseLeave={() => setHoveredEmailId(null)}
                 className={`group flex flex-col md:flex-row md:items-center px-4 md:px-6 py-3 md:py-2.5 cursor-pointer border-b border-[#2b323b]/5 hover:bg-[#dddcdc]/50 transition gap-0.5 md:gap-0 ${
