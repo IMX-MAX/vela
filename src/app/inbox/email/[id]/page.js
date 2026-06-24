@@ -15,6 +15,21 @@ import { EmailDetailSkeleton } from "@/components/Skeletons";
 
 const AiEditor = dynamic(() => import("@/components/AiEditor"), { ssr: false });
 
+const EmailIframe = React.memo(({ htmlBody, iframeRef }) => {
+  return (
+    <iframe
+      ref={iframeRef}
+      srcDoc={`<base target="_blank" /><meta name="referrer" content="no-referrer" />${htmlBody}`}
+      sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin"
+      referrerPolicy="no-referrer"
+      loading="lazy"
+      className="w-full border-none min-h-[300px]"
+      title="Email Content"
+      style={{ overflow: 'hidden' }}
+    />
+  );
+});
+
 export default function EmailDetailPage() {
   const params = useParams();
   const id = params?.id;
@@ -702,22 +717,24 @@ export default function EmailDetailPage() {
                 <button onClick={() => executeSnooze(24)} className="w-full text-left px-3 py-2 hover:bg-[#eceae6] transition text-[13px] text-gray-700">Tomorrow (+24h)</button>
                 <button onClick={() => executeSnooze(24 * 7)} className="w-full text-left px-3 py-2 hover:bg-[#eceae6] transition text-[13px] text-gray-700">Next Week (+7d)</button>
                 
-                <div className="px-3 py-2 border-t border-gray-100 mt-1">
-                  <div className="text-[11px] text-gray-400 font-medium mb-2 uppercase tracking-wider">Custom Date & Time</div>
-                  <input 
-                    type="datetime-local" 
-                    className="w-full text-[12px] p-1.5 border border-gray-200 rounded outline-none focus:border-[#2b323b] mb-1 bg-white text-gray-700"
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        const date = new Date(e.target.value);
-                        if (!isNaN(date.getTime()) && date.getTime() > Date.now()) {
-                           executeSnooze(null, date.getTime());
-                        } else if (!isNaN(date.getTime()) && date.getTime() <= Date.now()) {
-                           alert("Please select a future time.");
+                <div className="px-3 py-2 border-t border-gray-100 mt-1 bg-gray-50/50 rounded-b-md">
+                  <div className="text-[10px] text-gray-400 font-semibold mb-1.5 uppercase tracking-wider">Custom Date & Time</div>
+                  <div className="relative">
+                    <input 
+                      type="datetime-local" 
+                      className="w-full text-[12px] p-1.5 pl-2 pr-2 border border-gray-200 rounded-md outline-none focus:border-[#2b323b] focus:ring-1 focus:ring-[#2b323b] transition-shadow mb-1 bg-white text-gray-700 shadow-sm"
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          const date = new Date(e.target.value);
+                          if (!isNaN(date.getTime()) && date.getTime() > Date.now()) {
+                             executeSnooze(null, date.getTime());
+                          } else if (!isNaN(date.getTime()) && date.getTime() <= Date.now()) {
+                             alert("Please select a future time.");
+                          }
                         }
-                      }
-                    }}
-                  />
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -885,16 +902,7 @@ export default function EmailDetailPage() {
           {/* Email Body */}
           <div className="p-8">
             {email.htmlBody ? (
-              <iframe
-                ref={iframeRef}
-                srcDoc={`<base target="_blank" /><meta name="referrer" content="no-referrer" />${email.htmlBody}`}
-                sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin"
-                referrerPolicy="no-referrer"
-                loading="lazy"
-                className="w-full border-none min-h-[300px]"
-                title="Email Content"
-                style={{ overflow: 'hidden' }}
-              />
+              <EmailIframe htmlBody={email.htmlBody} iframeRef={iframeRef} />
             ) : email.body ? (
               <div className="text-[15px] leading-relaxed text-gray-800 whitespace-pre-wrap font-sans">
                 {email.body}
