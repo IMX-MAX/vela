@@ -7,86 +7,94 @@ import MarketingFooter from "@/components/MarketingFooter";
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-[#2b323b] text-white font-[Inter] selection:bg-[#50686c] selection:text-white flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-[#f2f4f5] via-[#e5e7e9] to-[#cfd3d6] text-[#1e2a3b] font-[Inter] selection:bg-[#5a768c] selection:text-white flex flex-col relative overflow-x-hidden">
+      
+      {/* Background Lighting Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-0 bottom-0 left-[10%] w-[30%] bg-gradient-to-r from-black/[0.08] to-transparent blur-[60px] transform -skew-x-[20deg] origin-top"></div>
+        <div className="absolute top-0 bottom-0 left-[25%] w-[15%] bg-gradient-to-r from-white/60 to-transparent blur-[40px] transform -skew-x-[20deg] origin-top"></div>
+        <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-white/40 blur-[120px]"></div>
+      </div>
+
       <MarketingNavbar />
       
-      <main className="flex-1 pt-32 pb-24 px-6 max-w-6xl mx-auto w-full">
+      <main className="flex-1 pt-32 pb-24 px-6 max-w-6xl mx-auto w-full relative z-10">
         <div className="text-center mb-16 animate-fade-in-up">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-xs font-medium text-gray-400 mb-6 backdrop-blur-md">
-            <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1e2a3b]/[0.04] border border-[#1e2a3b]/[0.08] text-xs font-medium text-[#1e2a3b]/70 mb-6 backdrop-blur-md">
+            <div className="h-1.5 w-1.5 rounded-full bg-[#5a768c] animate-pulse"></div>
             Early Access Pricing
           </div>
-          <h1 className="text-4xl md:text-5xl font-medium tracking-tight text-white mb-4">Simple, transparent pricing.</h1>
-          <p className="text-gray-400 max-w-xl mx-auto text-lg leading-relaxed">
+          <h1 className="text-4xl md:text-5xl font-medium tracking-tight text-[#1e2a3b] mb-4">Simple, transparent pricing.</h1>
+          <p className="text-[#1e2a3b]/60 max-w-xl mx-auto text-lg leading-relaxed">
             Get started for free during our beta. Upgrade when you need more power.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {/* Free Plan */}
-          <div className="relative rounded-3xl bg-white/[0.02] border border-white/[0.08] p-10 flex flex-col hover:border-white/[0.15] transition-colors animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-            <h3 className="text-2xl font-medium text-white mb-2">Free Plan</h3>
-            <p className="text-sm text-gray-400 mb-6">Perfect for casual use and getting started.</p>
-            <div className="text-4xl font-semibold text-white mb-8">$0 <span className="text-lg font-normal text-gray-500">/mo</span></div>
+          <div className="relative rounded-3xl bg-white/40 border border-white/60 p-10 flex flex-col hover:bg-white/60 hover:shadow-xl hover:shadow-black/5 backdrop-blur-xl transition-all duration-300 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+            <h3 className="text-2xl font-medium text-[#1e2a3b] mb-2">Free Plan</h3>
+            <p className="text-sm text-[#1e2a3b]/60 mb-6">Perfect for casual use and getting started.</p>
+            <div className="text-4xl font-semibold text-[#1e2a3b] mb-8">$0 <span className="text-lg font-normal text-[#1e2a3b]/40">/mo</span></div>
             
             <ul className="space-y-4 mb-10 flex-1">
-              <li className="flex items-start gap-3 text-sm text-gray-300">
-                <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
-                <span title="Fair use limits apply (summary and AI draft replies are not counted)" className="cursor-help border-b border-dashed border-gray-500 hover:text-white transition-colors">Limited monthly usage</span>
+              <li className="flex items-start gap-3 text-sm text-[#1e2a3b]/70">
+                <CheckCircle size={20} weight="fill" className="text-[#5a768c] shrink-0" />
+                <span title="Fair use limits apply (summary and AI draft replies are not counted)" className="cursor-help border-b border-dashed border-[#1e2a3b]/40 hover:text-[#1e2a3b] transition-colors">Limited monthly usage</span>
               </li>
-              <li className="flex items-start gap-3 text-sm text-gray-300">
-                <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
+              <li className="flex items-start gap-3 text-sm text-[#1e2a3b]/70">
+                <CheckCircle size={20} weight="fill" className="text-[#5a768c] shrink-0" />
                 <span>Basic email summarization</span>
               </li>
-              <li className="flex items-start gap-3 text-sm text-gray-300">
-                <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
+              <li className="flex items-start gap-3 text-sm text-[#1e2a3b]/70">
+                <CheckCircle size={20} weight="fill" className="text-[#5a768c] shrink-0" />
                 <span>Standard inbox features</span>
               </li>
-              <li className="flex items-start gap-3 text-sm text-gray-300">
-                <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
+              <li className="flex items-start gap-3 text-sm text-[#1e2a3b]/70">
+                <CheckCircle size={20} weight="fill" className="text-[#5a768c] shrink-0" />
                 <span>Zero tracking, ad-free</span>
               </li>
             </ul>
             
-            <Link href="/login" className="w-full text-center py-3 rounded-xl font-medium text-sm bg-white/[0.08] hover:bg-white/[0.12] text-white transition-colors">
+            <Link href="/login" className="w-full text-center py-3 rounded-xl font-medium text-sm bg-white/60 hover:bg-white shadow-sm hover:shadow-md text-[#1e2a3b] transition-all">
               Get Started for Free
             </Link>
           </div>
 
           {/* Pro Plan */}
-          <div className="relative rounded-3xl bg-white/[0.05] border border-[#50686c]/40 p-10 flex flex-col shadow-[0_0_40px_rgba(80,104,108,0.15)] animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+          <div className="relative rounded-3xl bg-white/60 border border-[#7f99b0]/40 p-10 flex flex-col shadow-xl shadow-[#7f99b0]/10 backdrop-blur-xl transition-all duration-300 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
             <div className="absolute top-0 right-10 -translate-y-1/2">
-              <span className="bg-[#50686c] text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide">Most Popular</span>
+              <span className="bg-[#5a768c] text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide shadow-md">Most Popular</span>
             </div>
             
-            <h3 className="text-2xl font-medium text-white mb-2">Pro Plan</h3>
-            <p className="text-sm text-gray-400 mb-6">For power users who need constant AI assistance.</p>
-            <div className="text-4xl font-semibold text-white mb-8">$8 <span className="text-lg font-normal text-gray-500">/mo</span></div>
+            <h3 className="text-2xl font-medium text-[#1e2a3b] mb-2">Pro Plan</h3>
+            <p className="text-sm text-[#1e2a3b]/60 mb-6">For power users who need constant AI assistance.</p>
+            <div className="text-4xl font-semibold text-[#1e2a3b] mb-8">$8 <span className="text-lg font-normal text-[#1e2a3b]/40">/mo</span></div>
             
             <ul className="space-y-4 mb-10 flex-1">
-              <li className="flex items-start gap-3 text-sm text-gray-300">
-                <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
-                <span className="font-medium text-white">Everything in Free, plus:</span>
+              <li className="flex items-start gap-3 text-sm text-[#1e2a3b]/70">
+                <CheckCircle size={20} weight="fill" className="text-[#5a768c] shrink-0" />
+                <span className="font-medium text-[#1e2a3b]">Everything in Free, plus:</span>
               </li>
-              <li className="flex items-start gap-3 text-sm text-gray-300">
-                <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
-                <span title="Significantly higher usage limits (summary and AI draft replies are not counted)" className="cursor-help border-b border-dashed border-gray-500 hover:text-white transition-colors">Up to 30x higher AI usage</span>
+              <li className="flex items-start gap-3 text-sm text-[#1e2a3b]/70">
+                <CheckCircle size={20} weight="fill" className="text-[#5a768c] shrink-0" />
+                <span title="Significantly higher usage limits (summary and AI draft replies are not counted)" className="cursor-help border-b border-dashed border-[#1e2a3b]/40 hover:text-[#1e2a3b] transition-colors">Up to 30x higher AI usage</span>
               </li>
-              <li className="flex items-start gap-3 text-sm text-gray-300">
-                <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
+              <li className="flex items-start gap-3 text-sm text-[#1e2a3b]/70">
+                <CheckCircle size={20} weight="fill" className="text-[#5a768c] shrink-0" />
                 <span>Connect multiple email accounts</span>
               </li>
-              <li className="flex items-start gap-3 text-sm text-gray-300">
-                <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
+              <li className="flex items-start gap-3 text-sm text-[#1e2a3b]/70">
+                <CheckCircle size={20} weight="fill" className="text-[#5a768c] shrink-0" />
                 <span>Access to Split Inboxes</span>
               </li>
-              <li className="flex items-start gap-3 text-sm text-gray-300">
-                <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
+              <li className="flex items-start gap-3 text-sm text-[#1e2a3b]/70">
+                <CheckCircle size={20} weight="fill" className="text-[#5a768c] shrink-0" />
                 <span>Advanced AI Composer tools</span>
               </li>
             </ul>
             
-            <button disabled className="w-full text-center py-3 rounded-xl font-medium text-sm bg-white text-[#2b323b] opacity-70 cursor-not-allowed transition-colors">
+            <button disabled className="w-full text-center py-3 rounded-xl font-medium text-sm bg-[#1e2a3b]/10 text-[#1e2a3b]/50 cursor-not-allowed transition-colors">
               Unavailable during beta
             </button>
           </div>
