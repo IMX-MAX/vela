@@ -31,6 +31,17 @@ export function parseEmailContent(message) {
   const date = headers.find((h) => h.name.toLowerCase() === "date")?.value || "";
   const messageId = headers.find((h) => h.name.toLowerCase() === "message-id")?.value || "";
   const references = headers.find((h) => h.name.toLowerCase() === "references")?.value || "";
+  const to = headers.find((h) => h.name.toLowerCase() === "to")?.value || "";
+
+  let senderName = from;
+  let senderEmail = "";
+  if (senderName && senderName.includes("<")) {
+    const parts = senderName.split("<");
+    senderName = parts[0].replace(/"/g, "").trim();
+    senderEmail = parts[1].replace(">", "").trim();
+  } else if (senderName) {
+    senderEmail = senderName;
+  }
 
   let body = "";
   let htmlBody = "";
@@ -70,5 +81,20 @@ export function parseEmailContent(message) {
     htmlBody = message.snippet;
   }
 
-  return { subject, from, body, htmlBody, date, snippet: message.snippet, messageId, references, threadId: message.threadId };
+  return { 
+    subject, 
+    from, 
+    senderName,
+    senderEmail,
+    rawTo: to,
+    body, 
+    htmlBody, 
+    date, 
+    snippet: message.snippet, 
+    messageId, 
+    references, 
+    threadId: message.threadId,
+    isStarred: (message.labelIds || []).includes("STARRED"),
+    id: message.id
+  };
 }
