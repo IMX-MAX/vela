@@ -174,6 +174,42 @@ export default function EmailDetailPage() {
     router.push("/inbox");
   };
 
+  const handleUnsubscribe = async () => {
+    if (!resolvedToken || !email) return;
+    setIsUnsubscribing(true);
+    try {
+      const { trashEmail } = await import("@/lib/gmail");
+      await trashEmail(resolvedToken, id); // Just trashing it as a proxy for unsubscribing, or we can just alert if real unsubsribe isn't implemented.
+      
+      const { inboxEmails, setInboxEmails } = useAuthStore.getState();
+      if (inboxEmails) {
+        setInboxEmails(inboxEmails.filter(e => e.id !== id));
+      }
+      router.push("/inbox");
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsUnsubscribing(false);
+      setShowUnsubscribeModal(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!showUnsubscribeModal) return;
+    
+    const handleModalKeys = (e) => {
+      if (e.key === "Escape") {
+        setShowUnsubscribeModal(false);
+      } else if (e.key === "Enter" && !isUnsubscribing) {
+        handleUnsubscribe();
+      }
+    };
+    
+    window.addEventListener("keydown", handleModalKeys);
+    return () => window.removeEventListener("keydown", handleModalKeys);
+  }, [showUnsubscribeModal, isUnsubscribing, handleUnsubscribe, resolvedToken, email, id, router]);
+
+
   const handleSummarize = async () => {
     if (!email) return;
 
@@ -336,25 +372,7 @@ export default function EmailDetailPage() {
     }
   };
 
-  const handleUnsubscribe = async () => {
-    if (!resolvedToken || !email) return;
-    setIsUnsubscribing(true);
-    try {
-      const { trashEmail } = await import("@/lib/gmail");
-      await trashEmail(resolvedToken, id); // Just trashing it as a proxy for unsubscribing, or we can just alert if real unsubsribe isn't implemented.
-      
-      const { inboxEmails, setInboxEmails } = useAuthStore.getState();
-      if (inboxEmails) {
-        setInboxEmails(inboxEmails.filter(e => e.id !== id));
-      }
-      router.push("/inbox");
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsUnsubscribing(false);
-      setShowUnsubscribeModal(false);
-    }
-  };
+
 
   const handleSnooze = () => {
     alert("Snooze functionality coming soon.");
@@ -384,20 +402,6 @@ export default function EmailDetailPage() {
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex !== -1 && currentIndex < inboxEmails?.length - 1;
 
-  useEffect(() => {
-    if (!showUnsubscribeModal) return;
-    
-    const handleModalKeys = (e) => {
-      if (e.key === "Escape") {
-        setShowUnsubscribeModal(false);
-      } else if (e.key === "Enter" && !isUnsubscribing) {
-        handleUnsubscribe();
-      }
-    };
-    
-    window.addEventListener("keydown", handleModalKeys);
-    return () => window.removeEventListener("keydown", handleModalKeys);
-  }, [showUnsubscribeModal, isUnsubscribing, handleUnsubscribe]);
 
   return (
     <div className="flex flex-col h-full bg-[#eceae6] rounded-2xl relative overflow-y-auto">
