@@ -41,7 +41,7 @@ function shouldResetUsage(plan, lastResetIso) {
 export function getUsageStatus(user) {
   const prefs = user?.prefs || {};
   const plan = prefs.plan === "pro" ? "pro" : "free";
-  const limit = plan === "pro" ? 40 : 10;
+  const limit = plan === "pro" ? 40 : 27;
   let current = prefs.aiUsageCount || 0;
   
   if (shouldResetUsage(plan, prefs.lastUsageReset)) {
@@ -72,7 +72,7 @@ export async function incrementAiUsage(user, checkAuth) {
     lastReset = new Date().toISOString();
   }
 
-  const limit = plan === "pro" ? 40 : 10;
+  const limit = plan === "pro" ? 40 : 27;
 
   if (current >= limit) {
     useAuthStore.getState().setShowUpgradeModal(true);

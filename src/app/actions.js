@@ -25,17 +25,17 @@ export async function summarizeEmailAction(emailContent, userContext = "") {
     const mistral = getMistralClient();
     emailContent = clamp(emailContent, MAX_CONTENT_CHARS);
     userContext = clamp(userContext, MAX_CONTEXT_CHARS);
-    const systemPrompt = `You are a helpful AI assistant specialized in SUMMARIZING emails.${userContext ? ` User Context: ${userContext}` : ""}`;
+    const systemPrompt = `You are an AI assistant specialized in SUMMARIZING emails. Your goal is to extract the most important information, action items, and key takeaways. Present the output as 3-5 concise bullet points. Be completely objective and output ONLY the summary.${userContext ? ` User Context: ${userContext}` : ""}`;
     
     const messages = [];
     if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
     messages.push({
       role: "user",
-      content: `Summarize the following email in 3-5 concise bullet points. Output ONLY the summary.\n\n${emailContent}`,
+      content: `Summarize the following email thread in 3-5 concise bullet points. Output ONLY the summary.\n\n${emailContent}`,
     });
 
-    const response = await mistral.agents.complete({
-      agentId: "ag_019ef18378507796bf7f3ed43d822ecf",
+    const response = await mistral.chat.complete({
+      model: "mistral-small-latest",
       messages,
     });
     return response.choices[0].message.content;
@@ -51,7 +51,7 @@ export async function draftReplyAction(emailContent, userPrompt, userContext = "
     emailContent = clamp(emailContent, MAX_CONTENT_CHARS);
     userPrompt = clamp(userPrompt, MAX_PROMPT_CHARS);
     userContext = clamp(userContext, MAX_CONTEXT_CHARS);
-    const systemPrompt = `You are an AI assistant specialized in DRAFTING EMAIL REPLIES.${userContext ? ` User Context: ${userContext}` : ""} IMPORTANT: Do NOT use any external tools (like a "draft email tool"). Simply output the exact text of the email reply directly in your response, with no conversational filler.`;
+    const systemPrompt = `You are an AI assistant specialized in DRAFTING EMAIL REPLIES.${userContext ? ` User Context: ${userContext}` : ""} Your goal is to write a professional, natural-sounding response based on the user's instructions. Match the tone of the user context if provided. IMPORTANT: Do NOT use any external tools (like a "draft email tool"). Simply output the exact text of the email reply directly in your response, with no conversational filler.`;
     
     const messages = [];
     if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
@@ -60,8 +60,8 @@ export async function draftReplyAction(emailContent, userPrompt, userContext = "
       content: `Draft a reply to the following email. Use a professional tone. Follow this user prompt: "${userPrompt}".\n\nEmail:\n${emailContent}`,
     });
 
-    const response = await mistral.agents.complete({
-      agentId: "ag_019ef18378507796bf7f3ed43d822ecf",
+    const response = await mistral.chat.complete({
+      model: "mistral-small-latest",
       messages,
     });
     return response.choices[0].message.content;
@@ -84,8 +84,8 @@ export async function modifyTextAction(selectedText, instruction, userContext = 
       { role: "user", content: `Instruction: ${instruction}\n\nText to modify:\n${selectedText}` }
     ];
 
-    const response = await mistral.agents.complete({
-      agentId: "ag_019ef18378507796bf7f3ed43d822ecf",
+    const response = await mistral.chat.complete({
+      model: "mistral-small-latest",
       messages,
     });
     return response.choices[0].message.content.trim();
@@ -107,13 +107,13 @@ export async function chatStepAction(messages, tokenOrConnectionId, userContext 
     }
 
     let updatedMessages = [...messages];
-    const systemContent = `You are a GENERAL AI AGENT inside the Vela email client.${userContext ? ` User Context: ${userContext}` : ""} You can use the provided tools to interact with the user's Gmail inbox. Be helpful, concise, and professional.`;
+    const systemContent = `You are Vela AI, an advanced email assistant powering the Command Palette. Your goal is to help the user manage their inbox efficiently. You have access to tools to search the user's inbox, search their contacts, and draft new emails. When referencing emails from search results, always use markdown links like [Subject](/inbox/email/MESSAGE_ID). Be concise, helpful, and proactive.${userContext ? ` User Context: ${userContext}` : ""}`;
     if (!updatedMessages.some(m => m.role === "system")) {
       updatedMessages = [{ role: "system", content: systemContent }, ...updatedMessages];
     }
     
-    const response = await mistral.agents.complete({
-      agentId: "ag_019ef18378507796bf7f3ed43d822ecf",
+    const response = await mistral.chat.complete({
+      model: "mistral-medium-latest",
       messages: updatedMessages,
       tools: [
         {
@@ -179,7 +179,7 @@ export async function chatStepAction(messages, tokenOrConnectionId, userContext 
           return `Message ID: ${m.id}\nDate: ${getHeader("Date")}\nFrom: ${getHeader("From")}\nSubject: ${getHeader("Subject")}\nSnippet: ${m.snippet || ""}`;
         }).join("\n\n---\n\n");
         const toolResult = parsedEmails || "No emails found.";
-        return { type: 'tool', name: toolCall.function.name, args, result: toolResult, message: choice, toolCallId: toolCall.id };
+        return { type: 'tool', name: toolCall.function.name, args, result: toolResult, message: choice, toolCallId: toolCall.id, thought: choice.content };
       } else if (toolCall.function.name === "search_contacts") {
         const { fetchContacts } = await import("@/lib/contacts");
         const { contacts } = await fetchContacts(tokenOrConnectionId);
@@ -191,7 +191,7 @@ export async function chatStepAction(messages, tokenOrConnectionId, userContext 
         });
         const parsedContacts = matched.map(c => `Name: ${c.names?.[0]?.givenName || "Unknown"}\nEmail: ${c.emailAddresses?.[0]?.value || "None"}\nPhone: ${c.phoneNumbers?.[0]?.value || "None"}`).join("\n\n---\n\n");
         const toolResult = parsedContacts || "No contacts found matching the query.";
-        return { type: 'tool', name: toolCall.function.name, args, result: toolResult, message: choice, toolCallId: toolCall.id };
+        return { type: 'tool', name: toolCall.function.name, args, result: toolResult, message: choice, toolCallId: toolCall.id, thought: choice.content };
       } else if (toolCall.function.name === "draft_email") {
         const result = `I've prepared a draft for you to review:\n\n\`\`\`draft-email\n${JSON.stringify({ to: args.to, subject: args.subject, body: args.body }, null, 2)}\n\`\`\``;
         return { type: 'text', content: result, message: choice };
@@ -220,13 +220,13 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
 
     // Inject system prompt if there is user context, but only if we haven't already
     let updatedMessages = [...messages];
-    const systemContent = `You are Vela AI, a helpful email assistant. Be concise. When referencing specific emails from search results, always format them as markdown links like [Subject or description](/inbox/email/MESSAGE_ID) so the user can click to view them.${userContext ? ` User Context: ${userContext}` : ""}`;
+    const systemContent = `You are Vela AI, an advanced email assistant powering the Command Palette. Your goal is to help the user manage their inbox efficiently. You have access to tools to search the user's inbox, search their contacts, and draft new emails. When referencing emails from search results, always use markdown links like [Subject](/inbox/email/MESSAGE_ID). Be concise, helpful, and proactive.${userContext ? ` User Context: ${userContext}` : ""}`;
     if (!updatedMessages.some(m => m.role === "system")) {
       updatedMessages = [{ role: "system", content: systemContent }, ...updatedMessages];
     }
     
-    const response = await mistral.agents.complete({
-      agentId: "ag_019ef18378507796bf7f3ed43d822ecf",
+    const response = await mistral.chat.complete({
+      model: "mistral-medium-latest",
       messages: updatedMessages,
       tools: [
         {
@@ -366,8 +366,8 @@ Return ONLY the updated writing style description, without any conversational fi
       { role: "user", content: `Current Style Profile: ${currentStyle || "None"}\n\nNewly Sent Email:\n${emailBody}` }
     ];
 
-    const response = await mistral.agents.complete({
-      agentId: "ag_019ef18378507796bf7f3ed43d822ecf",
+    const response = await mistral.chat.complete({
+      model: "mistral-small-latest",
       messages,
     });
     return response.choices[0].message.content.trim();

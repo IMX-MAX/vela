@@ -47,57 +47,58 @@ export default function EmailDetailPage() {
   const [resolvedToken, setResolvedToken] = useState(null);
   const [replyDraftId, setReplyDraftId] = useState(null);
 
+  const saveInlineDraft = async () => {
+    if (!resolvedToken || !replyType || !email) return;
+    if (!replyText && !replyHtml && !draft) return;
+    try {
+      const { saveDraft } = await import("@/lib/gmail");
+      let toField = email.senderEmail;
+      if (replyType === 'replyAll') {
+        const allEmails = new Set();
+        if (email.senderEmail) allEmails.add(email.senderEmail);
+        if (email.rawTo) {
+          email.rawTo.split(',').forEach(addr => {
+            const match = addr.match(/<([^>]+)>/) || addr.match(/([\w.-]+@[\w.-]+)/);
+            if (match && match[1]) allEmails.add(match[1].trim());
+            else allEmails.add(addr.trim());
+          });
+        }
+        toField = Array.from(allEmails).join(', ');
+      } else if (replyType === 'forward') {
+        toField = forwardTo;
+      }
+      
+      let subject = email.subject || "";
+      if (replyType === 'forward') {
+         subject = subject.toLowerCase().startsWith("fwd:") ? subject : `Fwd: ${subject}`;
+      } else {
+         subject = subject.toLowerCase().startsWith("re:") ? subject : `Re: ${subject}`;
+      }
+
+      const result = await saveDraft(
+        resolvedToken, 
+        replyDraftId, 
+        toField, 
+        subject, 
+        replyText || draft, 
+        replyHtml || draft, 
+        attachments, 
+        email.threadId, 
+        email.messageId, 
+        email.references
+      );
+      if (!replyDraftId && result.id) {
+        setReplyDraftId(result.id);
+      }
+    } catch (e) {
+      console.error("Save inline reply draft failed", e);
+    }
+  };
+
   useEffect(() => {
     if (!replyType || !email) return;
     if (!replyText && !replyHtml && !draft) return;
-    
-    const timeoutId = setTimeout(async () => {
-      if (!resolvedToken) return;
-      try {
-        const { saveDraft } = await import("@/lib/gmail");
-        let toField = email.senderEmail;
-        if (replyType === 'replyAll') {
-          const allEmails = new Set();
-          if (email.senderEmail) allEmails.add(email.senderEmail);
-          if (email.rawTo) {
-            email.rawTo.split(',').forEach(addr => {
-              const match = addr.match(/<([^>]+)>/) || addr.match(/([\w.-]+@[\w.-]+)/);
-              if (match && match[1]) allEmails.add(match[1].trim());
-              else allEmails.add(addr.trim());
-            });
-          }
-          toField = Array.from(allEmails).join(', ');
-        } else if (replyType === 'forward') {
-          toField = forwardTo;
-        }
-        
-        let subject = email.subject || "";
-        if (replyType === 'forward') {
-           subject = subject.toLowerCase().startsWith("fwd:") ? subject : `Fwd: ${subject}`;
-        } else {
-           subject = subject.toLowerCase().startsWith("re:") ? subject : `Re: ${subject}`;
-        }
-
-        const result = await saveDraft(
-          resolvedToken, 
-          replyDraftId, 
-          toField, 
-          subject, 
-          replyText || draft, 
-          replyHtml || draft, 
-          attachments, 
-          email.threadId, 
-          email.messageId, 
-          email.references
-        );
-        if (!replyDraftId && result.id) {
-          setReplyDraftId(result.id);
-        }
-      } catch (e) {
-        console.error("Auto-save inline reply draft failed", e);
-      }
-    }, 3000);
-    
+    const timeoutId = setTimeout(saveInlineDraft, 3000);
     return () => clearTimeout(timeoutId);
   }, [replyText, replyHtml, draft, replyDraftId, resolvedToken, replyType, email, attachments, forwardTo]);
 
@@ -325,7 +326,11 @@ export default function EmailDetailPage() {
       context = `Job Title: ${user.prefs.jobName || 'Unknown'}, Company: ${user.prefs.company || 'Unknown'}`;
     }
     
-    const result = await summarizeEmailAction(email.body || email.snippet, context);
+    const threadContent = threadMessages && threadMessages.length > 0 
+      ? threadMessages.map(m => `From: ${m.senderName} (${m.senderEmail})\nDate: ${m.date}\n\n${m.body || m.snippet}`).join("\n\n---\n\n")
+      : (email.body || email.snippet);
+      
+    const result = await summarizeEmailAction(threadContent, context);
     setSummary(result);
     
     const { saveSummary } = await import("@/lib/db");
@@ -541,14 +546,16 @@ export default function EmailDetailPage() {
     alert("Snooze functionality coming soon.");
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    await saveInlineDraft();
     const currentIndex = inboxEmails?.findIndex(e => e.id === id);
     if (currentIndex !== -1 && currentIndex < inboxEmails.length - 1) {
       router.push(`/inbox/email/${inboxEmails[currentIndex + 1].id}`);
     }
   };
 
-  const handlePrev = () => {
+  const handlePrev = async () => {
+    await saveInlineDraft();
     const currentIndex = inboxEmails?.findIndex(e => e.id === id);
     if (currentIndex > 0) {
       router.push(`/inbox/email/${inboxEmails[currentIndex - 1].id}`);
@@ -603,7 +610,10 @@ export default function EmailDetailPage() {
       <div className="h-14 flex items-center justify-between px-4 sticky top-0 z-10 rounded-t-2xl bg-[#eceae6] border-b border-[#dddcdc]">
         <div className="flex items-center gap-1.5">
           <button 
-            onClick={() => router.push('/inbox')} 
+            onClick={async () => {
+              await saveInlineDraft();
+              router.push('/inbox');
+            }} 
             title="Back to inbox"
             className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"
           >

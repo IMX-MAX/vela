@@ -115,9 +115,9 @@ export default function ComposePage() {
           </button>
           <button 
             onClick={async () => {
-              if (draftId && session?.providerAccessToken) {
-                const { deleteDraft } = await import("@/lib/gmail");
-                await deleteDraft(session.providerAccessToken, draftId).catch(() => {});
+              if ((to || subject || bodyText || body) && session?.providerAccessToken) {
+                const { saveDraft } = await import("@/lib/gmail");
+                await saveDraft(session.providerAccessToken, draftId, to, subject, bodyText || body, body).catch(() => {});
               }
               router.back();
             }}

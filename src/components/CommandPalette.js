@@ -31,6 +31,8 @@ export default function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [expandedSteps, setExpandedSteps] = useState({});
   const toggleSteps = (idx) => setExpandedSteps(prev => ({ ...prev, [idx]: !prev[idx] }));
+  const [expandedThoughts, setExpandedThoughts] = useState({});
+  const toggleThought = (id) => setExpandedThoughts(prev => ({ ...prev, [id]: !prev[id] }));
   
   const emailIdMatch = pathname?.match(/^\/inbox\/email\/(.+)$/);
   const currentEmailId = emailIdMatch ? emailIdMatch[1] : null;
@@ -260,6 +262,8 @@ export default function CommandPalette() {
           assistantMsg.steps.push({
             name: stepResponse.name,
             result: stepResponse.result,
+            thought: stepResponse.thought,
+            args: stepResponse.args,
             time: Date.now()
           });
           
@@ -528,16 +532,33 @@ export default function CommandPalette() {
                                  const description = step.name === 'search_inbox' ? `Searched inbox for "${step.args?.query || ''}"` :
                                                      step.name === 'search_contacts' ? `Searched contacts for "${step.args?.query || ''}"` :
                                                      `Used tool ${step.name}`;
+                                 const thoughtId = `${idx}-${sIdx}`;
                                  return (
-                                   <div key={sIdx} className="flex items-start gap-2.5 text-[12px] text-gray-600 bg-black/[0.02] p-2 rounded-md">
-                                     <Icon size={14} className="mt-0.5 text-[#50686c] shrink-0" weight="bold" />
-                                     <div className="flex-1">
-                                       <span className="font-medium text-gray-700">{description}</span>
-                                       {step.result && step.name !== 'draft_email' && (
-                                         <div className="mt-1 text-[11px] text-gray-500 line-clamp-2 italic">
-                                           {step.result.slice(0, 150)}{step.result.length > 150 ? '...' : ''}
-                                         </div>
-                                       )}
+                                   <div key={sIdx} className="flex flex-col gap-2.5">
+                                     {step.thought && (
+                                       <div className="flex flex-col gap-1 mt-1">
+                                         <button onClick={() => toggleThought(thoughtId)} className="flex items-center gap-1.5 text-[12px] font-medium text-gray-500 hover:text-gray-800 transition text-left">
+                                           <CheckCircle size={14} className="text-[#50686c]" />
+                                           <span>Thought</span>
+                                           {expandedThoughts[thoughtId] ? <CaretDown size={12} weight="bold" /> : <CaretRight size={12} weight="bold" />}
+                                         </button>
+                                         {expandedThoughts[thoughtId] && (
+                                            <div className="ml-5 text-[12px] text-gray-600 whitespace-pre-wrap leading-relaxed border-l-2 border-gray-200 pl-3 py-1">
+                                              {step.thought}
+                                            </div>
+                                         )}
+                                       </div>
+                                     )}
+                                     <div className="flex items-start gap-2.5 text-[12px] text-gray-600 bg-black/[0.02] p-2 rounded-md">
+                                       <Icon size={14} className="mt-0.5 text-[#50686c] shrink-0" weight="bold" />
+                                       <div className="flex-1">
+                                         <span className="font-medium text-gray-700">{description}</span>
+                                         {step.result && step.name !== 'draft_email' && (
+                                           <div className="mt-1 text-[11px] text-gray-500 line-clamp-2 italic">
+                                             {step.result.slice(0, 150)}{step.result.length > 150 ? '...' : ''}
+                                           </div>
+                                         )}
+                                       </div>
                                      </div>
                                    </div>
                                  );
