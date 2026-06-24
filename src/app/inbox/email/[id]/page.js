@@ -298,11 +298,26 @@ export default function EmailDetailPage() {
     }
     
     const result = await draftReplyAction(email.body || email.snippet, promptToUse, context);
-    setDraft(result);
-    setReplyText(result); 
-    setIsDrafting(false);
-    setShowAiPrompt(false);
-    setAiPrompt("");
+    
+    startTransition(() => {
+      setReplyType('reply');
+      setDraft(result);
+      setReplyHtml(result);
+      setReplyText(result); 
+      setIsDrafting(false);
+      setShowAiPrompt(false);
+      setAiPrompt("");
+    });
+
+    // Scroll to bottom after state updates
+    setTimeout(() => {
+      const scrollContainer = document.querySelector('.overflow-y-auto');
+      if (scrollContainer) {
+        scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   const handleSend = async () => {
@@ -579,27 +594,42 @@ export default function EmailDetailPage() {
             </div>
             
             {showAiPrompt && (
-              <div className="flex items-center gap-2 mt-1 bg-white border border-gray-200 rounded-lg p-1.5 shadow-sm max-w-md">
-                <input
-                  type="text"
-                  placeholder="e.g. tell him I'll be attending"
-                  value={aiPrompt}
-                  onChange={(e) => setAiPrompt(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && aiPrompt.trim()) {
+              <div className="mt-3 bg-gradient-to-r from-[#eceae6] to-[#f5f2eb] p-[1px] rounded-xl shadow-sm max-w-xl animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="flex items-center gap-2 bg-white rounded-[11px] p-2">
+                  <div className="pl-2 flex items-center justify-center">
+                    <Sparkle size={18} className="text-[#2b323b] animate-pulse" weight="fill" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="How should AI reply? (e.g. tell them I'll be attending)"
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && aiPrompt.trim() && !isDrafting) {
+                        e.preventDefault();
+                        handleDraftReply();
+                      }
+                    }}
+                    disabled={isDrafting}
+                    className="flex-1 bg-transparent border-none outline-none text-[14px] px-1 text-[#2b323b] placeholder-gray-400 disabled:opacity-50"
+                    autoFocus
+                  />
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
                       handleDraftReply();
-                    }
-                  }}
-                  className="flex-1 bg-transparent border-none outline-none text-[13px] px-2 text-gray-800 placeholder-gray-400"
-                  autoFocus
-                />
-                <button 
-                  onClick={handleDraftReply}
-                  disabled={!aiPrompt.trim() || isDrafting}
-                  className="bg-gray-800 hover:bg-[#2b323b] text-white rounded px-3 py-1 text-[13px] font-medium transition disabled:opacity-50"
-                >
-                  Draft
-                </button>
+                    }}
+                    disabled={!aiPrompt.trim() || isDrafting}
+                    className="bg-[#2b323b] hover:bg-[#3f4854] text-white rounded-lg px-4 py-1.5 text-[13px] font-medium transition flex items-center gap-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isDrafting ? (
+                      <span className="flex items-center gap-1.5">
+                        <div className="h-3 w-3 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                        Drafting
+                      </span>
+                    ) : "Generate"}
+                  </button>
+                </div>
               </div>
             )}
           </div>
