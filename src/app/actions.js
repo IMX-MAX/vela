@@ -25,13 +25,13 @@ export async function summarizeEmailAction(emailContent, userContext = "") {
     const mistral = getMistralClient();
     emailContent = clamp(emailContent, MAX_CONTENT_CHARS);
     userContext = clamp(userContext, MAX_CONTEXT_CHARS);
-    const systemPrompt = userContext ? `You are a helpful AI assistant. User Context: ${userContext}` : "";
+    const systemPrompt = `You are a helpful AI assistant specialized in SUMMARIZING emails.${userContext ? ` User Context: ${userContext}` : ""}`;
     
     const messages = [];
     if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
     messages.push({
       role: "user",
-      content: `Summarize the following email in 3-5 concise bullet points:\n\n${emailContent}`,
+      content: `Summarize the following email in 3-5 concise bullet points. Output ONLY the summary.\n\n${emailContent}`,
     });
 
     const response = await mistral.agents.complete({
@@ -51,13 +51,13 @@ export async function draftReplyAction(emailContent, userPrompt, userContext = "
     emailContent = clamp(emailContent, MAX_CONTENT_CHARS);
     userPrompt = clamp(userPrompt, MAX_PROMPT_CHARS);
     userContext = clamp(userContext, MAX_CONTEXT_CHARS);
-    const systemPrompt = userContext ? `You are a helpful AI assistant. User Context: ${userContext}` : "";
+    const systemPrompt = `You are an AI assistant specialized in DRAFTING EMAIL REPLIES.${userContext ? ` User Context: ${userContext}` : ""} IMPORTANT: Do NOT use any external tools (like a "draft email tool"). Simply output the exact text of the email reply directly in your response, with no conversational filler.`;
     
     const messages = [];
     if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
     messages.push({
       role: "user",
-      content: `Draft a reply to the following email. Use a professional tone. User prompt: "${userPrompt}".\n\nEmail:\n${emailContent}`,
+      content: `Draft a reply to the following email. Use a professional tone. Follow this user prompt: "${userPrompt}".\n\nEmail:\n${emailContent}`,
     });
 
     const response = await mistral.agents.complete({
@@ -107,7 +107,7 @@ export async function chatStepAction(messages, tokenOrConnectionId, userContext 
     }
 
     let updatedMessages = [...messages];
-    const systemContent = `You are Vela AI, a helpful email assistant. Be concise. When referencing specific emails from search results, always format them as markdown links like [Subject or description](/inbox/email/MESSAGE_ID) so the user can click to view them.${userContext ? ` User Context: ${userContext}` : ""}`;
+    const systemContent = `You are a GENERAL AI AGENT inside the Vela email client.${userContext ? ` User Context: ${userContext}` : ""} You can use the provided tools to interact with the user's Gmail inbox. Be helpful, concise, and professional.`;
     if (!updatedMessages.some(m => m.role === "system")) {
       updatedMessages = [{ role: "system", content: systemContent }, ...updatedMessages];
     }

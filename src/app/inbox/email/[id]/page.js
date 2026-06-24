@@ -42,6 +42,7 @@ export default function EmailDetailPage() {
   
   const [replyText, setReplyText] = useState("");
   const [replyHtml, setReplyHtml] = useState("");
+  const [attachments, setAttachments] = useState([]);
   const [isSending, setIsSending] = useState(false);
   const [resolvedToken, setResolvedToken] = useState(null);
 
@@ -320,6 +321,43 @@ export default function EmailDetailPage() {
     }, 100);
   };
 
+  const handleExpandHistory = (e) => {
+    e.preventDefault();
+    if (!email) return;
+    
+    const historyHtml = `
+      <br><br>
+      <div class="gmail_quote">
+        <div dir="ltr" class="gmail_attr">
+          On ${email.date ? format(new Date(email.date), "MMM d, yyyy, h:mm a") : ""} ${email.senderName} &lt;<a href="mailto:${email.senderEmail}">${email.senderEmail}</a>&gt; wrote:<br>
+        </div>
+        <blockquote class="gmail_quote" style="margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+          ${email.body || email.snippet}
+        </blockquote>
+      </div>
+    `;
+    
+    setReplyHtml(prev => prev + historyHtml);
+    setReplyText(prev => prev + "\n\nOn ... wrote:\n" + (email.snippet || ""));
+  };
+
+  const handleAttachment = (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setAttachments(prev => [...prev, {
+          filename: file.name,
+          mimeType: file.type || "application/octet-stream",
+          content: ev.target.result,
+        }]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleSend = async () => {
     if (!email || !replyText || !resolvedToken) return;
     if (replyType === 'forward' && !forwardTo) return;
@@ -349,7 +387,7 @@ export default function EmailDetailPage() {
          subject = subject.toLowerCase().startsWith("re:") ? subject : `Re: ${subject}`;
       }
 
-      await sendEmail(resolvedToken, toField, subject, replyText, replyHtml || replyText);
+      await sendEmail(resolvedToken, toField, subject, replyText, replyHtml || replyText, attachments);
       router.push("/inbox");
     } catch (error) {
       console.error("Failed to send", error);
@@ -755,9 +793,9 @@ export default function EmailDetailPage() {
                 </div>
               )}
             </div>
-            <div className="flex-1 w-full min-h-[150px] overflow-visible">
+            <div className="flex-1 w-full min-h-[150px] overflow-visible flex flex-col">
               <AiEditor 
-                value={replyText}
+                value={replyHtml || replyText}
                 onChange={(html, text) => {
                   setReplyHtml(html);
                   setReplyText(text);
@@ -765,13 +803,29 @@ export default function EmailDetailPage() {
                 placeholder="Write your reply..."
                 borderless={true}
               />
+              {attachments.length > 0 && (
+                <div className="flex flex-wrap gap-2 px-4 pb-3">
+                  {attachments.map((att, i) => (
+                    <div key={i} className="flex items-center gap-2 bg-gray-100 border border-gray-200 rounded-md px-2 py-1 text-[13px] text-gray-700">
+                      <span className="truncate max-w-[150px]">{att.filename}</span>
+                      <button 
+                        onClick={() => setAttachments(prev => prev.filter((_, idx) => idx !== i))}
+                        className="text-gray-500 hover:text-red-500"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="px-4 py-3 bg-[#fbfbfc] border-t border-gray-100 flex justify-between items-center rounded-b-xl">
               <div className="flex items-center gap-3 text-gray-400">
-                <button className="hover:text-[#50686c] transition flex items-center justify-center p-1 bg-[#eceae6] rounded-md"><DotsThree size={16} weight="bold" /></button>
-                <button className="hover:text-[#50686c] transition"><span className="icon-paperclip"></span></button>
-                <button className="hover:text-[#50686c] transition font-mono text-[14px]">{'{ }'}</button>
-                <button className="hover:text-[#50686c] transition"><Clock size={16} /></button>
+                <button type="button" onClick={handleExpandHistory} className="hover:text-[#50686c] transition flex items-center justify-center p-1 bg-[#eceae6] rounded-md"><DotsThree size={16} weight="bold" /></button>
+                <label className="hover:text-[#50686c] transition flex items-center justify-center p-1 bg-[#eceae6] rounded-md cursor-pointer">
+                  <input type="file" multiple className="hidden" onChange={handleAttachment} />
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M209.66,122.34a8,8,0,0,1,0,11.32l-82,82a56,56,0,0,1-79.2-79.2l83.52-83.52a38.05,38.05,0,0,1,53.8,53.8l-80.4,80.4a22.25,22.25,0,0,1-31.42-31.42l72.23-72.23a8,8,0,1,1,11.31,11.32L85.27,167a6.25,6.25,0,0,0,8.84,8.84l80.4-80.4a22.05,22.05,0,0,0-31.18-31.18l-83.52,83.52a40,40,0,1,0,56.57,56.57l82-82A8,8,0,0,1,209.66,122.34Z"></path></svg>
+                </label>
               </div>
               <div className="flex items-center gap-3">
                 <button 

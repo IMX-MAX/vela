@@ -85,33 +85,54 @@ export async function searchEmailsQuick(tokenOrConnectionId, query, maxResults =
   return details;
 }
 
-export async function sendEmail(tokenOrConnectionId, to, subject, body, htmlBody = null) {
-  let rawMessage = "";
+export async function sendEmail(tokenOrConnectionId, to, subject, body, htmlBody = null, attachments = []) {
+  const boundaryMixed = "mixed_" + Math.random().toString(36).substring(2);
+  const boundaryAlt = "alt_" + Math.random().toString(36).substring(2);
 
   // Make sure we always send HTML to enforce sans-serif font, preventing default serif rendering in clients
   const htmlContent = htmlBody 
     ? `<div style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px; color: #222;">${htmlBody}</div>`
     : `<div style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px; color: #222;">${body.replace(/\n/g, '<br>')}</div>`;
 
-  const boundary = "boundary_" + Math.random().toString(36).substring(2);
-  rawMessage = [
-    `To: ${to}`,
-    `Subject: ${subject}`,
-    `MIME-Version: 1.0`,
-    `Content-Type: multipart/alternative; boundary="${boundary}"`,
-    "",
-    `--${boundary}`,
-    `Content-Type: text/plain; charset=UTF-8`,
-    "",
-    body,
-    "",
-    `--${boundary}`,
-    `Content-Type: text/html; charset=UTF-8`,
-    "",
-    htmlContent,
-    "",
-    `--${boundary}--`
-  ].join("\n");
+  let parts = [];
+  parts.push(`To: ${to}`);
+  parts.push(`Subject: ${subject}`);
+  parts.push(`MIME-Version: 1.0`);
+  
+  if (attachments && attachments.length > 0) {
+    parts.push(`Content-Type: multipart/mixed; boundary="${boundaryMixed}"`);
+    parts.push(``);
+    parts.push(`--${boundaryMixed}`);
+  }
+  
+  parts.push(`Content-Type: multipart/alternative; boundary="${boundaryAlt}"`);
+  parts.push(``);
+  parts.push(`--${boundaryAlt}`);
+  parts.push(`Content-Type: text/plain; charset="UTF-8"`);
+  parts.push(``);
+  parts.push(body);
+  parts.push(`--${boundaryAlt}`);
+  parts.push(`Content-Type: text/html; charset="UTF-8"`);
+  parts.push(``);
+  parts.push(htmlContent);
+  parts.push(`--${boundaryAlt}--`);
+
+  if (attachments && attachments.length > 0) {
+    for (const att of attachments) {
+      parts.push(`--${boundaryMixed}`);
+      parts.push(`Content-Type: ${att.mimeType}; name="${att.filename}"`);
+      parts.push(`Content-Disposition: attachment; filename="${att.filename}"`);
+      parts.push(`Content-Transfer-Encoding: base64`);
+      parts.push(``);
+      // Chunk base64 string
+      const b64 = att.content.split(',').pop(); // remove data URL prefix if present
+      const chunked = b64.match(/.{1,76}/g).join('\r\n');
+      parts.push(chunked);
+    }
+    parts.push(`--${boundaryMixed}--`);
+  }
+
+  const rawMessage = parts.join('\r\n');
 
   const encodedMessage = Buffer.from(rawMessage, 'utf-8').toString('base64url');
 
