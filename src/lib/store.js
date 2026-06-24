@@ -11,9 +11,9 @@ export const useAuthStore = create((set) => ({
   savedChats: [],
   inboxEmails: [],
   inboxSplits: [
-    { id: 'important', name: 'Important & Other', desc: 'Messages that matter, front and center. Built by Tatem.', enabled: false },
-    { id: 'team', name: 'Team', desc: 'All emails from your team, grouped together. Built by Tatem.', enabled: false },
-    { id: 'calendar', name: 'Calendar', desc: 'All your invites and reminders, in one place. Built by Tatem.', enabled: false }
+    { id: 'important', name: 'Important & Other', desc: 'Messages that matter, front and center.', enabled: false },
+    { id: 'team', name: 'Team', desc: 'All emails from your team, grouped together.', enabled: false },
+    { id: 'calendar', name: 'Calendar', desc: 'All your invites and reminders, in one place.', enabled: false }
   ],
   googleProfile: null,
   setGoogleProfile: (profile) => set({ googleProfile: profile }),

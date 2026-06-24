@@ -398,7 +398,7 @@ export default function InboxPage() {
                 <div key={split.id} className="flex items-center justify-between p-4 hover:bg-[#eceae6] rounded-xl transition">
                   <div>
                     <div className="font-medium text-[#2b323b] text-[14px] mb-0.5">{split.name}</div>
-                    <div className="text-[13px] text-gray-500">{split.desc}</div>
+                    <div className="text-[13px] text-gray-500">{split.desc?.replace(' Built by Tatem.', '')}</div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button onClick={() => {
