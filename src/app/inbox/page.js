@@ -34,6 +34,12 @@ export default function InboxPage() {
   // Custom split form state
   const [newSplit, setNewSplit] = useState({ name: "", desc: "", rules: { domain: "", sender: "", recipient: "", subject: "", custom: "" }, showInImportant: false });
 
+  const [emptyFetches, setEmptyFetches] = useState(0);
+
+  useEffect(() => {
+    setEmptyFetches(0);
+  }, [activeTab, filter, searchQuery]);
+
   const getAvailableTabs = useCallback(() => {
     let tabs = [];
     const importantSplit = inboxSplits.find(s => s.id === 'important');
@@ -176,6 +182,13 @@ export default function InboxPage() {
     setNextPageToken(next);
     setLoadingMore(false);
   }, [loadingMore, nextPageToken, resolvedToken, filter, searchQuery, setInboxEmails]);
+
+  useEffect(() => {
+    if (!loading && !loadingMore && nextPageToken && filteredEmails.length === 0 && !authError && emptyFetches < 5) {
+      setEmptyFetches(prev => prev + 1);
+      handleLoadMore();
+    }
+  }, [loading, loadingMore, nextPageToken, filteredEmails.length, authError, emptyFetches, handleLoadMore]);
 
   const prefetchEmailBody = useCallback(async (id) => {
     if (!resolvedToken) return;
