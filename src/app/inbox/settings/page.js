@@ -265,7 +265,7 @@ export default function SettingsPage() {
                 <div className="text-sm text-gray-600 mb-4">Perfect for casual use.</div>
                 <div className="text-2xl font-bold text-[#2b323b] mb-4">$0 <span className="text-sm font-normal text-gray-500">/mo</span></div>
                 <ul className="text-[13px] text-gray-700 space-y-2 mb-6">
-                  <li>&bull; 10 AI actions per month</li>
+                  <li>&bull; Limited monthly AI runs</li>
                   <li>&bull; Basic email summarization</li>
                 </ul>
                 <div className={`text-center py-2 rounded-lg font-medium text-[13px] ${plan === 'free' ? 'bg-blue-100 text-blue-700' : 'bg-white text-gray-800 border border-gray-300'}`}>
@@ -279,7 +279,7 @@ export default function SettingsPage() {
                 <div className="text-sm text-gray-600 mb-4">For power users.</div>
                 <div className="text-2xl font-bold text-[#2b323b] mb-4">$12 <span className="text-sm font-normal text-gray-500">/mo</span></div>
                 <ul className="text-[13px] text-gray-700 space-y-2 mb-6">
-                  <li>&bull; 40 AI actions per day</li>
+                  <li>&bull; Up to 30x more usage than free</li>
                   <li>&bull; Advanced contextual replies</li>
                 </ul>
                 <div className={`text-center py-2 rounded-lg font-medium text-[13px] ${plan === 'pro' ? 'bg-blue-100 text-blue-700' : 'bg-white text-gray-800 border border-gray-300'}`}>
@@ -299,7 +299,9 @@ export default function SettingsPage() {
                 <div>
                   <div className="text-3xl font-semibold text-[#2b323b]">{Math.round((usageStatus.current / usageStatus.limit) * 100)}% <span className="text-lg font-normal text-gray-500">used</span></div>
                   <div className="text-[13px] text-gray-600 mt-1">
-                    Your {usageStatus.plan} plan limits you to {usageStatus.limit} actions per {usageStatus.plan === 'pro' ? 'day' : 'month'}.
+                    {usageStatus.plan === 'pro' 
+                      ? 'Your Pro plan offers up to 30x more usage than free.' 
+                      : 'Your free plan offers limited AI runs per month. Upgrade to Pro for up to 30x more usage.'}
                   </div>
                 </div>
               </div>

@@ -32,7 +32,7 @@ export default function PricingPage() {
             <ul className="space-y-4 mb-10 flex-1">
               <li className="flex items-start gap-3 text-sm text-gray-300">
                 <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
-                <span title="10 AI agent runs per month (summary and AI draft replies are not counted)" className="cursor-help border-b border-dashed border-gray-500 hover:text-white transition-colors">Limited monthly usage</span>
+                <span title="Fair use limits apply (summary and AI draft replies are not counted)" className="cursor-help border-b border-dashed border-gray-500 hover:text-white transition-colors">Limited monthly usage</span>
               </li>
               <li className="flex items-start gap-3 text-sm text-gray-300">
                 <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
@@ -66,7 +66,7 @@ export default function PricingPage() {
             <ul className="space-y-4 mb-10 flex-1">
               <li className="flex items-start gap-3 text-sm text-gray-300">
                 <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
-                <span title="30 + 10 AI agent runs per day (summary and AI draft replies are not counted)" className="cursor-help border-b border-dashed border-gray-500 hover:text-white transition-colors"><strong className="text-white">Up to 30x higher usage than free</strong></span>
+                <span title="Significantly higher usage limits (summary and AI draft replies are not counted)" className="cursor-help border-b border-dashed border-gray-500 hover:text-white transition-colors"><strong className="text-white">Up to 30x higher usage than free</strong></span>
               </li>
               <li className="flex items-start gap-3 text-sm text-gray-300">
                 <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
