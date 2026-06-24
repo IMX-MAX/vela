@@ -278,6 +278,16 @@ export async function doneEmail(tokenOrConnectionId, messageId) {
   });
 }
 
+export async function unsnoozeEmail(tokenOrConnectionId, messageId) {
+  return await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}/modify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ addLabelIds: ["INBOX", "UNREAD"] })
+  });
+}
+
 export async function markEmailAsRead(tokenOrConnectionId, messageId) {
   return await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}/modify`, {
     method: "POST",

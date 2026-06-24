@@ -67,6 +67,7 @@ export default function EmailDetailPage() {
   const [isSending, setIsSending] = useState(false);
   const [resolvedToken, setResolvedToken] = useState(null);
   const [replyDraftId, setReplyDraftId] = useState(null);
+  const [showSnoozeMenu, setShowSnoozeMenu] = useState(false);
 
   const saveInlineDraft = async () => {
     if (!resolvedToken || !replyType || !email) return;
@@ -563,8 +564,28 @@ export default function EmailDetailPage() {
 
 
 
-  const handleSnooze = () => {
-    alert("Snooze functionality coming soon.");
+  const executeSnooze = async (hours) => {
+    if (!resolvedToken || !email || !user) return;
+    try {
+      const until = Date.now() + (hours * 60 * 60 * 1000);
+      const currentSnoozed = user.prefs?.snoozedEmails || [];
+      const newSnoozed = [...currentSnoozed, { id, emailAddress: email.receiverEmail || user.email, until }];
+      
+      const { account } = await import("@/lib/appwrite");
+      await account.updatePrefs({ ...user.prefs, snoozedEmails: newSnoozed });
+
+      const { doneEmail } = await import("@/lib/gmail");
+      await doneEmail(resolvedToken, id);
+      
+      const { inboxEmails, setInboxEmails } = useAuthStore.getState();
+      if (inboxEmails) {
+        setInboxEmails(inboxEmails.filter(e => e.id !== id));
+      }
+      setShowSnoozeMenu(false);
+      router.push(getBackUrl());
+    } catch (e) {
+      console.error("Snooze failed", e);
+    }
   };
 
   const handleNext = async () => {
@@ -671,7 +692,18 @@ export default function EmailDetailPage() {
           <button onClick={handleStar} title="Star" className={`p-2 transition rounded-md flex items-center justify-center ${email.isStarred ? 'text-yellow-500 hover:bg-yellow-50' : 'text-gray-500 hover:text-[#2b323b] hover:bg-[#2b323b]/5'}`}>
             <Star size={18} weight={email.isStarred ? "fill" : "regular"} />
           </button>
-          <button onClick={handleSnooze} title="Snooze" className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"><Clock size={18} /></button>
+          <div className="relative">
+            <button onClick={() => setShowSnoozeMenu(!showSnoozeMenu)} title="Snooze" className={`p-2 transition rounded-md flex items-center justify-center ${showSnoozeMenu ? 'bg-[#2b323b]/10 text-[#2b323b]' : 'text-gray-500 hover:text-[#2b323b] hover:bg-[#2b323b]/5'}`}>
+              <Clock size={18} />
+            </button>
+            {showSnoozeMenu && (
+              <div className="absolute right-0 top-full mt-1 w-40 bg-[#fbfbfc] shadow-md rounded-md py-1 border border-gray-100 z-50">
+                <button onClick={() => executeSnooze(4)} className="w-full text-left px-3 py-2 hover:bg-[#eceae6] transition text-[13px] text-gray-700">Later Today</button>
+                <button onClick={() => executeSnooze(24)} className="w-full text-left px-3 py-2 hover:bg-[#eceae6] transition text-[13px] text-gray-700">Tomorrow</button>
+                <button onClick={() => executeSnooze(24 * 7)} className="w-full text-left px-3 py-2 hover:bg-[#eceae6] transition text-[13px] text-gray-700">Next Week</button>
+              </div>
+            )}
+          </div>
           <button onClick={handleDone} title="Mark as done" className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"><Check size={18} /></button>
           <button onClick={handleTrash} title="Delete" className="p-2 text-gray-500 hover:text-[#2b323b] transition rounded-md hover:bg-[#2b323b]/5 flex items-center justify-center"><Trash size={18} /></button>
           <div className="w-px h-6 bg-[#dddcdc] mx-1"></div>

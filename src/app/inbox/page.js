@@ -25,6 +25,49 @@ export default function InboxPage() {
   const [resolvedToken, setResolvedToken] = useState(null);
   const [authError, setAuthError] = useState(null);
   const [hoveredEmailId, setHoveredEmailId] = useState(null);
+
+  useEffect(() => {
+    if (!resolvedToken || !user) return;
+    
+    const checkSnoozed = async () => {
+      if (!user.prefs?.snoozedEmails || user.prefs.snoozedEmails.length === 0) return;
+      
+      const now = Date.now();
+      const snoozed = user.prefs.snoozedEmails;
+      const toUnsnooze = snoozed.filter(s => s.until <= now);
+      
+      if (toUnsnooze.length > 0) {
+        const { unsnoozeEmail } = await import("@/lib/gmail");
+        const { account } = await import("@/lib/appwrite");
+        
+        let unsnoozedIds = [];
+        for (const item of toUnsnooze) {
+          let tokenToUse = Array.isArray(resolvedToken) ? resolvedToken[0] : resolvedToken; 
+          if (item.emailAddress && user.prefs.connectedAccounts) {
+            const acc = user.prefs.connectedAccounts.find(a => a.email === item.emailAddress);
+            if (acc && !acc.isPaused) tokenToUse = acc.token;
+          }
+          
+          try {
+            await unsnoozeEmail(tokenToUse, item.id);
+            unsnoozedIds.push(item.id);
+          } catch(e) {
+            console.error("Failed to unsnooze", item.id, e);
+          }
+        }
+        
+        if (unsnoozedIds.length > 0) {
+          const remaining = snoozed.filter(s => !unsnoozedIds.includes(s.id));
+          await account.updatePrefs({ ...user.prefs, snoozedEmails: remaining });
+          await useAuthStore.getState().checkAuth();
+        }
+      }
+    };
+    
+    checkSnoozed();
+    const interval = setInterval(checkSnoozed, 60000);
+    return () => clearInterval(interval);
+  }, [resolvedToken, user]);
   const observerTarget = useRef(null);
   
   const [activeTab, setActiveTab] = useState("Inbox");
