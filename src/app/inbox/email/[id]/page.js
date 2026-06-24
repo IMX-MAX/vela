@@ -673,9 +673,11 @@ export default function EmailDetailPage() {
           {/* Card Header */}
           <div className="px-8 py-6 flex items-start justify-between border-b border-gray-100 relative">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-full bg-[#f0f0f0] flex items-center justify-center text-sm font-medium text-gray-700">
-                {email.senderName ? email.senderName[0].toUpperCase() : "U"}
-              </div>
+              <img 
+                src={`https://unavatar.io/${email.senderEmail}?fallback=https://ui-avatars.com/api/?name=${email.senderName || 'U'}&background=random`} 
+                alt="Profile" 
+                className="h-9 w-9 rounded-full object-cover shrink-0 bg-white" 
+              />
               <div>
                 <div className="font-medium text-[15px] text-[#2b323b] flex items-center gap-2">
                   {email.senderName}

@@ -250,23 +250,40 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
         >
           <div className="flex flex-col p-1 max-h-[280px] overflow-y-auto">
             <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">AI Actions</div>
-            {filteredOptions.map((opt, index) => (
-              <button
-                key={opt.id}
-                onClick={() => handleSlashOptionSelect(opt)}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left transition ${
-                  index === selectedSlashIndex ? 'bg-gray-100 text-[#2b323b]' : 'text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <span className="text-[16px] w-5 text-center">{opt.icon}</span>
-                <div className="flex flex-col">
-                  <span className="text-[13px] font-semibold leading-tight">{opt.label}</span>
-                  <span className="text-[11px] text-gray-400 leading-none mt-0.5">{opt.subtitle}</span>
-                </div>
-              </button>
-            ))}
-            {filteredOptions.length === 0 && (
-              <div className="px-3 py-2 text-xs text-gray-400 text-center">No options match</div>
+            {user?.prefs?.plan === 'pro' ? (
+              <>
+                {filteredOptions.map((opt, index) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => handleSlashOptionSelect(opt)}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left transition ${
+                      index === selectedSlashIndex ? 'bg-gray-100 text-[#2b323b]' : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <span className="text-[16px] w-5 text-center">{opt.icon}</span>
+                    <div className="flex flex-col">
+                      <span className="text-[13px] font-semibold leading-tight">{opt.label}</span>
+                      <span className="text-[11px] text-gray-400 leading-none mt-0.5">{opt.subtitle}</span>
+                    </div>
+                  </button>
+                ))}
+                {filteredOptions.length === 0 && (
+                  <div className="px-3 py-2 text-xs text-gray-400 text-center">No options match</div>
+                )}
+              </>
+            ) : (
+              <div className="px-3 py-4 text-center">
+                <span className="text-sm font-medium text-gray-600 block mb-2">Upgrade to Pro for AI tools in the email composer</span>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    useAuthStore.getState().setShowUpgradeModal(true);
+                  }}
+                  className="px-4 py-1.5 bg-[#2b323b] text-white text-[13px] rounded-lg shadow hover:bg-[#1a1f24] transition font-medium"
+                >
+                  Upgrade
+                </button>
+              </div>
             )}
           </div>
         </div>

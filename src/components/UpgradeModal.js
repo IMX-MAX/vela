@@ -28,17 +28,25 @@ export default function UpgradeModal({ onClose }) {
         
         <div className="p-6 bg-[#fbfbfc]">
           <ul className="space-y-3 mb-8 text-[14px] text-gray-700">
-            <li className="flex items-center gap-3">
+            <li className="flex items-center gap-3 font-medium">
               <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-[10px]">✓</div>
-              Up to 30x more usage than free
+              Everything in Free, plus:
             </li>
             <li className="flex items-center gap-3">
               <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-[10px]">✓</div>
-              Advanced contextual drafting
+              Up to 30x more AI usage
             </li>
             <li className="flex items-center gap-3">
               <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-[10px]">✓</div>
-              General AI assistant access
+              Connect multiple email accounts
+            </li>
+            <li className="flex items-center gap-3">
+              <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-[10px]">✓</div>
+              Access to Split Inboxes
+            </li>
+            <li className="flex items-center gap-3">
+              <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-[10px]">✓</div>
+              Advanced AI Composer tools
             </li>
           </ul>
           

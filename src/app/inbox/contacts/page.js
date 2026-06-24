@@ -183,13 +183,11 @@ export default function ContactsPage() {
                   className="group flex items-center px-6 py-2.5 border-b border-[#2b323b]/5 hover:bg-[#dddcdc]/30 transition-colors"
                 >
                   <div className="w-[30%] flex items-center gap-4 pr-4">
-                    {contact.photos?.[0]?.url && !contact.photos[0].default ? (
-                      <img src={contact.photos[0].url} alt="Profile" className="h-9 w-9 rounded-full object-cover shrink-0" />
-                    ) : (
-                      <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#c7d4ce] to-[#aebcb6] flex items-center justify-center text-[#2b323b] font-medium text-sm shrink-0">
-                        {avatarLetter}
-                      </div>
-                    )}
+                    <img 
+                      src={(!contact.photos?.[0]?.default && contact.photos?.[0]?.url) || `https://unavatar.io/${contact.emailAddresses?.[0]?.value || ''}?fallback=https://ui-avatars.com/api/?name=${displayName}&background=random`} 
+                      alt="Profile" 
+                      className="h-9 w-9 rounded-full object-cover shrink-0 bg-white" 
+                    />
                     <span className={`truncate text-[14px] ${hasName ? 'font-medium text-gray-800' : 'text-gray-500'}`}>
                       {displayName}
                     </span>

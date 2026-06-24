@@ -136,11 +136,11 @@ export default function InboxLayout({ children }) {
           className="h-8 w-8 rounded-full bg-white flex items-center justify-center text-sm font-semibold text-[#50686c] shadow-sm overflow-hidden border border-[#dddcdc]"
           onClick={() => setIsProfileOpen(!isProfileOpen)}
         >
-          {googleProfile?.picture ? (
-            <img src={googleProfile.picture} alt="Profile" className="h-full w-full object-cover" />
-          ) : (
-            user.name ? user.name.slice(0, 5).toLowerCase() : "usr"
-          )}
+          <img 
+            src={googleProfile?.picture || `https://unavatar.io/${user?.email || ''}?fallback=https://ui-avatars.com/api/?name=${user?.name || 'U'}&background=random`} 
+            alt="Profile" 
+            className="h-full w-full object-cover bg-white" 
+          />
         </div>
       </div>
 
@@ -184,13 +184,11 @@ export default function InboxLayout({ children }) {
             className="flex items-center gap-2 cursor-pointer transition"
             onClick={() => setIsProfileOpen(!isProfileOpen)}
           >
-            {googleProfile?.picture ? (
-              <img src={googleProfile.picture} alt="Profile" className="h-7 w-7 rounded-full object-cover" />
-            ) : (
-              <div className="h-7 w-7 rounded-full bg-white flex items-center justify-center text-[10px] font-semibold text-[#50686c]">
-                {user.name ? user.name.slice(0, 5).toLowerCase() : "usr"}
-              </div>
-            )}
+            <img 
+              src={googleProfile?.picture || `https://unavatar.io/${user?.email || ''}?fallback=https://ui-avatars.com/api/?name=${user?.name || 'U'}&background=random`} 
+              alt="Profile" 
+              className="h-7 w-7 rounded-full object-cover bg-white" 
+            />
           </div>
           
           {isProfileOpen && (

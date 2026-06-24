@@ -61,24 +61,28 @@ export default function PricingPage() {
             
             <h3 className="text-2xl font-medium text-white mb-2">Pro Plan</h3>
             <p className="text-sm text-gray-400 mb-6">For power users who need constant AI assistance.</p>
-            <div className="text-4xl font-semibold text-white mb-8">$12 <span className="text-lg font-normal text-gray-500">/mo</span></div>
+            <div className="text-4xl font-semibold text-white mb-8">$8 <span className="text-lg font-normal text-gray-500">/mo</span></div>
             
             <ul className="space-y-4 mb-10 flex-1">
               <li className="flex items-start gap-3 text-sm text-gray-300">
                 <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
-                <span title="Significantly higher usage limits (summary and AI draft replies are not counted)" className="cursor-help border-b border-dashed border-gray-500 hover:text-white transition-colors"><strong className="text-white">Up to 30x higher usage than free</strong></span>
+                <span className="font-medium text-white">Everything in Free, plus:</span>
               </li>
               <li className="flex items-start gap-3 text-sm text-gray-300">
                 <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
-                <span>Advanced contextual replies</span>
+                <span title="Significantly higher usage limits (summary and AI draft replies are not counted)" className="cursor-help border-b border-dashed border-gray-500 hover:text-white transition-colors">Up to 30x higher AI usage</span>
               </li>
               <li className="flex items-start gap-3 text-sm text-gray-300">
                 <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
-                <span>Inline AI text editing</span>
+                <span>Connect multiple email accounts</span>
               </li>
               <li className="flex items-start gap-3 text-sm text-gray-300">
                 <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
-                <span>Priority support</span>
+                <span>Access to Split Inboxes</span>
+              </li>
+              <li className="flex items-start gap-3 text-sm text-gray-300">
+                <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
+                <span>Advanced AI Composer tools</span>
               </li>
             </ul>
             

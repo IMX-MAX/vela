@@ -23,7 +23,10 @@ export async function fetchGoogleProfile(tokenOrConnectionId) {
   }
 }
 
-export async function fetchEmails(tokenOrConnectionId, maxResults = 20, label = "inbox", searchQuery = null, pageToken = null) {
+export async function fetchEmails(tokens, maxResults = 20, label = "inbox", searchQuery = null, pageTokens = null) {
+  const tokenArray = Array.isArray(tokens) ? tokens : [tokens];
+  const pageTokenArray = Array.isArray(pageTokens) ? pageTokens : [pageTokens];
+
   let query = label === "starred" ? "is:starred" 
               : label === "sent" ? "in:sent"
               : label === "drafts" ? "in:drafts"
@@ -36,35 +39,77 @@ export async function fetchEmails(tokenOrConnectionId, maxResults = 20, label = 
     query = searchQuery;
   }
 
-  let url = `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=${maxResults}&q=${encodeURIComponent(query)}`;
-  if (pageToken) {
-    url += `&pageToken=${pageToken}`;
-  }
-  
-  const data = await makeGmailRequest(tokenOrConnectionId, url);
-  if (data?.error) {
-    throw new Error(data.error.message || JSON.stringify(data.error));
-  }
-  if (!data || !data.messages) return { messages: [], nextPageToken: null };
+  const fetchPromises = tokenArray.map(async (token, idx) => {
+    if (!token) return { messages: [], nextPageToken: null };
+    
+    // Distribute maxResults evenly among tokens
+    const fetchCount = Math.max(1, Math.ceil(maxResults / tokenArray.length));
+    let url = `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=${fetchCount}&q=${encodeURIComponent(query)}`;
+    
+    const pt = pageTokenArray[idx];
+    if (pt) {
+      url += `&pageToken=${pt}`;
+    }
+    
+    try {
+      const data = await makeGmailRequest(token, url);
+      if (data?.error) {
+        console.error("fetchEmails error for token idx", idx, data.error);
+        if (idx === 0) throw new Error(data.error.message || JSON.stringify(data.error));
+        return { messages: [], nextPageToken: null };
+      }
+      if (!data || !data.messages) return { messages: [], nextPageToken: null };
 
-  // Group by threadId to prevent showing multiple emails from the same thread
-  const seenThreads = new Set();
-  const uniqueMessages = [];
-  for (const msg of data.messages) {
-    if (!seenThreads.has(msg.threadId)) {
-      seenThreads.add(msg.threadId);
-      uniqueMessages.push(msg);
+      // Group by threadId
+      const seenThreads = new Set();
+      const uniqueMessages = [];
+      for (const msg of data.messages) {
+        if (!seenThreads.has(msg.threadId)) {
+          seenThreads.add(msg.threadId);
+          uniqueMessages.push(msg);
+        }
+      }
+
+      const detailedMessages = await Promise.all(
+        uniqueMessages.map(async (msg) => {
+          const detail = await makeGmailRequest(token, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`);
+          detail._accountIndex = idx;
+          return detail;
+        })
+      );
+
+      return { messages: detailedMessages, nextPageToken: data.nextPageToken };
+    } catch (err) {
+      console.error("fetchEmails fetch error for token idx", idx, err);
+      return { messages: [], nextPageToken: null };
+    }
+  });
+
+  const results = await Promise.all(fetchPromises);
+  
+  let combinedMessages = [];
+  let nextTokens = [];
+  
+  for (let i = 0; i < results.length; i++) {
+    combinedMessages = combinedMessages.concat(results[i].messages);
+    nextTokens.push(results[i].nextPageToken || null);
+  }
+
+  combinedMessages.sort((a, b) => parseInt(b.internalDate || 0) - parseInt(a.internalDate || 0));
+
+  const seenThreadsGlobally = new Set();
+  const finalMessages = [];
+  for (const msg of combinedMessages) {
+    if (!seenThreadsGlobally.has(msg.threadId)) {
+      seenThreadsGlobally.add(msg.threadId);
+      finalMessages.push(msg);
     }
   }
 
-  // Fetch metadata-only details for each message to make inbox load lightning fast
-  const detailedMessages = await Promise.all(
-    uniqueMessages.map((msg) =>
-      makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`)
-    )
-  );
-
-  return { messages: detailedMessages, nextPageToken: data.nextPageToken };
+  return { 
+    messages: finalMessages.slice(0, maxResults), 
+    nextPageToken: nextTokens.some(t => t) ? nextTokens : null 
+  };
 }
 
 export async function fetchEmailDetails(tokenOrConnectionId, messageId) {
@@ -72,17 +117,42 @@ export async function fetchEmailDetails(tokenOrConnectionId, messageId) {
 }
 
 // Fast metadata-only search for AI — uses format=metadata to skip body parsing
-export async function searchEmailsQuick(tokenOrConnectionId, query, maxResults = 5) {
-  const url = `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=${maxResults}&q=${encodeURIComponent(query)}`;
-  const data = await makeGmailRequest(tokenOrConnectionId, url);
-  if (!data || !data.messages) return [];
+export async function searchEmailsQuick(tokens, query, maxResults = 5) {
+  const tokenArray = Array.isArray(tokens) ? tokens : [tokens];
+  
+  const fetchPromises = tokenArray.map(async (token, idx) => {
+    if (!token) return [];
+    
+    const fetchCount = Math.max(1, Math.ceil(maxResults / tokenArray.length));
+    const url = `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=${fetchCount}&q=${encodeURIComponent(query)}`;
+    try {
+      const data = await makeGmailRequest(token, url);
+      if (!data || !data.messages) return [];
 
-  const details = await Promise.all(
-    data.messages.map((msg) =>
-      makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`)
-    )
-  );
-  return details;
+      const details = await Promise.all(
+        data.messages.map(async (msg) => {
+          const detail = await makeGmailRequest(token, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`);
+          detail._accountIndex = idx;
+          return detail;
+        })
+      );
+      return details;
+    } catch (e) {
+      console.error("searchEmailsQuick error for token idx", idx, e);
+      return [];
+    }
+  });
+
+  const results = await Promise.all(fetchPromises);
+  
+  let combinedDetails = [];
+  for (const res of results) {
+    combinedDetails = combinedDetails.concat(res);
+  }
+
+  combinedDetails.sort((a, b) => parseInt(b.internalDate || 0) - parseInt(a.internalDate || 0));
+
+  return combinedDetails.slice(0, maxResults);
 }
 
 function buildMimeMessage(to, subject, body, htmlBody, attachments, replyToMessageId, references) {

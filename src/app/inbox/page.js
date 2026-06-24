@@ -108,6 +108,7 @@ export default function InboxPage() {
           snippet: parsedContent.snippet || "",
           dateStr: parsedContent.date,
           labelIds: msg.labelIds || [],
+          _accountIndex: msg._accountIndex,
         };
       });
       return { parsed, next: data.nextPageToken, error: null };
@@ -115,9 +116,12 @@ export default function InboxPage() {
       if (!isRetry && (error.message.includes("401") || error.message.includes("Request had invalid authentication credentials") || error.message.includes("Invalid Credentials"))) {
         await useAuthStore.getState().checkAuth();
         const newToken = useAuthStore.getState().session?.providerAccessToken;
-        if (newToken && newToken !== token) {
-          setResolvedToken(newToken);
-          return fetchEmailBatch(newToken, pageToken, true);
+        const currentPrimary = Array.isArray(token) ? token[0] : token;
+        if (newToken && newToken !== currentPrimary) {
+          const additionalAccounts = useAuthStore.getState().user?.prefs?.connectedAccounts || [];
+          const newAllTokens = [newToken, ...additionalAccounts.map(a => a.token)].filter(Boolean);
+          setResolvedToken(newAllTokens);
+          return fetchEmailBatch(newAllTokens, pageToken, true);
         }
       }
       console.error("Error fetching emails:", error);
@@ -151,10 +155,12 @@ export default function InboxPage() {
       }
 
       if (token) {
-        setResolvedToken(token);
+        const additionalAccounts = useAuthStore.getState().user?.prefs?.connectedAccounts || [];
+        const allTokens = [token, ...additionalAccounts.map(a => a.token)].filter(Boolean);
+        setResolvedToken(allTokens);
         const { fetchGoogleProfile } = await import("@/lib/gmail");
         const [{ parsed, next, error }, profile] = await Promise.all([
-          fetchEmailBatch(token),
+          fetchEmailBatch(allTokens),
           fetchGoogleProfile(token)
         ]);
         
@@ -207,7 +213,9 @@ export default function InboxPage() {
       
       const { fetchEmailDetails } = await import("@/lib/gmail");
       const { parseEmailContent } = await import("@/lib/emailParser");
-      const rawMsg = await fetchEmailDetails(resolvedToken, id);
+      const emailObj = emails.find(e => e.id === id) || useAuthStore.getState().inboxEmails?.find(e => e.id === id);
+      const tokenToUse = emailObj && emailObj._accountIndex !== undefined && Array.isArray(resolvedToken) ? resolvedToken[emailObj._accountIndex] : (Array.isArray(resolvedToken) ? resolvedToken[0] : resolvedToken);
+      const rawMsg = await fetchEmailDetails(tokenToUse, id);
       const parsed = parseEmailContent(rawMsg);
       await saveCachedEmailBody(id, parsed);
     } catch (e) {
@@ -228,16 +236,20 @@ export default function InboxPage() {
     e.stopPropagation();
     setEmails(emails.filter(email => email.id !== id));
     setInboxEmails(emails.filter(email => email.id !== id), filter);
+    const emailObj = emails.find(email => email.id === id);
+    const tokenToUse = emailObj && emailObj._accountIndex !== undefined && Array.isArray(resolvedToken) ? resolvedToken[emailObj._accountIndex] : (Array.isArray(resolvedToken) ? resolvedToken[0] : resolvedToken);
     const { doneEmail } = await import("@/lib/gmail");
-    await doneEmail(resolvedToken, id);
+    await doneEmail(tokenToUse, id);
   };
 
   const handleTrash = async (e, id) => {
     if (e) e.stopPropagation();
     setEmails(emails.filter(email => email.id !== id));
     setInboxEmails(emails.filter(email => email.id !== id), filter);
+    const emailObj = emails.find(email => email.id === id);
+    const tokenToUse = emailObj && emailObj._accountIndex !== undefined && Array.isArray(resolvedToken) ? resolvedToken[emailObj._accountIndex] : (Array.isArray(resolvedToken) ? resolvedToken[0] : resolvedToken);
     const { trashEmail } = await import("@/lib/gmail");
-    await trashEmail(resolvedToken, id);
+    await trashEmail(tokenToUse, id);
   };
 
   useEffect(() => {
@@ -338,7 +350,14 @@ export default function InboxPage() {
               </div>
               <div className="relative group flex items-center ml-1">
                 <button 
-                  onClick={() => setShowSettingsModal(true)}
+                  onClick={() => {
+                    const plan = useAuthStore.getState().user?.prefs?.plan || 'free';
+                    if (plan === 'pro') {
+                      setShowSettingsModal(true);
+                    } else {
+                      useAuthStore.getState().setShowUpgradeModal(true);
+                    }
+                  }}
                   className="p-1.5 text-gray-500 hover:text-[#2b323b] hover:bg-[#dcdada] rounded-md transition"
                 >
                   <FadersHorizontal size={16} weight="bold" />

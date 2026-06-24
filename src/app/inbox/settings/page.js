@@ -20,6 +20,8 @@ export default function SettingsPage() {
   const [company, setCompany] = useState("");
   const [writingStyle, setWritingStyle] = useState("");
   const [plan, setPlan] = useState("free");
+  const [billingCycle, setBillingCycle] = useState("annual");
+  const [showDowngradeModal, setShowDowngradeModal] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -45,12 +47,21 @@ export default function SettingsPage() {
   };
 
   const handleSetPlan = async (newPlan) => {
+    if (plan === 'pro' && newPlan === 'free') {
+      setShowDowngradeModal(true);
+      return;
+    }
+    await confirmSetPlan(newPlan);
+  };
+
+  const confirmSetPlan = async (newPlan) => {
     try {
       await account.updatePrefs({
         ...user?.prefs,
         plan: newPlan
       });
       setPlan(newPlan);
+      setShowDowngradeModal(false);
       await checkAuth();
     } catch (error) {
       console.error("Failed to update plan", error);
@@ -129,13 +140,11 @@ export default function SettingsPage() {
             <div className="bg-[#eceae6] rounded-xl border border-[#dddcdc]/60 p-6 mb-10 shadow-sm">
               <div className="mb-6">
                 <label className="block text-[13px] font-medium text-gray-800 mb-2">Profile picture</label>
-                {googleProfile?.picture ? (
-                  <img src={googleProfile.picture} alt="Profile" className="h-10 w-10 rounded-full object-cover" />
-                ) : (
-                  <div className="h-10 w-10 rounded-full bg-[#dddcdc] flex items-center justify-center text-sm font-semibold text-[#50686c]">
-                    {user?.name ? user.name.slice(0, 5).toLowerCase() : "usr"}
-                  </div>
-                )}
+                <img 
+                  src={googleProfile?.picture || `https://unavatar.io/${user?.email || ''}?fallback=https://ui-avatars.com/api/?name=${user?.name || 'U'}&background=random`} 
+                  alt="Profile" 
+                  className="h-10 w-10 rounded-full object-cover bg-white" 
+                />
               </div>
               
               <div className="mb-6">
@@ -232,9 +241,11 @@ export default function SettingsPage() {
                 <tbody>
                   <tr className="border-b border-[#dddcdc]/40 last:border-0 hover:bg-[#2b323b]/[0.02] transition">
                     <td className="py-4 px-6 flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-[#dddcdc] flex items-center justify-center text-xs font-semibold text-[#50686c]">
-                        {user?.name ? user.name.slice(0, 5).toLowerCase() : "usr"}
-                      </div>
+                      <img 
+                        src={googleProfile?.picture || `https://unavatar.io/${user?.email || ''}?fallback=https://ui-avatars.com/api/?name=${user?.name || 'U'}&background=random`} 
+                        alt="Profile" 
+                        className="h-8 w-8 rounded-full object-cover bg-white" 
+                      />
                       <div>
                         <div className="font-medium text-[#2b323b]">{user?.name}</div>
                         <div className="text-[13px] text-gray-500">{user?.email} &middot; Primary account</div>
@@ -242,22 +253,96 @@ export default function SettingsPage() {
                     </td>
                     <td className="py-4 px-6 text-gray-700">Active</td>
                     <td className="py-4 px-6 text-right">
-                      <button className="text-gray-400 hover:text-gray-800 transition"><DotsThree size={20} weight="bold" /></button>
+                      {/* Primary account cannot be removed */}
                     </td>
                   </tr>
+                  {(user?.prefs?.connectedAccounts || []).map((acc, idx) => (
+                    <tr key={idx} className="border-b border-[#dddcdc]/40 last:border-0 hover:bg-[#2b323b]/[0.02] transition">
+                      <td className="py-4 px-6 flex items-center gap-3">
+                        <img 
+                          src={acc.picture || `https://ui-avatars.com/api/?name=${acc.name || 'U'}&background=random`} 
+                          alt="Profile" 
+                          className="h-8 w-8 rounded-full object-cover bg-white" 
+                        />
+                        <div>
+                          <div className="font-medium text-[#2b323b]">{acc.name}</div>
+                          <div className="text-[13px] text-gray-500">{acc.email} &middot; Secondary account</div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6 text-gray-700">Active</td>
+                      <td className="py-4 px-6 text-right">
+                        <button 
+                          onClick={async () => {
+                            const newAccounts = [...(user?.prefs?.connectedAccounts || [])];
+                            newAccounts.splice(idx, 1);
+                            await account.updatePrefs({ ...user?.prefs, connectedAccounts: newAccounts });
+                            await checkAuth();
+                          }}
+                          className="text-red-400 hover:text-red-600 transition text-[13px] font-medium"
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
 
-
+            <div className="flex justify-end">
+              <button 
+                onClick={async () => {
+                  if (plan !== 'pro') {
+                     useAuthStore.getState().setShowUpgradeModal(true);
+                     return;
+                  }
+                  const currentAccounts = user?.prefs?.connectedAccounts || [];
+                  if (currentAccounts.length >= 2) return;
+                  
+                  // Mock adding a secondary account
+                  const newAccounts = [...currentAccounts, {
+                    name: "Mock Secondary",
+                    email: `secondary${currentAccounts.length + 1}@example.com`,
+                    picture: "",
+                    token: "mock-token-" + Date.now() // Note: this mock token will fail gracefully in fetchEmails
+                  }];
+                  await account.updatePrefs({ ...user?.prefs, connectedAccounts: newAccounts });
+                  await checkAuth();
+                }}
+                disabled={(user?.prefs?.connectedAccounts || []).length >= 2 && plan === 'pro'}
+                className={`px-4 py-2 rounded-lg font-medium text-[13px] transition ${
+                  (user?.prefs?.connectedAccounts || []).length >= 2 && plan === 'pro'
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-[#2b323b] text-white hover:bg-[#1a1f24] shadow-sm'
+                }`}
+              >
+                {plan === 'pro' ? 'Connect additional account' : 'Connect additional account (Pro)'}
+              </button>
+            </div>
 
           </div>
         )}
 
         {tab === 'billing' && (
-          <div className="max-w-2xl">
+          <div className="max-w-2xl relative">
             <h1 className="text-2xl font-medium text-[#2b323b] mb-8">Billing & Plans</h1>
-            <h2 className="text-[15px] font-medium text-gray-800 mb-3">Choose your plan</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-[15px] font-medium text-gray-800">Choose your plan</h2>
+              <div className="flex items-center gap-2 bg-[#eceae6] p-1 rounded-lg border border-[#dddcdc]">
+                <button 
+                  onClick={() => setBillingCycle('monthly')}
+                  className={`px-3 py-1 text-[13px] font-medium rounded-md transition ${billingCycle === 'monthly' ? 'bg-white shadow-sm text-[#2b323b]' : 'text-gray-500'}`}
+                >
+                  Monthly
+                </button>
+                <button 
+                  onClick={() => setBillingCycle('annual')}
+                  className={`px-3 py-1 text-[13px] font-medium rounded-md transition ${billingCycle === 'annual' ? 'bg-white shadow-sm text-[#2b323b]' : 'text-gray-500'}`}
+                >
+                  Annual
+                </button>
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-6 mb-10">
               {/* Free Plan */}
               <div className={`bg-[#eceae6] rounded-xl border p-6 shadow-sm cursor-pointer transition ${plan === 'free' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-[#dddcdc]/60 hover:border-gray-400'}`} onClick={() => handleSetPlan('free')}>
@@ -273,20 +358,48 @@ export default function SettingsPage() {
                 </div>
               </div>
               
-              {/* Pro Plan — selection disabled during beta (billing not yet live) */}
-              <div className={`bg-[#eceae6] rounded-xl border p-6 shadow-sm transition ${plan === 'pro' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-[#dddcdc]/60 opacity-80 cursor-not-allowed'}`}>
+              {/* Pro Plan */}
+              <div className={`bg-[#eceae6] rounded-xl border p-6 shadow-sm transition cursor-pointer ${plan === 'pro' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-[#dddcdc]/60 hover:border-gray-400'}`} onClick={() => handleSetPlan('pro')}>
                 <div className="font-semibold text-lg text-gray-800 mb-2">Pro Plan</div>
                 <div className="text-sm text-gray-600 mb-4">For power users.</div>
-                <div className="text-2xl font-bold text-[#2b323b] mb-4">$12 <span className="text-sm font-normal text-gray-500">/mo</span></div>
+                <div className="text-2xl font-bold text-[#2b323b] mb-4">${billingCycle === 'annual' ? '6' : '8'} <span className="text-sm font-normal text-gray-500">/mo</span></div>
                 <ul className="text-[13px] text-gray-700 space-y-2 mb-6">
+                  <li className="font-medium">&bull; Everything in Free, plus:</li>
                   <li>&bull; Up to 30x more usage than free</li>
                   <li>&bull; Advanced contextual replies</li>
+                  <li>&bull; Connect up to 2 additional accounts</li>
                 </ul>
                 <div className={`text-center py-2 rounded-lg font-medium text-[13px] ${plan === 'pro' ? 'bg-blue-100 text-blue-700' : 'bg-white text-gray-800 border border-gray-300'}`}>
-                  {plan === 'pro' ? 'Current Plan' : 'unavaiable during beta'}
+                  {plan === 'pro' ? 'Current Plan' : 'Select Pro'}
                 </div>
               </div>
             </div>
+
+            {/* Downgrade Modal */}
+            {showDowngradeModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+                  <h3 className="text-lg font-semibold text-[#2b323b] mb-2">Downgrade to Free?</h3>
+                  <p className="text-[14px] text-gray-600 mb-6">
+                    Are you sure you want to downgrade to the Free plan? You will lose access to Pro features like multiple connected accounts, split inboxes, and the AI composer.
+                  </p>
+                  <div className="flex items-center justify-end gap-3">
+                    <button 
+                      onClick={() => setShowDowngradeModal(false)}
+                      className="px-4 py-2 rounded-lg font-medium text-[13px] text-gray-700 hover:bg-gray-100 transition"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onClick={() => confirmSetPlan('free')}
+                      className="px-4 py-2 rounded-lg font-medium text-[13px] bg-red-500 text-white hover:bg-red-600 transition shadow-sm"
+                    >
+                      Downgrade
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
