@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, startTransition } from "react";
+import React, { useEffect, useState, useRef, startTransition } from "react";
 import { useAuthStore } from "@/lib/store";
 import { fetchEmailDetails, sendEmail } from "@/lib/gmail";
 import { parseEmailContent } from "@/lib/emailParser";
