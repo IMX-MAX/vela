@@ -146,6 +146,43 @@ export default function SettingsPage() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (plan === 'pro' || user?.prefs?.subscriptionStatus === 'active') {
+      alert("Please downgrade to the free plan and cancel your active subscription before deleting your account.");
+      return;
+    }
+    
+    if (confirm("Are you sure you want to delete your account? This action cannot be undone. All your connected accounts and local data will be permanently removed.")) {
+      try {
+        const res = await fetch('/api/account/delete', { method: 'POST' });
+        if (!res.ok) throw new Error("Failed to delete");
+        
+        import('idb-keyval').then(({ clear }) => {
+          clear().then(() => {
+            useAuthStore.getState().logout().then(() => {
+              router.push("/login");
+            });
+          });
+        });
+      } catch (error) {
+        console.error("Failed to delete account", error);
+        alert("Failed to delete account. Please try again.");
+      }
+    }
+  };
+
+  const handleClearLocalData = () => {
+    if (confirm("Are you sure you want to clear your local data? You will be signed out and need to reconnect.")) {
+      import('idb-keyval').then(({ clear }) => {
+        clear().then(() => {
+          useAuthStore.getState().logout().then(() => {
+            router.push("/login");
+          });
+        });
+      });
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[60] bg-[#dddcdc] flex flex-col md:flex-row text-[14px]">
       {/* Sidebar */}
@@ -188,6 +225,12 @@ export default function SettingsPage() {
             onClick={() => setTab('usage')}
           >
             Usage
+          </div>
+          <div 
+            className={`whitespace-nowrap px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'privacy' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
+            onClick={() => setTab('privacy')}
+          >
+            Privacy
           </div>
         </div>
       </div>
@@ -489,8 +532,42 @@ export default function SettingsPage() {
               </div>
               
               <div className="text-[13px] text-gray-500">
-                Usage resets {usageStatus.plan === 'pro' ? 'daily at 12:00 AM NYC time' : 'on the 1st of each month (NYC time)'}.
+                 Usage resets {usageStatus.plan === 'pro' ? 'daily at 12:00 AM NYC time' : 'on the 1st of each month (NYC time)'}.
               </div>
+            </div>
+          </div>
+        )}
+
+        {tab === 'privacy' && (
+          <div className="max-w-2xl">
+            <h1 className="text-2xl font-medium text-[#2b323b] mb-8">Privacy & Data</h1>
+            
+            <h2 className="text-[15px] font-medium text-gray-800 mb-3">Local data</h2>
+            <div className="bg-[#eceae6] rounded-xl border border-[#dddcdc]/60 p-6 mb-10 shadow-sm flex items-center justify-between">
+              <div>
+                <div className="font-medium text-[#2b323b] mb-1">Clear local cache</div>
+                <div className="text-[13px] text-gray-500 max-w-sm">This will clear your local IndexedDB cache, which stores downloaded emails for offline access. You will be signed out.</div>
+              </div>
+              <button 
+                onClick={handleClearLocalData}
+                className="px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg text-[13px] font-medium shadow-sm transition"
+              >
+                Clear data
+              </button>
+            </div>
+
+            <h2 className="text-[15px] font-medium text-red-600 mb-3">Danger zone</h2>
+            <div className="bg-red-50 rounded-xl border border-red-200 p-6 shadow-sm flex items-center justify-between">
+              <div>
+                <div className="font-medium text-red-700 mb-1">Delete account</div>
+                <div className="text-[13px] text-red-600/80 max-w-sm">Permanently delete your Vela account and all associated data. Active subscriptions must be canceled first.</div>
+              </div>
+              <button 
+                onClick={handleDeleteAccount}
+                className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg text-[13px] font-medium shadow-sm transition"
+              >
+                Delete account
+              </button>
             </div>
           </div>
         )}

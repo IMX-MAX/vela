@@ -35,7 +35,13 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3 text-[#2b323b]">4. Intellectual Property</h2>
+            <h2 className="text-xl font-semibold mb-3 text-[#2b323b]">4. Third-Party API Data & AI Generated Content</h2>
+            <p>Vela uses the Google Gmail API to access your email data. Our use of this data is strictly limited to providing you with the email client interface and optional AI-powered features. We adhere strictly to the Google API Services User Data Policy.</p>
+            <p className="mt-2">When using Vela Intelligence for summarization or drafting, you acknowledge that AI-generated content may be inaccurate, inappropriate, or incomplete. You are solely responsible for reviewing and verifying any AI-drafted email before sending it.</p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-3 text-[#2b323b]">5. Intellectual Property</h2>
             <p>The service and its original content, features, and functionality are and will remain the exclusive property of Vela and its licensors. The service is protected by copyright, trademark, and other laws.</p>
           </section>
 

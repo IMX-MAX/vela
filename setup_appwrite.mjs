@@ -44,6 +44,17 @@ async function setup() {
             await databases.createCollection('default', 'users', 'Users');
         }
 
+        console.log("Checking collection 'retained_usage'...");
+        let retainedUsageExists = false;
+        try {
+            await databases.getCollection('default', 'retained_usage');
+            retainedUsageExists = true;
+            console.log("Collection 'retained_usage' already exists.");
+        } catch (e) {
+            console.log("Creating collection 'retained_usage'...");
+            await databases.createCollection('default', 'retained_usage', 'Retained Usage');
+        }
+
         console.log("Creating attributes...");
         // Define attributes
         const attributes = [
@@ -53,7 +64,13 @@ async function setup() {
             () => databases.createStringAttribute('default', 'users', 'googleAccessToken', 2048, false),
             () => databases.createStringAttribute('default', 'users', 'googleRefreshToken', 2048, false),
             () => databases.createStringAttribute('default', 'users', 'googleTokenExpiry', 255, false),
-            () => databases.createStringAttribute('default', 'users', 'createdAt', 255, false)
+            () => databases.createStringAttribute('default', 'users', 'createdAt', 255, false),
+            () => databases.createStringAttribute('default', 'users', 'subscriptionPlan', 255, false, 'free'),
+            () => databases.createStringAttribute('default', 'users', 'stripeCustomerId', 255, false),
+            () => databases.createStringAttribute('default', 'users', 'subscriptionStatus', 255, false),
+            
+            () => databases.createStringAttribute('default', 'retained_usage', 'email', 255, true),
+            () => databases.createStringAttribute('default', 'retained_usage', 'deletedAt', 255, true)
         ];
 
         for (const createAttr of attributes) {
