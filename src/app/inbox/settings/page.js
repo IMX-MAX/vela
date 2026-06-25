@@ -535,13 +535,6 @@ export default function SettingsPage() {
                   }
                 }}
               >
-                {/* Purple Sash */}
-                <div className="absolute top-0 right-0 overflow-hidden w-32 h-32 rounded-tr-2xl pointer-events-none z-10">
-                  <div className="absolute top-7 -right-7 bg-[#9b66c9] text-white text-[10px] font-semibold py-1.5 w-40 text-center rotate-45 flex items-center justify-center gap-1 shadow-sm tracking-wide">
-                    ✨ AI included
-                  </div>
-                </div>
-
                 <div className="relative z-20">
                   <div className="font-bold text-2xl text-gray-900 mb-1">Vela Pro</div>
                   <div className="text-[13px] text-gray-500 mb-6">For power users.</div>

@@ -246,7 +246,7 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
         >
           <div className="flex flex-col p-1 max-h-[280px] overflow-y-auto">
             <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">AI Actions</div>
-            {user?.prefs?.plan === 'pro' ? (
+            {user?.db?.subscriptionPlan === 'pro' ? (
               <>
                 {filteredOptions.map((opt, index) => (
                   <button
