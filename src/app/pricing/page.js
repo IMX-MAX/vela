@@ -7,18 +7,17 @@ import MarketingFooter from "@/components/MarketingFooter";
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f2f4f5] via-[#e5e7e9] to-[#cfd3d6] text-[#1e2a3b] font-[Inter] selection:bg-[#5a768c] selection:text-white flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#b9c2c8] text-[#1e2a3b] font-[Inter] selection:bg-[#7f99b0] selection:text-white flex flex-col relative overflow-x-hidden">
       
       {/* Background Lighting Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-0 bottom-0 left-[10%] w-[30%] bg-gradient-to-r from-black/[0.08] to-transparent blur-[60px] transform -skew-x-[20deg] origin-top"></div>
-        <div className="absolute top-0 bottom-0 left-[25%] w-[15%] bg-gradient-to-r from-white/60 to-transparent blur-[40px] transform -skew-x-[20deg] origin-top"></div>
-        <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-white/40 blur-[120px]"></div>
+        <div className="absolute top-0 bottom-0 right-[15%] w-[35%] bg-gradient-to-l from-white/70 to-transparent blur-[80px] transform skew-x-[-15deg] origin-top"></div>
+        <div className="absolute top-0 bottom-0 right-[0%] w-[25%] bg-gradient-to-l from-black/[0.15] to-transparent blur-[60px] transform skew-x-[-15deg] origin-top"></div>
       </div>
 
       <MarketingNavbar />
       
-      <main className="flex-1 pt-32 pb-24 px-6 max-w-6xl mx-auto w-full relative z-10">
+      <main className="flex-1 pt-40 pb-32 px-12 md:px-24 max-w-[1400px] mx-auto w-full relative z-10">
         <div className="text-center mb-16 animate-fade-in-up">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1e2a3b]/[0.04] border border-[#1e2a3b]/[0.08] text-xs font-medium text-[#1e2a3b]/70 mb-6 backdrop-blur-md">
             <div className="h-1.5 w-1.5 rounded-full bg-[#5a768c] animate-pulse"></div>

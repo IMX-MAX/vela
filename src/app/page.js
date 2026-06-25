@@ -1,206 +1,115 @@
 "use client";
 
 import Link from "next/link";
-import { useAuthStore } from "@/lib/store";
-import { useEffect, useState, useRef } from "react";
-import { Sparkle, Lightning, MagnifyingGlass, ArrowRight, Command, EnvelopeSimple, ShieldCheck, Clock } from "@phosphor-icons/react";
+import { PaperPlaneRight } from "@phosphor-icons/react";
 import MarketingNavbar from "@/components/MarketingNavbar";
 import MarketingFooter from "@/components/MarketingFooter";
 
 export default function LandingPage() {
-  const { user, loading, checkAuth } = useAuthStore();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const heroRef = useRef(null);
-
-  useEffect(() => {
-    checkAuth();
-    
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-
-    const handleMouse = (e) => {
-      if (heroRef.current) {
-        const rect = heroRef.current.getBoundingClientRect();
-        setMousePos({
-          x: ((e.clientX - rect.left) / rect.width) * 100,
-          y: ((e.clientY - rect.top) / rect.height) * 100
-        });
-      }
-    };
-    window.addEventListener("mousemove", handleMouse);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("mousemove", handleMouse);
-    };
-  }, [checkAuth]);
-
-  const ctaLink = !loading && user ? "/inbox" : "/login";
-  const ctaText = !loading && user ? "Open Inbox" : "Get Started";
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f2f4f5] via-[#e5e7e9] to-[#cfd3d6] text-[#1e2a3b] font-[Inter] selection:bg-[#5a768c] selection:text-white overflow-x-hidden relative">
+    <div className="min-h-screen bg-[#b9c2c8] text-[#1e2a3b] font-[Inter] selection:bg-[#7f99b0] selection:text-white flex flex-col relative overflow-x-hidden">
       
-      {/* Navbar */}
+      {/* Background Lighting Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-0 bottom-0 right-[15%] w-[35%] bg-gradient-to-l from-white/70 to-transparent blur-[80px] transform skew-x-[-15deg] origin-top"></div>
+        <div className="absolute top-0 bottom-0 right-[0%] w-[25%] bg-gradient-to-l from-black/[0.15] to-transparent blur-[60px] transform skew-x-[-15deg] origin-top"></div>
+      </div>
+
       <MarketingNavbar />
-
-      {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-screen flex flex-col justify-center px-6 max-w-6xl mx-auto">
-        
-        {/* Dynamic dramatic lighting background */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-          <div className="absolute top-0 bottom-0 left-[10%] w-[30%] bg-gradient-to-r from-black/[0.12] to-transparent blur-[60px] transform -skew-x-[20deg] origin-top"></div>
-          <div className="absolute top-0 bottom-0 left-[25%] w-[15%] bg-gradient-to-r from-white/60 to-transparent blur-[40px] transform -skew-x-[20deg] origin-top"></div>
-          <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-white/40 blur-[120px]"></div>
-          
-          {/* Subtle cursor tracking orb */}
-          <div
-            className="absolute w-[600px] h-[600px] rounded-full transition-all duration-[2000ms] ease-out opacity-40 mix-blend-overlay"
-            style={{
-              left: `${mousePos.x}%`,
-              top: `${mousePos.y}%`,
-              transform: "translate(-50%, -50%)",
-              background: "radial-gradient(circle, #ffffff 0%, transparent 70%)"
-            }}
-          ></div>
-        </div>
-
-        <div className="max-w-4xl pt-20 relative z-10">
-          
-          <h1 className="text-6xl md:text-[8rem] font-medium tracking-[-0.04em] text-[#1e2a3b] leading-[0.95] mb-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            the <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#1e2a3b] to-[#7f99b0]">future</span><br />
-            of email <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#1e2a3b] to-[#7f99b0]">is</span><br />
-            here
-          </h1>
-          
-          <p className="text-lg md:text-xl text-[#1e2a3b]/60 max-w-lg leading-relaxed mb-10 animate-fade-in-up font-light" style={{ animationDelay: '0.15s' }}>
-            Vela is the ultimate AI email client spearheading UI and AI in email. Experience the fastest email workflow, built for speed, clarity, and deep focus.
-          </p>
-          
-          <div className="flex flex-wrap items-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            <Link href={ctaLink} className="group inline-flex items-center gap-2 text-sm font-medium bg-[#1e2a3b] text-white px-8 py-4 rounded-full hover:bg-[#2a3a4c] transition-all duration-200 shadow-xl shadow-black/10">
-              {ctaText} <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-            <span className="text-xs text-[#1e2a3b]/50 font-medium">Free during beta</span>
-          </div>
-        </div>
-
-      </section>
-
-      {/* Bento Grid Features */}
-      <section className="px-6 pb-32 max-w-5xl mx-auto relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[#1e2a3b] mb-4">Everything you need, nothing you don't.</h2>
-          <p className="text-[#1e2a3b]/60 max-w-lg mx-auto text-sm leading-relaxed">Built from the ground up with a focus on speed, keyboard navigation, and AI intelligence.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Feature 1: Speed - Large Card */}
-          <div className="group relative rounded-3xl bg-white/40 border border-white/60 p-8 overflow-hidden hover:bg-white/60 hover:shadow-xl hover:shadow-black/5 transition-all duration-500 md:row-span-2 backdrop-blur-xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div className="relative z-10 h-full flex flex-col">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-8 w-8 rounded-lg bg-yellow-500/20 flex items-center justify-center">
-                  <Lightning size={18} weight="fill" className="text-yellow-600" />
-                </div>
-              </div>
-              <h3 className="text-lg font-medium text-[#1e2a3b] mb-2">Blazing Fast</h3>
-              <p className="text-sm text-[#1e2a3b]/60 leading-relaxed mb-8">Built on a modern stack. Every interaction is instantaneous — no loading spinners, no waiting.</p>
-              
-              {/* Speed Visual */}
-              <div className="flex-1 flex items-center justify-center">
-                <div className="relative">
-                  <div className="text-6xl font-mono font-light text-[#1e2a3b]/10 group-hover:text-[#1e2a3b]/20 transition-colors duration-500">
-                    0<span className="text-[#5a768c]">ms</span>
-                  </div>
-                  <div className="absolute -bottom-6 left-0 right-0 text-center text-xs text-[#1e2a3b]/40 font-mono">perceived latency</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Feature 2: Keyboard */}
-          <div className="group relative rounded-3xl bg-white/40 border border-white/60 p-8 overflow-hidden hover:bg-white/60 hover:shadow-xl hover:shadow-black/5 transition-all duration-500 backdrop-blur-xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-8 w-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                  <Command size={18} weight="bold" className="text-blue-600" />
-                </div>
-              </div>
-              <h3 className="text-lg font-medium text-[#1e2a3b] mb-2">Keyboard First</h3>
-              <p className="text-sm text-[#1e2a3b]/60 leading-relaxed mb-6">Navigate your entire inbox without ever touching your mouse. Every action has a shortcut.</p>
-              
-              {/* Keyboard Keys Visual */}
-              <div className="flex items-center gap-1.5 justify-center">
-                {['J', 'K', 'E', 'R', '#'].map((key) => (
-                  <div key={key} className="h-9 w-9 rounded-lg bg-white/50 border border-white/80 flex items-center justify-center text-xs font-mono text-[#1e2a3b]/60 group-hover:border-white transition-all duration-300 shadow-sm">
-                    {key}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Feature 3: AI */}
-          <div className="group relative rounded-3xl bg-white/40 border border-white/60 p-8 overflow-hidden hover:bg-white/60 hover:shadow-xl hover:shadow-black/5 transition-all duration-500 backdrop-blur-xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-8 w-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                  <Sparkle size={18} weight="fill" className="text-purple-600" />
-                </div>
-              </div>
-              <h3 className="text-lg font-medium text-[#1e2a3b] mb-2">AI Intelligence</h3>
-              <p className="text-sm text-[#1e2a3b]/60 leading-relaxed mb-6">Instantly extract the core message from long threads. Draft replies in seconds with context-aware AI.</p>
-              
-              {/* AI Visual */}
-              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/50 border border-white/80 shadow-sm">
-                <Sparkle size={16} weight="fill" className="text-purple-600 shrink-0" />
-                <div className="flex flex-col gap-1.5 flex-1">
-                  <div className="h-1.5 w-full bg-[#1e2a3b]/10 rounded-full"></div>
-                  <div className="h-1.5 w-3/4 bg-[#1e2a3b]/10 rounded-full"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-32 px-6 text-center relative overflow-hidden z-10">
-        <div className="relative z-10 bg-white/40 border border-white/60 backdrop-blur-2xl rounded-[3rem] max-w-4xl mx-auto p-16 shadow-2xl shadow-black/5">
-          <h2 className="text-4xl md:text-5xl font-medium text-[#1e2a3b] mb-4 tracking-tight">Ready to try Vela?</h2>
-          <p className="text-[#1e2a3b]/60 mb-10 max-w-md mx-auto text-sm leading-relaxed">
-            Join the beta and experience email the way it should be.
-          </p>
-          <Link href={ctaLink} className="group inline-flex items-center gap-2 text-sm font-medium bg-[#1e2a3b] text-white px-8 py-4 rounded-full hover:bg-[#2a3a4c] transition-all duration-200 shadow-xl shadow-black/10">
-            {ctaText} <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <MarketingFooter />
       
-      {/* Global Animation Styles */}
+      <main className="w-full">
+        {/* Hero Section */}
+        <section className="pt-40 pb-32 px-12 md:px-24 max-w-[1400px] mx-auto w-full relative z-10 animate-fade-in-up">
+          <h1 className="text-5xl md:text-[6.5rem] font-medium tracking-tight text-[#1e2a3b] leading-[1.05] mb-10">
+            the <span className="text-[#194060]">future of email — is</span><br />
+            <span className="text-[#194060]">here</span>
+          </h1>
+          <p className="text-lg md:text-xl text-[#1e2a3b]/80 max-w-2xl leading-relaxed font-medium">
+            Vela is the next generation of AI email clients. Experience<br />
+            one of the fastest workflows, designed for speed, clarity, and focus.
+          </p>
+        </section>
+
+        {/* Feature 1: Reply/Summarize */}
+        <section className="py-24 px-12 md:px-24 max-w-[1400px] mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <div className="rounded-xl overflow-hidden shadow-2xl shadow-black/10 transition-transform hover:scale-[1.02] duration-500">
+            <img src="/mockups/email_reply_summary_mockup.png" alt="Email Summary UI" className="w-full h-auto object-cover" />
+          </div>
+          <div className="flex flex-col gap-8 max-w-lg">
+            <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[#7f99b0]">reply to and summarize emails</h2>
+            <div className="space-y-6 text-[#1e2a3b]/80 font-medium leading-relaxed">
+              <p>Use ai to automate the easy things.</p>
+              <p>Get instant summaries of emails, to instantly understand what's going on.</p>
+              <p>Reply to emails automatically, and let ai handle your inbox, so you can skip to what matters.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Feature 2: Search */}
+        <section className="py-24 px-12 md:px-24 max-w-[1400px] mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <div className="flex flex-col gap-8 max-w-lg order-2 md:order-1">
+            <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[#7f99b0]">ai that knows what you're<br />looking for</h2>
+            <div className="space-y-6 text-[#1e2a3b]/80 font-medium leading-relaxed">
+              <p>just hit cmd + k on your keyboard to bring up Command Palette.</p>
+              <p>Search anything, navigate to any page, or ask ai any question about your inbox.</p>
+              <p>Vela's agents parse your inbox and make sure nothing slips through the cracks.</p>
+            </div>
+          </div>
+          <div className="rounded-3xl overflow-hidden shadow-2xl shadow-black/10 transition-transform hover:scale-[1.02] duration-500 order-1 md:order-2 p-4 bg-black/5">
+            <img src="/mockups/command_palette_search_mockup.png" alt="Command Palette UI" className="w-full h-auto object-cover rounded-2xl" />
+          </div>
+        </section>
+
+        {/* Feature 3: Composer */}
+        <section className="py-24 px-12 md:px-24 max-w-[1400px] mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <div className="rounded-xl overflow-hidden shadow-2xl shadow-black/10 transition-transform hover:scale-[1.02] duration-500">
+            <img src="/mockups/email_composer_markdown_mockup.png" alt="Email Composer UI" className="w-full h-auto object-cover" />
+          </div>
+          <div className="flex flex-col gap-8 max-w-lg">
+            <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[#305a7d]">email writing experience that<br />feels like your favorite notes<br />apps</h2>
+            <div className="space-y-6 text-[#1e2a3b]/80 font-medium leading-relaxed">
+              <p>Our email composer supports markdown writing so you can craft beautiful emails without the stress.</p>
+              <p>Hit / to open the AI Actions menu, allowing you to use our tools to help you write better emails. Our models have been trained to write emails specifically, outperforming most general LLMs.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Feature 4: Modern Age */}
+        <section className="py-24 px-12 md:px-24 max-w-[1400px] mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <div className="flex flex-col gap-8 max-w-lg order-2 md:order-1">
+            <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[#194060]">The email client designed<br />for the modern age</h2>
+            <div className="space-y-6 text-[#1e2a3b]/80 font-medium leading-relaxed">
+              <p>Forget about bulky, bloated, and outdated email services.</p>
+              <p>Vela has been hand crafted to be lightweight. We don't serve you ads, nor do we sell your data. Vela runs with perceived interactions of &lt;100ms</p>
+              <p>Our ai models are hosted with strict data privacy laws in Europe.</p>
+            </div>
+          </div>
+          <div className="rounded-xl overflow-hidden shadow-2xl shadow-black/10 transition-transform hover:scale-[1.02] duration-500 order-1 md:order-2">
+            <img src="/mockups/modern_inbox_mockup.png" alt="Modern Inbox UI" className="w-full h-auto object-cover" />
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-40 px-6 text-center w-full">
+          <h2 className="text-5xl md:text-7xl font-medium text-[#0f2136] tracking-tight mb-6">there's no need to wait.</h2>
+          <p className="text-xl md:text-2xl text-[#1e2a3b] max-w-2xl mx-auto font-medium leading-snug">
+            try vela for free today — unlock the<br />
+            email experience you've always been<br />
+            promised.
+          </p>
+        </section>
+      </main>
+
+      <MarketingFooter />
+
       <style jsx global>{`
         @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(16px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in-up {
           opacity: 0;
-          animation: fadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
       `}</style>
     </div>

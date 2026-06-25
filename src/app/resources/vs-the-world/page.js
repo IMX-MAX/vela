@@ -412,11 +412,18 @@ Gmail is slow and spies on you. Outlook is bloated and ugly. Superhuman is expen
 
 export default function VsTheWorldPage() {
   return (
-    <div className="min-h-screen bg-[#2b323b] text-white font-[Inter] selection:bg-[#50686c] selection:text-white flex flex-col">
+    <div className="min-h-screen bg-[#b9c2c8] text-[#1e2a3b] font-[Inter] selection:bg-[#7f99b0] selection:text-white flex flex-col relative overflow-x-hidden">
+      
+      {/* Background Lighting Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-0 bottom-0 right-[15%] w-[35%] bg-gradient-to-l from-white/70 to-transparent blur-[80px] transform skew-x-[-15deg] origin-top"></div>
+        <div className="absolute top-0 bottom-0 right-[0%] w-[25%] bg-gradient-to-l from-black/[0.15] to-transparent blur-[60px] transform skew-x-[-15deg] origin-top"></div>
+      </div>
+
       <MarketingNavbar />
       
-      <main className="flex-1 pt-32 pb-24 px-6 max-w-4xl mx-auto w-full">
-        <article className="prose prose-invert prose-emerald max-w-none prose-headings:font-medium prose-a:text-emerald-400 prose-pre:bg-white/[0.04] prose-pre:border prose-pre:border-white/[0.08] prose-th:bg-white/[0.04] prose-th:p-3 prose-td:p-3 prose-table:border-collapse prose-table:border prose-table:border-white/[0.08] prose-td:border-b prose-td:border-white/[0.08] prose-tr:border-white/[0.08] bg-white/[0.02] border border-white/[0.06] rounded-3xl p-8 md:p-12 shadow-2xl">
+      <main className="flex-1 pt-40 pb-32 px-12 md:px-24 max-w-[1400px] mx-auto w-full relative z-10 flex justify-center">
+        <article className="prose prose-slate max-w-4xl w-full prose-headings:font-medium prose-a:text-[#305a7d] prose-pre:bg-white/40 prose-pre:border prose-pre:border-[#1e2a3b]/10 prose-th:bg-white/40 prose-th:p-3 prose-td:p-3 prose-table:border-collapse prose-table:border prose-table:border-[#1e2a3b]/10 prose-td:border-b prose-td:border-[#1e2a3b]/10 prose-tr:border-[#1e2a3b]/10 bg-white/40 border border-white/60 rounded-3xl p-8 md:p-12 shadow-2xl backdrop-blur-xl">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {markdownContent}
           </ReactMarkdown>
