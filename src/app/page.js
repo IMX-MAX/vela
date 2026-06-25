@@ -4,7 +4,7 @@ import Link from "next/link";
 import { 
   PaperPlaneRight, Sparkle, ArrowBendUpLeft, PencilSimple, 
   Tray, ArrowRight, ArrowsOut, Briefcase, FileText, MagnifyingGlass,
-  Paperclip, Image
+  Paperclip, Image, Star, CheckCircle, Trash, FadersHorizontal
 } from "@phosphor-icons/react";
 import MarketingNavbar from "@/components/MarketingNavbar";
 import MarketingFooter from "@/components/MarketingFooter";
