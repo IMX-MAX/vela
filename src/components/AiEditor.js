@@ -82,13 +82,9 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
     
     let isFallback = false;
     if (!selectedText) {
-      if (isCustom) {
-        isFallback = true;
-      } else {
-        from = 0;
-        to = editor.state.doc.content.size;
-        selectedText = editor.getText();
-      }
+      from = 0;
+      to = editor.state.doc.content.size;
+      selectedText = editor.getText();
     }
 
     const promptText = isCustom ? inputPrompt : instruction;

@@ -520,49 +520,26 @@ export default function CommandPalette() {
                         <div className="mb-2">
                           <button 
                             onClick={() => toggleSteps(idx)} 
-                            className="flex items-center gap-1.5 text-[12px] font-medium text-gray-500 hover:text-gray-800 transition"
+                            className="flex items-center gap-2 text-[16px] font-medium text-slate-500 hover:text-slate-800 transition"
                           >
                             <span>{msg.endTime ? `Worked for ${Math.max(1, Math.round((msg.endTime - msg.startTime)/1000))}s` : `Working...`}</span>
-                            {expandedSteps[idx] ? <CaretDown size={12} weight="bold" /> : <CaretRight size={12} weight="bold" />}
+                            {expandedSteps[idx] ? <CaretDown size={14} weight="bold" /> : <CaretRight size={14} weight="bold" />}
                           </button>
                           {expandedSteps[idx] && (
-                            <div className="mt-2 pl-3 border-l-2 border-gray-200 flex flex-col gap-2.5">
+                            <div className="mt-4 pl-4 border-l-2 border-slate-400/80 flex flex-col gap-3">
                                {msg.steps.map((step, sIdx) => {
-                                 const Icon = step.name === 'search_inbox' ? Envelope : (step.name === 'search_contacts' ? Users : Sparkle);
                                  const description = step.name === 'search_inbox' ? `Searched inbox for "${step.args?.query || ''}"` :
                                                      step.name === 'search_contacts' ? `Searched contacts for "${step.args?.query || ''}"` :
                                                      `Used tool ${step.name}`;
-                                 const thoughtId = `${idx}-${sIdx}`;
                                  return (
-                                   <div key={sIdx} className="flex flex-col gap-2.5">
-                                     {step.thought && (
-                                       <div className="flex flex-col gap-1 mt-1">
-                                         <button onClick={() => toggleThought(thoughtId)} className="flex items-center gap-1.5 text-[12px] font-medium text-gray-500 hover:text-gray-800 transition text-left">
-                                           <CheckCircle size={14} className="text-[#50686c]" />
-                                           <span>Thought</span>
-                                           {expandedThoughts[thoughtId] ? <CaretDown size={12} weight="bold" /> : <CaretRight size={12} weight="bold" />}
-                                         </button>
-                                         {expandedThoughts[thoughtId] && (
-                                            <div className="ml-5 text-[12px] text-gray-600 whitespace-pre-wrap leading-relaxed border-l-2 border-gray-200 pl-3 py-1">
-                                              {step.thought}
-                                            </div>
-                                         )}
-                                       </div>
-                                     )}
-                                     <div className="flex items-start gap-2.5 text-[12px] text-gray-600 bg-black/[0.02] p-2 rounded-md">
-                                       <Icon size={14} className="mt-0.5 text-[#50686c] shrink-0" weight="bold" />
-                                       <div className="flex-1">
-                                         <span className="font-medium text-gray-700">{description}</span>
-                                         {step.result && step.name !== 'draft_email' && (
-                                           <div className="mt-1 text-[11px] text-gray-500 line-clamp-2 italic">
-                                             {step.result.slice(0, 150)}{step.result.length > 150 ? '...' : ''}
-                                           </div>
-                                         )}
-                                       </div>
-                                     </div>
+                                   <div key={sIdx} className="text-[15px] text-slate-500">
+                                      {description}
                                    </div>
                                  );
                                })}
+                               {!msg.endTime && (
+                                 <div className="text-[15px] text-slate-500">thinking...</div>
+                               )}
                             </div>
                           )}
                         </div>

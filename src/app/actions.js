@@ -25,13 +25,13 @@ export async function summarizeEmailAction(emailContent, userContext = "") {
     const mistral = getMistralClient();
     emailContent = clamp(emailContent, MAX_CONTENT_CHARS);
     userContext = clamp(userContext, MAX_CONTEXT_CHARS);
-    const systemPrompt = `You are an AI assistant specialized in SUMMARIZING emails. Your goal is to extract the most important information, action items, and key takeaways. Present the output as 3-5 concise bullet points. Be completely objective and output ONLY the summary.${userContext ? ` User Context: ${userContext}` : ""}`;
+    const systemPrompt = `You are an AI assistant specialized in SUMMARIZING emails. Your goal is to extract the most important information, action items, and key takeaways. Accurately capture the specific ask or purpose of the email, not just the topic. Handle threads with multiple people correctly by tracking who said what and providing context of the entire thread. Do NOT hallucinate any details (ensure dates, names, and numbers are strictly accurate). Present the output as 3-5 concise bullet points. Be completely objective and output ONLY the summary.${userContext ? ` User Context: ${userContext}` : ""}`;
     
     const messages = [];
     if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
     messages.push({
       role: "user",
-      content: `Summarize the following email thread in 3-5 concise bullet points. Output ONLY the summary.\n\n${emailContent}`,
+      content: `Summarize the following email thread in 3-5 concise bullet points. Make sure to capture the specific ask, clarify who said what, and do not hallucinate any details (wrong dates, names, numbers). Output ONLY the summary.\n\n${emailContent}`,
     });
 
     const response = await mistral.chat.complete({
@@ -51,13 +51,13 @@ export async function draftReplyAction(emailContent, userPrompt, userContext = "
     emailContent = clamp(emailContent, MAX_CONTENT_CHARS);
     userPrompt = clamp(userPrompt, MAX_PROMPT_CHARS);
     userContext = clamp(userContext, MAX_CONTEXT_CHARS);
-    const systemPrompt = `You are an AI assistant specialized in DRAFTING EMAIL REPLIES.${userContext ? ` User Context: ${userContext}` : ""} Your goal is to write a professional, natural-sounding response based on the user's instructions. Match the tone of the user context if provided. IMPORTANT: Do NOT use any external tools (like a "draft email tool"). Simply output the exact text of the email reply directly in your response, with no conversational filler.`;
+    const systemPrompt = `You are an AI assistant specialized in DRAFTING EMAIL REPLIES.${userContext ? ` User Context: ${userContext}` : ""} Your goal is to write a professional, natural-sounding response based on the user's instructions. Match the user's tone naturally so it doesn't sound like a press release. Get the context right from the ENTIRE email thread, not just the last message. IMPORTANT: Do NOT use any external tools (like a "draft email tool"). Simply output the exact text of the email reply directly in your response, with no conversational filler.`;
     
     const messages = [];
     if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
     messages.push({
       role: "user",
-      content: `Draft a reply to the following email. Use a professional tone. Follow this user prompt: "${userPrompt}".\n\nEmail:\n${emailContent}`,
+      content: `Draft a reply to the following email. Match the tone naturally and get the context from the thread. Follow this user prompt: "${userPrompt}".\n\nEmail:\n${emailContent}`,
     });
 
     const response = await mistral.chat.complete({
