@@ -54,7 +54,7 @@ export default function LandingPage() {
                     <div className="w-12 h-12 rounded-full bg-[#f1f3f5] flex items-center justify-center font-medium text-gray-700 text-lg">C</div>
                     <div>
                       <div className="font-semibold text-gray-800 text-[15px] flex items-center gap-2">
-                        Crossway <span className="text-[14px] font-normal text-gray-400">communications@crossway.org</span>
+                        Crossway <span className="text-[14px] font-normal text-gray-400">john@example.com</span>
                       </div>
                       <div className="text-[13px] text-gray-400 mt-0.5">to me <span className="ml-1 text-[10px]">▼</span></div>
                     </div>
