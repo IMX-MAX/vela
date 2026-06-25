@@ -208,43 +208,65 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="relative z-10 order-1 md:order-2 transform hover:scale-[1.02] transition-transform duration-500">
-            <div className="bg-white rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.08)] border border-black/5 w-full max-w-3xl mx-auto h-[480px] flex overflow-hidden">
+            <div className="bg-[#dddcdc] rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-black/5 w-full max-w-4xl mx-auto h-[480px] flex overflow-hidden">
               {/* Sidebar */}
-              <div className="w-56 bg-[#f7f9fa] border-r border-black/5 flex flex-col py-6">
-                <div className="px-6 mb-8 flex items-center gap-2 text-[#194060]">
+              <div className="w-56 bg-[#dddcdc] flex flex-col py-4 px-3 relative">
+                <div className="px-3 mb-6 flex items-center gap-2 text-[#2b323b]">
                   <img src="/logo-vela.png" alt="Logo" className="w-5 h-5 opacity-80" />
-                  <span className="font-semibold text-lg">vela</span>
+                  <span className="font-semibold text-[15px]">Vela</span>
                 </div>
-                <div className="px-3 flex flex-col gap-1">
-                  <div className="flex items-center justify-between px-3 py-2.5 bg-[#e9ecef] rounded-lg text-[#194060]">
+                <div className="flex flex-col gap-0.5">
+                  <div className="flex items-center justify-between px-3 py-2 bg-[#c7d4ce] rounded-lg text-[#2b323b]">
                     <div className="flex items-center gap-3">
                       <Tray size={18} weight="fill" />
-                      <span className="text-sm font-semibold">Inbox</span>
+                      <span className="text-[13px] font-medium">Inbox</span>
                     </div>
-                    <span className="text-[10px] font-bold bg-white text-gray-600 px-2 py-0.5 rounded-full shadow-sm">24</span>
                   </div>
-                  <div className="flex items-center gap-3 px-3 py-2.5 text-gray-500 hover:bg-black/5 rounded-lg transition-colors cursor-pointer">
-                    <FileText size={18} weight="bold" />
-                    <span className="text-sm font-semibold">Drafts</span>
+                  <div className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-[#c7d4ce]/50 hover:text-[#2b323b] rounded-lg transition-colors cursor-pointer">
+                    <Star size={18} />
+                    <span className="text-[13px] font-medium">Starred</span>
                   </div>
-                  <div className="flex items-center gap-3 px-3 py-2.5 text-gray-500 hover:bg-black/5 rounded-lg transition-colors cursor-pointer">
-                    <PaperPlaneRight size={18} weight="bold" />
-                    <span className="text-sm font-semibold">Sent</span>
+                  <div className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-[#c7d4ce]/50 hover:text-[#2b323b] rounded-lg transition-colors cursor-pointer">
+                    <PaperPlaneRight size={18} />
+                    <span className="text-[13px] font-medium">Sent</span>
                   </div>
+                  <div className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-[#c7d4ce]/50 hover:text-[#2b323b] rounded-lg transition-colors cursor-pointer">
+                    <FileText size={18} />
+                    <span className="text-[13px] font-medium">Drafts</span>
+                  </div>
+                  <div className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-[#c7d4ce]/50 hover:text-[#2b323b] rounded-lg transition-colors cursor-pointer">
+                    <CheckCircle size={18} />
+                    <span className="text-[13px] font-medium">Done</span>
+                  </div>
+                  <div className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-[#c7d4ce]/50 hover:text-[#2b323b] rounded-lg transition-colors cursor-pointer">
+                    <Trash size={18} />
+                    <span className="text-[13px] font-medium">Trash</span>
+                  </div>
+                </div>
+                <div className="absolute bottom-4 left-4 w-8 h-8 rounded-full bg-white flex items-center justify-center text-sm font-bold text-gray-400 shadow-sm border border-[#dddcdc]">
+                  U
                 </div>
               </div>
-              {/* Main List */}
-              <div className="flex-1 flex flex-col bg-white">
-                <div className="px-8 py-6 border-b border-black/5 flex items-center justify-between bg-white sticky top-0">
-                  <h3 className="font-bold text-xl text-gray-800">Inbox</h3>
-                  <div className="flex gap-3">
-                    <div className="w-8 h-8 flex items-center justify-center text-gray-400">
-                      <MagnifyingGlass size={18} weight="bold"/>
+
+              {/* Main Area */}
+              <div className="flex-1 flex flex-col bg-[#eceae6] rounded-2xl m-1 ml-0 overflow-hidden relative shadow-sm border border-[#dddcdc]/50">
+                {/* Top Bar */}
+                <div className="h-14 border-b border-[#dddcdc] flex items-center px-6 sticky top-0 bg-[#eceae6]/90 backdrop-blur-sm z-10">
+                  <div className="flex items-center gap-1">
+                    <div className="px-3 py-1.5 rounded-md text-[14px] font-medium bg-white shadow-sm text-[#2b323b]">
+                      Inbox
+                    </div>
+                    <div className="px-3 py-1.5 rounded-md text-[14px] font-medium text-gray-500">
+                      Other
                     </div>
                   </div>
+                  <div className="ml-2 text-gray-400">
+                    <FadersHorizontal size={16} weight="bold" />
+                  </div>
                 </div>
+
+                {/* Email List */}
                 <div className="flex-1 overflow-hidden flex flex-col">
-                  {/* Email List Items */}
                   {[
                     { sender: 'Alex Morgan', subj: 'Project Q3 Roadmap update', preview: 'Here are the latest details...', time: '10:42 AM', unread: true },
                     { sender: 'Vercel', subj: 'Deployment successful', preview: 'Your production deployment...', time: 'Yesterday', unread: false },
@@ -254,11 +276,17 @@ export default function LandingPage() {
                     { sender: 'Linear', subj: 'New issue assigned to you', preview: 'Issue #104 has been...', time: 'Jan 20', unread: false },
                     { sender: 'Linear', subj: 'New issue assigned to you', preview: 'Issue #104 has been...', time: 'Jan 20', unread: false }
                   ].map((email, i) => (
-                    <div key={i} className={`px-8 py-4 border-b border-black/5 flex items-center gap-6 cursor-pointer relative ${email.unread ? 'bg-[#f4f7f9]' : 'hover:bg-gray-50'}`}>
-                      {email.unread && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#194060]"></div>}
-                      <div className="w-36 truncate text-[13px] font-bold text-[#194060]">{email.sender}</div>
-                      <div className="flex-1 truncate text-[13px] font-semibold text-gray-800">{email.subj} <span className="font-normal text-gray-400 ml-1">— {email.preview}</span></div>
-                      <div className={`text-[11px] font-bold ${email.unread ? 'text-[#194060]' : 'text-gray-400'}`}>{email.time}</div>
+                    <div key={i} className={`px-6 py-3 border-b border-[#2b323b]/5 flex items-center gap-4 cursor-pointer relative ${email.unread ? 'bg-white' : 'hover:bg-[#dddcdc]/50'}`}>
+                      <div className="w-4 flex-shrink-0 flex items-center justify-center">
+                        {email.unread && <div className="h-2 w-2 rounded-full bg-[#2b323b]"></div>}
+                      </div>
+                      <div className={`w-36 truncate text-[13px] ${email.unread ? 'font-semibold text-[#2b323b]' : 'font-medium text-gray-700'}`}>{email.sender}</div>
+                      <div className="flex-1 truncate flex items-center min-w-0">
+                        <div className={`truncate text-[13px] ${email.unread ? 'font-semibold text-[#2b323b]' : 'font-medium text-gray-800'}`}>{email.subj}</div>
+                        <span className="text-gray-500 mx-2 text-[13px]">&mdash;</span>
+                        <div className="text-gray-500 truncate text-[13px] flex-1">{email.preview}</div>
+                      </div>
+                      <div className={`text-[12px] flex-shrink-0 w-20 text-right ${email.unread ? 'font-medium text-[#2b323b]' : 'text-gray-500'}`}>{email.time}</div>
                     </div>
                   ))}
                 </div>
