@@ -30,10 +30,19 @@ export default function SettingsPage() {
         setJobName(user.prefs.jobName || "");
         setCompany(user.prefs.company || "");
         setWritingStyle(user.prefs.writingStyle || "");
-        setPlan(user.prefs.plan || "free");
+      }
+      if (user.db) {
+        setPlan(user.db.subscriptionPlan || "free");
       }
     }
   }, [user]);
+
+  const getConnectedAccounts = () => {
+    if (!user?.db?.connectedAccounts) return [];
+    try {
+      return JSON.parse(user.db.connectedAccounts);
+    } catch(e) { return []; }
+  };
 
   const handleSaveName = async () => {
     if (userName !== user?.name) {
@@ -51,7 +60,7 @@ export default function SettingsPage() {
       useAuthStore.getState().setShowUpgradeModal(true);
       return;
     }
-    const currentAccounts = user?.prefs?.connectedAccounts || [];
+    const currentAccounts = getConnectedAccounts();
     if (reconnectIdx === null && currentAccounts.length >= 2) return;
 
     const width = 500;
@@ -97,7 +106,10 @@ export default function SettingsPage() {
           });
         }
         
-        await account.updatePrefs({ ...user?.prefs, connectedAccounts: newAccounts });
+        await fetch('/api/user/update-accounts', {
+          method: 'POST',
+          body: JSON.stringify({ accounts: newAccounts })
+        });
         await checkAuth();
       } else if (event.data.type === 'OAUTH_ERROR') {
         window.removeEventListener('message', messageListener);
@@ -118,9 +130,9 @@ export default function SettingsPage() {
 
   const confirmSetPlan = async (newPlan) => {
     try {
-      await account.updatePrefs({
-        ...user?.prefs,
-        plan: newPlan
+      await fetch('/api/user/update-plan', {
+        method: 'POST',
+        body: JSON.stringify({ plan: newPlan })
       });
       setPlan(newPlan);
       setShowDowngradeModal(false);
@@ -147,7 +159,7 @@ export default function SettingsPage() {
   };
 
   const handleDeleteAccount = async () => {
-    if (plan === 'pro' || user?.prefs?.subscriptionStatus === 'active') {
+    if (plan === 'pro' || user?.db?.subscriptionStatus === 'active') {
       alert("Please downgrade to the free plan and cancel your active subscription before deleting your account.");
       return;
     }
@@ -361,7 +373,7 @@ export default function SettingsPage() {
                       {/* Primary account cannot be removed */}
                     </td>
                   </tr>
-                  {(user?.prefs?.connectedAccounts || []).map((acc, idx) => (
+                  {getConnectedAccounts().map((acc, idx) => (
                     <tr key={idx} className="border-b border-[#dddcdc]/40 last:border-0 hover:bg-[#2b323b]/[0.02] transition">
                       <td className="py-4 px-6 flex items-center gap-3">
                         <img 
@@ -393,13 +405,19 @@ export default function SettingsPage() {
                           </button>
                         )}
                         <button 
-                          onClick={async () => {
-                            const newAccounts = [...(user?.prefs?.connectedAccounts || [])];
-                            newAccounts.splice(idx, 1);
-                            await account.updatePrefs({ ...user?.prefs, connectedAccounts: newAccounts });
-                            await checkAuth();
-                          }}
                           className="text-red-400 hover:text-red-600 transition text-[13px] font-medium"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            if (confirm("Are you sure you want to remove this account?")) {
+                              const newAccounts = [...getConnectedAccounts()];
+                              newAccounts.splice(idx, 1);
+                              await fetch('/api/user/update-accounts', {
+                                method: 'POST',
+                                body: JSON.stringify({ accounts: newAccounts })
+                              });
+                              await checkAuth();
+                            }
+                          }}
                         >
                           Remove
                         </button>
@@ -413,9 +431,9 @@ export default function SettingsPage() {
             <div className="flex justify-end">
               <button 
                 onClick={() => handleConnectAccount(null)}
-                disabled={(user?.prefs?.connectedAccounts || []).length >= 2 && plan === 'pro'}
+                disabled={getConnectedAccounts().length >= 2 && plan === 'pro'}
                 className={`px-4 py-2 rounded-lg font-medium text-[13px] transition ${
-                  (user?.prefs?.connectedAccounts || []).length >= 2 && plan === 'pro'
+                  getConnectedAccounts().length >= 2 && plan === 'pro'
                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     : 'bg-[#2b323b] text-white hover:bg-[#1a1f24] shadow-sm'
                 }`}

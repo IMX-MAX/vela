@@ -43,9 +43,12 @@ export default function InboxPage() {
         let unsnoozedIds = [];
         for (const item of toUnsnooze) {
           let tokenToUse = Array.isArray(resolvedToken) ? resolvedToken[0] : resolvedToken; 
-          if (item.emailAddress && user.prefs.connectedAccounts) {
-            const acc = user.prefs.connectedAccounts.find(a => a.email === item.emailAddress);
-            if (acc && !acc.isPaused) tokenToUse = acc.token;
+          if (item.emailAddress && user.db?.connectedAccounts) {
+            try {
+              const connectedAccounts = JSON.parse(user.db.connectedAccounts);
+              const acc = connectedAccounts.find(a => a.email === item.emailAddress);
+              if (acc && !acc.isPaused) tokenToUse = acc.token;
+            } catch(e) {}
           }
           
           try {
@@ -161,7 +164,10 @@ export default function InboxPage() {
         const newToken = useAuthStore.getState().session?.providerAccessToken;
         const currentPrimary = Array.isArray(token) ? token[0] : token;
         if (newToken && newToken !== currentPrimary) {
-          const additionalAccounts = useAuthStore.getState().user?.prefs?.connectedAccounts || [];
+          let additionalAccounts = [];
+          try {
+            additionalAccounts = JSON.parse(useAuthStore.getState().user?.db?.connectedAccounts || "[]");
+          } catch(e) {}
           const validSecondaryTokens = additionalAccounts.filter(a => !a.isPaused).map(a => a.token);
           const newAllTokens = [newToken, ...validSecondaryTokens].filter(Boolean);
           setResolvedToken(newAllTokens);
@@ -199,7 +205,10 @@ export default function InboxPage() {
       }
 
       if (token) {
-        let additionalAccounts = useAuthStore.getState().user?.prefs?.connectedAccounts || [];
+        let additionalAccounts = [];
+        try {
+          additionalAccounts = JSON.parse(useAuthStore.getState().user?.db?.connectedAccounts || "[]");
+        } catch(e) {}
         let updatedAccounts = false;
         
         additionalAccounts = await Promise.all(additionalAccounts.map(async (acc) => {
@@ -230,8 +239,10 @@ export default function InboxPage() {
 
         if (updatedAccounts && user) {
           try {
-            const { account } = await import("@/lib/appwrite");
-            await account.updatePrefs({ ...user?.prefs, connectedAccounts: additionalAccounts });
+            await fetch('/api/user/update-accounts', {
+              method: 'POST',
+              body: JSON.stringify({ accounts: additionalAccounts })
+            });
           } catch(e) { console.error("Error saving refreshed tokens", e); }
         }
 

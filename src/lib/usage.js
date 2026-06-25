@@ -39,12 +39,12 @@ function shouldResetUsage(plan, lastResetIso) {
  * Returns { allowed, limit, current, plan, nextReset }
  */
 export function getUsageStatus(user) {
-  const prefs = user?.prefs || {};
-  const plan = prefs.plan === "pro" ? "pro" : "free";
+  const db = user?.db || {};
+  const plan = db.subscriptionPlan === "pro" ? "pro" : "free";
   const limit = plan === "pro" ? 40 : 27;
-  let current = prefs.aiUsageCount || 0;
+  let current = db.aiUsageCount || 0;
   
-  if (shouldResetUsage(plan, prefs.lastUsageReset)) {
+  if (shouldResetUsage(plan, db.lastUsageReset)) {
     current = 0;
   }
 
@@ -57,41 +57,33 @@ export function getUsageStatus(user) {
 }
 
 /**
- * Increments AI usage. Throws an error if limit exceeded.
+ * Increments AI usage securely via API route. Throws an error if limit exceeded.
  */
 export async function incrementAiUsage(user, checkAuth) {
   if (!user) throw new Error("User not authenticated");
   
-  const prefs = user.prefs || {};
-  const plan = prefs.plan === "pro" ? "pro" : "free";
-  let current = prefs.aiUsageCount || 0;
-  let lastReset = prefs.lastUsageReset;
-
-  if (shouldResetUsage(plan, lastReset)) {
-    current = 0;
-    lastReset = new Date().toISOString();
-  }
-
-  const limit = plan === "pro" ? 40 : 27;
-
-  if (current >= limit) {
+  const status = getUsageStatus(user);
+  if (!status.allowed) {
     useAuthStore.getState().setShowUpgradeModal(true);
-    throw new Error(`AI action limit reached for your ${plan} plan.`);
+    throw new Error(`AI action limit reached for your ${status.plan} plan.`);
   }
 
-  current += 1;
-
-  // Update Appwrite prefs
-  await account.updatePrefs({
-    ...prefs,
-    plan,
-    aiUsageCount: current,
-    lastUsageReset: lastReset
+  // Increment securely via API
+  const res = await fetch('/api/user/increment-usage', {
+    method: 'POST'
   });
 
-  if (checkAuth) {
-    await checkAuth(); // Refresh the user store
+  if (!res.ok) {
+    if (res.status === 403) {
+      useAuthStore.getState().setShowUpgradeModal(true);
+      throw new Error("AI action limit reached.");
+    }
+    throw new Error("Failed to increment usage");
   }
 
-  return current;
+  if (checkAuth) {
+    await checkAuth(); // Refresh the user store to get updated db document
+  }
+
+  return status.current + 1;
 }
