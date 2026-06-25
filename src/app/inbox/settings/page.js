@@ -542,7 +542,7 @@ export default function SettingsPage() {
                   <div className="text-4xl font-bold text-white mb-6">${billingCycle === 'annual' ? '6' : '8'} <span className="text-base font-normal text-gray-500">/mo</span></div>
                   <ul className="text-[14px] text-gray-300 space-y-3 mb-8 flex-grow">
                     <li className="font-medium text-white flex items-center gap-2"><svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Everything in Free, plus:</li>
-                    <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> 100 AI runs per day</li>
+                    <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Up to 60x more usage than free</li>
                     <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Advanced contextual replies</li>
                     <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Connect up to 2 additional accounts</li>
                   </ul>
@@ -580,8 +580,8 @@ export default function SettingsPage() {
                   <div className="text-3xl font-semibold text-[#2b323b]">{Math.round((usageStatus.current / usageStatus.limit) * 100)}% <span className="text-lg font-normal text-gray-500">used</span></div>
                   <div className="text-[13px] text-gray-600 mt-1">
                     {usageStatus.plan === 'pro' 
-                      ? 'Your Pro plan gives you 100 AI runs per day.' 
-                      : 'Your free plan offers limited AI runs per month. Upgrade to Pro for 100 AI runs per day.'}
+                      ? 'Your Pro plan gives you up to 60x more usage.' 
+                      : 'Your free plan offers limited AI runs per month. Upgrade to Pro for up to 60x more usage.'}
                   </div>
                 </div>
               </div>
