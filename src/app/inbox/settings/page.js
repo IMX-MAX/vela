@@ -481,27 +481,41 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
               {/* Free Plan */}
               <div 
-                className={`relative bg-white rounded-2xl border p-7 shadow-sm transition-all duration-300 ${plan === 'free' ? 'border-blue-500 ring-4 ring-blue-500/10' : 'border-gray-200 hover:border-gray-300 hover:shadow-md cursor-pointer hover:-translate-y-1'}`} 
+                className={`relative bg-white rounded-2xl border p-7 shadow-sm transition-all duration-300 ${plan === 'free' ? 'border-gray-300 ring-2 ring-gray-200' : 'border-gray-200 hover:border-gray-300 hover:shadow-md cursor-pointer'}`} 
                 onClick={() => handleSetPlan('free')}
               >
-                <div className="font-semibold text-xl text-gray-900 mb-2">Free Plan</div>
-                <div className="text-[14px] text-gray-500 mb-6">Perfect for casual use.</div>
-                <div className="text-4xl font-bold text-gray-900 mb-6">$0 <span className="text-base font-normal text-gray-400">/mo</span></div>
-                <ul className="text-[14px] text-gray-600 space-y-3 mb-8">
-                  <li className="flex items-center gap-2"><svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> 27 AI runs per month</li>
-                  <li className="flex items-center gap-2"><svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Basic email summarization</li>
-                </ul>
-                <div className={`text-center py-2.5 rounded-xl font-medium text-[14px] transition-colors ${plan === 'free' ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
-                  {plan === 'free' ? 'Current Plan' : 'Downgrade to Free'}
+                <div className="font-bold text-2xl text-gray-900 mb-1">Free</div>
+                <div className="text-[13px] text-gray-500 mb-6">Perfect for casual use.</div>
+                
+                <div className="flex items-end gap-2 mb-6">
+                  <div className="text-5xl font-bold text-gray-900">$0</div>
+                  <div className="flex flex-col text-[12px] text-gray-500 leading-tight pb-1">
+                    <span>/ month</span>
+                  </div>
                 </div>
+
+                <div className={`text-center py-2 rounded-lg font-medium text-[14px] border transition-colors mb-8 ${plan === 'free' ? 'bg-gray-50 text-gray-400 border-gray-200 cursor-default' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
+                  {plan === 'free' ? 'Current Plan' : 'Downgrade'}
+                </div>
+                
+                <div className="font-bold text-[13px] text-gray-900 mb-4">Includes</div>
+                <ul className="text-[14px] text-gray-700 space-y-3">
+                  <li className="flex items-start gap-2.5">
+                    <svg className="w-3.5 h-3.5 text-gray-800 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> 
+                    <span>27 AI runs per month</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <svg className="w-3.5 h-3.5 text-gray-800 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> 
+                    <span>Basic email summarization</span>
+                  </li>
+                </ul>
               </div>
               
               {/* Pro Plan */}
               <div 
-                className={`relative bg-white rounded-2xl border p-7 shadow-sm transition-all duration-300 ${plan === 'pro' ? 'border-blue-500 ring-4 ring-blue-500/10' : 'border-gray-200 hover:border-gray-300 hover:shadow-md cursor-pointer hover:-translate-y-1'}`} 
+                className={`relative bg-white rounded-2xl border p-7 shadow-sm transition-all duration-300 ${plan === 'pro' ? 'border-gray-300 ring-2 ring-gray-200' : 'border-gray-200 hover:border-gray-300 hover:shadow-md cursor-pointer'}`} 
                 onClick={async () => {
                   if (plan === 'pro') return;
-                  
                   try {
                     const { account } = await import('@/lib/appwrite');
                     const jwtResponse = await account.createJWT();
@@ -514,35 +528,51 @@ export default function SettingsPage() {
                       body: JSON.stringify({ billingCycle })
                     });
                     const data = await res.json();
-                    
-                    if (data.url) {
-                      window.location.href = data.url;
-                    } else if (data.error) {
-                      alert('Checkout Error: ' + data.error);
-                    }
+                    if (data.url) window.location.href = data.url;
+                    else if (data.error) alert('Checkout Error: ' + data.error);
                   } catch (error) {
                     console.error('Failed to create checkout session', error);
                   }
                 }}
               >
-                <div className="relative z-20 h-full flex flex-col">
-                  {plan === 'pro' && (
-                    <div className="absolute top-0 right-0 bg-blue-500 text-white text-[11px] font-bold px-3 py-1 rounded-bl-lg rounded-tr-[12px] uppercase tracking-wider">
-                      Current Plan
-                    </div>
-                  )}
-                  <div className="font-semibold text-xl text-gray-900 mb-2">Vela Pro</div>
-                  <div className="text-[14px] text-gray-500 mb-6">For power users.</div>
-                  <div className="text-4xl font-bold text-gray-900 mb-6">${billingCycle === 'annual' ? '6' : '8'} <span className="text-base font-normal text-gray-400">/mo</span></div>
-                  <ul className="text-[14px] text-gray-600 space-y-3 mb-8 flex-grow">
-                    <li className="font-medium text-gray-900 flex items-center gap-2"><svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Everything in Free, plus:</li>
-                    <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Up to 60x more usage than free</li>
-                    <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Advanced contextual replies</li>
-                    <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Connect up to 2 additional accounts</li>
-                  </ul>
-                  <div className={`text-center py-2.5 rounded-xl font-medium text-[14px] transition-all ${plan === 'pro' ? 'bg-blue-50 text-blue-700' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'}`}>
-                    {plan === 'pro' ? 'Active' : 'Upgrade to Pro'}
+                {/* Purple Sash */}
+                <div className="absolute top-0 right-0 overflow-hidden w-32 h-32 rounded-tr-2xl pointer-events-none z-10">
+                  <div className="absolute top-7 -right-7 bg-[#9b66c9] text-white text-[10px] font-semibold py-1.5 w-40 text-center rotate-45 flex items-center justify-center gap-1 shadow-sm tracking-wide">
+                    ✨ AI included
                   </div>
+                </div>
+
+                <div className="relative z-20">
+                  <div className="font-bold text-2xl text-gray-900 mb-1">Vela Pro</div>
+                  <div className="text-[13px] text-gray-500 mb-6">For power users.</div>
+                  
+                  <div className="flex items-end gap-2 mb-6">
+                    <div className="text-5xl font-bold text-gray-900">${billingCycle === 'annual' ? '6' : '8'}</div>
+                    <div className="flex flex-col text-[12px] text-gray-500 leading-tight pb-1">
+                      <span>/ month</span>
+                      <span>{billingCycle === 'annual' ? 'billed annually' : 'billed monthly'}</span>
+                    </div>
+                  </div>
+                  
+                  <div className={`text-center py-2 rounded-lg font-medium text-[14px] border transition-colors mb-8 ${plan === 'pro' ? 'bg-gray-50 text-gray-400 border-gray-200 cursor-default' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
+                    {plan === 'pro' ? 'Current Plan' : 'Switch now'}
+                  </div>
+                  
+                  <div className="font-bold text-[13px] text-gray-900 mb-4">Everything in Free, plus</div>
+                  <ul className="text-[14px] text-gray-700 space-y-3">
+                    <li className="flex items-start gap-2.5">
+                      <svg className="w-3.5 h-3.5 text-gray-800 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> 
+                      <span>Up to 60x more usage than free</span>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <svg className="w-3.5 h-3.5 text-gray-800 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> 
+                      <span>Advanced contextual replies</span>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <svg className="w-3.5 h-3.5 text-gray-800 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> 
+                      <span>Connect up to 2 additional accounts</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
