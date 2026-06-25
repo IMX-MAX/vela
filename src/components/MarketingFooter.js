@@ -10,7 +10,6 @@ export default function MarketingFooter() {
         
         {/* Left: Logo */}
         <div className="flex items-center gap-3 text-[#1e2a3b] opacity-60">
-          <PaperPlaneTilt size={56} weight="bold" />
           <span className="font-medium text-4xl tracking-tight">vela</span>
         </div>
         

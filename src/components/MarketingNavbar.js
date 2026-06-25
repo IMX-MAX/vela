@@ -19,7 +19,7 @@ export default function MarketingNavbar() {
         
         {/* Left: Logo */}
         <Link href="/" className="flex items-center gap-2 text-[#1e2a3b] opacity-80 hover:opacity-100 transition-opacity">
-          <PaperPlaneTilt size={24} weight="bold" />
+          <img src="/logo-vela.png" alt="Vela Logo" className="h-6 w-auto" />
           <span className="font-semibold text-xl tracking-tight mt-0.5">vela</span>
         </Link>
         
