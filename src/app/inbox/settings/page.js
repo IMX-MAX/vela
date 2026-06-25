@@ -126,25 +126,29 @@ export default function SettingsPage() {
     window.addEventListener('message', messageListener);
   };
 
-  const handleSetPlan = async (newPlan) => {
-    if (plan === 'pro' && newPlan === 'free') {
-      setShowDowngradeModal(true);
-      return;
+  const openStripePortal = async () => {
+    try {
+      const { account } = await import('@/lib/appwrite');
+      const jwtResponse = await account.createJWT();
+      const res = await fetch('/api/stripe/portal', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${jwtResponse.jwt}` }
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert('Portal Error: ' + data.error);
+      }
+    } catch(e) {
+      console.error('Failed to open portal', e);
     }
-    await confirmSetPlan(newPlan);
   };
 
-  const confirmSetPlan = async (newPlan) => {
-    try {
-      await fetch('/api/user/update-plan', {
-        method: 'POST',
-        body: JSON.stringify({ plan: newPlan })
-      });
-      setPlan(newPlan);
-      setShowDowngradeModal(false);
-      await checkAuth();
-    } catch (error) {
-      console.error("Failed to update plan", error);
+  const handleSetPlan = async (newPlan) => {
+    if (plan === 'pro' && newPlan === 'free') {
+      await openStripePortal();
+      return;
     }
   };
 
@@ -165,10 +169,6 @@ export default function SettingsPage() {
   };
 
   const handleDeleteAccount = async () => {
-    if (plan === 'pro' || user?.db?.subscriptionStatus === 'active') {
-      alert("Please downgrade to the free plan and cancel your active subscription before deleting your account.");
-      return;
-    }
     
     if (confirm("Are you sure you want to delete your account? This action cannot be undone. All your connected accounts and local data will be permanently removed.")) {
       try {
@@ -544,54 +544,11 @@ export default function SettingsPage() {
                   <p className="text-[13px] text-gray-500">Manage your payment methods and billing history via Stripe.</p>
                 </div>
                 <button 
-                  onClick={async () => {
-                    try {
-                      const { account } = await import('@/lib/appwrite');
-                      const jwtResponse = await account.createJWT();
-                      const res = await fetch('/api/stripe/portal', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${jwtResponse.jwt}` }
-                      });
-                      const data = await res.json();
-                      if (data.url) {
-                        window.location.href = data.url;
-                      } else {
-                        alert('Portal Error: ' + data.error);
-                      }
-                    } catch(e) {
-                      console.error('Failed to open portal', e);
-                    }
-                  }}
+                  onClick={openStripePortal}
                   className="px-5 py-2.5 bg-white border border-[#dddcdc]/60 shadow-sm rounded-lg text-[13px] font-medium text-[#2b323b] hover:bg-gray-50 transition"
                 >
                   Manage billing
                 </button>
-              </div>
-            )}
-
-            {/* Downgrade Modal */}
-            {showDowngradeModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-                <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-                  <h3 className="text-lg font-semibold text-[#2b323b] mb-2">Downgrade to Free?</h3>
-                  <p className="text-[14px] text-gray-600 mb-6">
-                    Are you sure you want to downgrade to the Free plan? You will lose access to Pro features like multiple connected accounts, split inboxes, and the AI composer.
-                  </p>
-                  <div className="flex items-center justify-end gap-3">
-                    <button 
-                      onClick={() => setShowDowngradeModal(false)}
-                      className="px-4 py-2 rounded-lg font-medium text-[13px] text-gray-700 hover:bg-gray-100 transition"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      onClick={() => confirmSetPlan('free')}
-                      className="px-4 py-2 rounded-lg font-medium text-[13px] bg-red-500 text-white hover:bg-red-600 transition shadow-sm"
-                    >
-                      Downgrade
-                    </button>
-                  </div>
-                </div>
               </div>
             )}
           </div>

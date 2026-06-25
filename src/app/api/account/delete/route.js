@@ -35,14 +35,18 @@ export async function POST(req) {
     const userId = currentUser.$id;
     const email = currentUser.email;
 
-    // Check if the user has an active subscription in the DB
+    // Automatically cancel any active Stripe subscriptions
     try {
       const userDoc = await databases.getDocument('default', 'users', userId);
-      if (userDoc.subscriptionPlan === 'pro' || userDoc.subscriptionStatus === 'active') {
-         return NextResponse.json({ error: 'Please cancel your active subscription before deleting your account.' }, { status: 400 });
+      if (userDoc.stripeCustomerId && process.env.STRIPE_SECRET_KEY) {
+        const stripe = new (await import('stripe')).default(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
+        const subscriptions = await stripe.subscriptions.list({ customer: userDoc.stripeCustomerId, status: 'active' });
+        for (const sub of subscriptions.data) {
+          await stripe.subscriptions.cancel(sub.id);
+        }
       }
     } catch (err) {
-      // User document might not exist, which is fine to proceed with deletion
+      console.error("Failed to cancel Stripe subscription during deletion:", err);
     }
 
     // Log the retained usage
