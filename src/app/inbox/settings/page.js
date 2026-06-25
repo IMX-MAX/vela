@@ -498,7 +498,7 @@ export default function SettingsPage() {
               
               {/* Pro Plan */}
               <div 
-                className={`relative group rounded-2xl p-7 transition-all duration-300 ${plan === 'pro' ? 'ring-4 ring-blue-500/20' : 'cursor-pointer hover:-translate-y-1 hover:shadow-xl'}`} 
+                className={`relative bg-white rounded-2xl border p-7 shadow-sm transition-all duration-300 ${plan === 'pro' ? 'border-blue-500 ring-4 ring-blue-500/10' : 'border-gray-200 hover:border-gray-300 hover:shadow-md cursor-pointer hover:-translate-y-1'}`} 
                 onClick={async () => {
                   if (plan === 'pro') return;
                   
@@ -525,28 +525,22 @@ export default function SettingsPage() {
                   }
                 }}
               >
-                {/* Gradient Border/Glow effect */}
-                <div className={`absolute -inset-[1px] bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 rounded-2xl z-0 ${plan === 'pro' ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'} transition-opacity duration-300`}></div>
-                
-                {/* Card Content */}
-                <div className="absolute inset-[2px] bg-[#0b0f19] rounded-[14px] z-10"></div>
-                
                 <div className="relative z-20 h-full flex flex-col">
                   {plan === 'pro' && (
-                    <div className="absolute top-0 right-0 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-[11px] font-bold px-3 py-1 rounded-bl-lg rounded-tr-[12px] uppercase tracking-wider">
+                    <div className="absolute top-0 right-0 bg-blue-500 text-white text-[11px] font-bold px-3 py-1 rounded-bl-lg rounded-tr-[12px] uppercase tracking-wider">
                       Current Plan
                     </div>
                   )}
-                  <div className="font-semibold text-xl text-white mb-2">Vela Pro</div>
-                  <div className="text-[14px] text-gray-400 mb-6">For power users.</div>
-                  <div className="text-4xl font-bold text-white mb-6">${billingCycle === 'annual' ? '6' : '8'} <span className="text-base font-normal text-gray-500">/mo</span></div>
-                  <ul className="text-[14px] text-gray-300 space-y-3 mb-8 flex-grow">
-                    <li className="font-medium text-white flex items-center gap-2"><svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Everything in Free, plus:</li>
-                    <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Up to 60x more usage than free</li>
-                    <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Advanced contextual replies</li>
-                    <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Connect up to 2 additional accounts</li>
+                  <div className="font-semibold text-xl text-gray-900 mb-2">Vela Pro</div>
+                  <div className="text-[14px] text-gray-500 mb-6">For power users.</div>
+                  <div className="text-4xl font-bold text-gray-900 mb-6">${billingCycle === 'annual' ? '6' : '8'} <span className="text-base font-normal text-gray-400">/mo</span></div>
+                  <ul className="text-[14px] text-gray-600 space-y-3 mb-8 flex-grow">
+                    <li className="font-medium text-gray-900 flex items-center gap-2"><svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Everything in Free, plus:</li>
+                    <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Up to 60x more usage than free</li>
+                    <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Advanced contextual replies</li>
+                    <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Connect up to 2 additional accounts</li>
                   </ul>
-                  <div className={`text-center py-2.5 rounded-xl font-medium text-[14px] transition-all ${plan === 'pro' ? 'bg-white/10 text-white' : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 group-hover:shadow-blue-500/40'}`}>
+                  <div className={`text-center py-2.5 rounded-xl font-medium text-[14px] transition-all ${plan === 'pro' ? 'bg-blue-50 text-blue-700' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'}`}>
                     {plan === 'pro' ? 'Active' : 'Upgrade to Pro'}
                   </div>
                 </div>
