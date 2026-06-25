@@ -67,7 +67,7 @@ export async function POST(req) {
     let userDoc = await databases.getDocument('default', 'users', userId);
 
     const plan = userDoc.subscriptionPlan === 'pro' ? 'pro' : 'free';
-    const limit = plan === 'pro' ? 40 : 27;
+    const limit = plan === 'pro' ? 100 : 27;
     let current = userDoc.aiUsageCount || 0;
     let lastReset = userDoc.lastUsageReset;
 

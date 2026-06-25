@@ -478,24 +478,27 @@ export default function SettingsPage() {
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-6 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
               {/* Free Plan */}
-              <div className={`bg-[#eceae6] rounded-xl border p-6 shadow-sm cursor-pointer transition ${plan === 'free' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-[#dddcdc]/60 hover:border-gray-400'}`} onClick={() => handleSetPlan('free')}>
-                <div className="font-semibold text-lg text-gray-800 mb-2">Free Plan</div>
-                <div className="text-sm text-gray-600 mb-4">Perfect for casual use.</div>
-                <div className="text-2xl font-bold text-[#2b323b] mb-4">$0 <span className="text-sm font-normal text-gray-500">/mo</span></div>
-                <ul className="text-[13px] text-gray-700 space-y-2 mb-6">
-                  <li>&bull; Limited monthly AI runs</li>
-                  <li>&bull; Basic email summarization</li>
+              <div 
+                className={`relative bg-white rounded-2xl border p-7 shadow-sm transition-all duration-300 ${plan === 'free' ? 'border-blue-500 ring-4 ring-blue-500/10' : 'border-gray-200 hover:border-gray-300 hover:shadow-md cursor-pointer hover:-translate-y-1'}`} 
+                onClick={() => handleSetPlan('free')}
+              >
+                <div className="font-semibold text-xl text-gray-900 mb-2">Free Plan</div>
+                <div className="text-[14px] text-gray-500 mb-6">Perfect for casual use.</div>
+                <div className="text-4xl font-bold text-gray-900 mb-6">$0 <span className="text-base font-normal text-gray-400">/mo</span></div>
+                <ul className="text-[14px] text-gray-600 space-y-3 mb-8">
+                  <li className="flex items-center gap-2"><svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> 27 AI runs per month</li>
+                  <li className="flex items-center gap-2"><svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Basic email summarization</li>
                 </ul>
-                <div className={`text-center py-2 rounded-lg font-medium text-[13px] ${plan === 'free' ? 'bg-blue-100 text-blue-700' : 'bg-white text-gray-800 border border-gray-300'}`}>
-                  {plan === 'free' ? 'Current Plan' : 'Select Free'}
+                <div className={`text-center py-2.5 rounded-xl font-medium text-[14px] transition-colors ${plan === 'free' ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
+                  {plan === 'free' ? 'Current Plan' : 'Downgrade to Free'}
                 </div>
               </div>
               
               {/* Pro Plan */}
               <div 
-                className={`bg-[#eceae6] rounded-xl border p-6 shadow-sm transition ${plan === 'pro' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-[#dddcdc]/60 hover:border-gray-400 cursor-pointer'}`} 
+                className={`relative group rounded-2xl p-7 transition-all duration-300 ${plan === 'pro' ? 'ring-4 ring-blue-500/20' : 'cursor-pointer hover:-translate-y-1 hover:shadow-xl'}`} 
                 onClick={async () => {
                   if (plan === 'pro') return;
                   
@@ -522,17 +525,30 @@ export default function SettingsPage() {
                   }
                 }}
               >
-                <div className="font-semibold text-lg text-gray-800 mb-2">Pro Plan</div>
-                <div className="text-sm text-gray-600 mb-4">For power users.</div>
-                <div className="text-2xl font-bold text-[#2b323b] mb-4">${billingCycle === 'annual' ? '6' : '8'} <span className="text-sm font-normal text-gray-500">/mo</span></div>
-                <ul className="text-[13px] text-gray-700 space-y-2 mb-6">
-                  <li className="font-medium">&bull; Everything in Free, plus:</li>
-                  <li>&bull; Up to 30x more usage than free</li>
-                  <li>&bull; Advanced contextual replies</li>
-                  <li>&bull; Connect up to 2 additional accounts</li>
-                </ul>
-                <div className={`text-center py-2 rounded-lg font-medium text-[13px] ${plan === 'pro' ? 'bg-blue-100 text-blue-700' : 'bg-[#2b323b] text-white hover:bg-[#1a1f24]'}`}>
-                  {plan === 'pro' ? 'Current Plan' : 'Select Pro'}
+                {/* Gradient Border/Glow effect */}
+                <div className={`absolute -inset-[1px] bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 rounded-2xl z-0 ${plan === 'pro' ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'} transition-opacity duration-300`}></div>
+                
+                {/* Card Content */}
+                <div className="absolute inset-[2px] bg-[#0b0f19] rounded-[14px] z-10"></div>
+                
+                <div className="relative z-20 h-full flex flex-col">
+                  {plan === 'pro' && (
+                    <div className="absolute top-0 right-0 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-[11px] font-bold px-3 py-1 rounded-bl-lg rounded-tr-[12px] uppercase tracking-wider">
+                      Current Plan
+                    </div>
+                  )}
+                  <div className="font-semibold text-xl text-white mb-2">Vela Pro</div>
+                  <div className="text-[14px] text-gray-400 mb-6">For power users.</div>
+                  <div className="text-4xl font-bold text-white mb-6">${billingCycle === 'annual' ? '6' : '8'} <span className="text-base font-normal text-gray-500">/mo</span></div>
+                  <ul className="text-[14px] text-gray-300 space-y-3 mb-8 flex-grow">
+                    <li className="font-medium text-white flex items-center gap-2"><svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Everything in Free, plus:</li>
+                    <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> 100 AI runs per day</li>
+                    <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Advanced contextual replies</li>
+                    <li className="flex items-center gap-2"><svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Connect up to 2 additional accounts</li>
+                  </ul>
+                  <div className={`text-center py-2.5 rounded-xl font-medium text-[14px] transition-all ${plan === 'pro' ? 'bg-white/10 text-white' : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 group-hover:shadow-blue-500/40'}`}>
+                    {plan === 'pro' ? 'Active' : 'Upgrade to Pro'}
+                  </div>
                 </div>
               </div>
             </div>
@@ -564,8 +580,8 @@ export default function SettingsPage() {
                   <div className="text-3xl font-semibold text-[#2b323b]">{Math.round((usageStatus.current / usageStatus.limit) * 100)}% <span className="text-lg font-normal text-gray-500">used</span></div>
                   <div className="text-[13px] text-gray-600 mt-1">
                     {usageStatus.plan === 'pro' 
-                      ? 'Your Pro plan offers up to 30x more usage than free.' 
-                      : 'Your free plan offers limited AI runs per month. Upgrade to Pro for up to 30x more usage.'}
+                      ? 'Your Pro plan gives you 100 AI runs per day.' 
+                      : 'Your free plan offers limited AI runs per month. Upgrade to Pro for 100 AI runs per day.'}
                   </div>
                 </div>
               </div>

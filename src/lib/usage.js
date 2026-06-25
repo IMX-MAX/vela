@@ -41,7 +41,7 @@ function shouldResetUsage(plan, lastResetIso) {
 export function getUsageStatus(user) {
   const db = user?.db || {};
   const plan = db.subscriptionPlan === "pro" ? "pro" : "free";
-  const limit = plan === "pro" ? 40 : 27;
+  const limit = plan === "pro" ? 100 : 27;
   let current = db.aiUsageCount || 0;
   
   if (shouldResetUsage(plan, db.lastUsageReset)) {
