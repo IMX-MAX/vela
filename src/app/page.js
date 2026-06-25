@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { 
   PaperPlaneRight, Sparkle, ArrowBendUpLeft, PencilSimple, 
-  Tray, ArrowRight, ArrowsOut, Briefcase, FileText, MagnifyingGlass
+  Tray, ArrowRight, ArrowsOut, Briefcase, FileText, MagnifyingGlass,
+  Paperclip, Image
 } from "@phosphor-icons/react";
 import MarketingNavbar from "@/components/MarketingNavbar";
 import MarketingFooter from "@/components/MarketingFooter";
@@ -23,8 +24,9 @@ export default function LandingPage() {
       <main className="w-full">
         {/* Hero Section */}
         <section className="pt-40 pb-32 px-12 md:px-24 max-w-[1400px] mx-auto w-full relative z-10 animate-fade-in-up">
-          <h1 className="text-5xl md:text-[6.5rem] font-medium tracking-tight text-[#1e2a3b] leading-[1.05] mb-10">
-            the <span className="text-[#194060]">future of email — is</span><br />
+          <h1 className="text-5xl md:text-[6.5rem] font-medium tracking-tight leading-[1.05] mb-10">
+            <span className="text-[#194060]">the </span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#194060] to-[#7f99b0]">future of email — is</span><br />
             <span className="text-[#194060]">here</span>
           </h1>
           <p className="text-lg md:text-xl text-[#1e2a3b]/80 max-w-2xl leading-relaxed font-medium mb-12">
@@ -44,31 +46,44 @@ export default function LandingPage() {
 
         {/* Feature 1: Reply/Summarize */}
         <section className="py-24 px-12 md:px-24 max-w-[1400px] mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          <div className="relative z-10">
-            <div className="bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-black/5 p-6 w-full max-w-md mx-auto overflow-hidden transform hover:scale-[1.02] transition-transform duration-500">
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex gap-3 items-center">
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-medium text-gray-500">C</div>
-                  <span className="font-semibold text-gray-800 text-sm">Crossway</span>
+          <div className="relative z-10 p-4 transform hover:scale-[1.02] transition-transform duration-500">
+            <div className="bg-white rounded-[4px] shadow-sm w-full max-w-2xl mx-auto overflow-hidden">
+              <div className="p-8">
+                <div className="flex justify-between items-center mb-10">
+                  <div className="flex gap-4 items-center">
+                    <div className="w-12 h-12 rounded-full bg-[#f1f3f5] flex items-center justify-center font-bold text-gray-400 text-lg">C</div>
+                    <div>
+                      <div className="font-bold text-[#1e2a3b] text-base flex items-center gap-2">Crossway <span className="text-xs font-normal text-gray-400 uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded-sm">hello@crossway.org</span></div>
+                      <div className="text-xs text-gray-400 mt-1">To: me <span className="ml-1 text-[8px]">▼</span></div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-medium text-gray-400 uppercase tracking-widest">Jan 22, 2026, 9:17 PM</span>
                 </div>
-                <span className="text-xs text-gray-400 mt-1">Jan 22, 2026, 9:17 PM</span>
-              </div>
-              <div className="flex gap-3 mb-6">
-                <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-md text-xs font-medium text-[#7f99b0] transition-colors">
-                  <Sparkle size={14} weight="fill" /> Summarize
-                </button>
-                <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-md text-xs font-medium text-[#1e2a3b]/60 transition-colors">
-                  <ArrowBendUpLeft size={14} weight="bold" /> Reply with AI
-                </button>
-              </div>
-              <div className="w-full h-32 bg-orange-50/50 rounded-lg flex flex-col items-center justify-center border border-orange-100/50">
-                <div className="grid grid-cols-2 gap-1 mb-2 opacity-20">
-                  <div className="w-3 h-3 bg-gray-800 rounded-sm"></div>
-                  <div className="w-3 h-3 bg-gray-800 rounded-sm"></div>
-                  <div className="w-3 h-3 bg-gray-800 rounded-sm"></div>
-                  <div className="w-3 h-3 bg-gray-800 rounded-sm"></div>
+                
+                <div className="flex gap-4 mb-16">
+                  <button className="flex items-center gap-2 px-5 py-2.5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-gray-100 rounded-lg text-sm font-semibold text-gray-600 transition-colors">
+                    <Sparkle size={16} weight="fill" className="text-gray-400" /> Summarize
+                  </button>
+                  <button className="flex items-center gap-2 px-5 py-2.5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-gray-100 rounded-lg text-sm font-semibold text-gray-600 transition-colors">
+                    <ArrowBendUpLeft size={16} weight="bold" className="text-gray-400" /> Reply with AI
+                  </button>
                 </div>
-                <span className="text-[10px] font-bold tracking-widest text-orange-800/40 uppercase">Crossway</span>
+
+                <div className="flex flex-col items-center justify-center mb-8">
+                  <div className="grid grid-cols-2 gap-1.5 mb-3 opacity-40">
+                    <div className="w-3.5 h-3.5 bg-gray-600 rounded-sm"></div>
+                    <div className="w-3.5 h-3.5 bg-gray-600 rounded-sm"></div>
+                    <div className="w-3.5 h-3.5 bg-gray-600 rounded-sm"></div>
+                    <div className="w-3.5 h-3.5 bg-gray-600 rounded-sm"></div>
+                  </div>
+                  <span className="text-sm font-bold tracking-[0.2em] text-[#305a7d] uppercase">Crossway</span>
+                </div>
+              </div>
+              <div className="w-full h-32 bg-[#a36b5e] flex items-end justify-center px-20">
+                <div className="w-48 h-20 bg-[#d9a58c] rounded-t-[40px] opacity-80 relative flex justify-center">
+                  <div className="absolute bottom-0 w-12 h-16 bg-[#b27d6d] rounded-t-full"></div>
+                  <div className="absolute bottom-0 w-16 h-12 bg-[#b27d6d] rounded-t-full translate-x-12"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -92,21 +107,25 @@ export default function LandingPage() {
               <p>Vela's agents parse your inbox and make sure nothing slips through the cracks.</p>
             </div>
           </div>
-          <div className="relative z-10 order-1 md:order-2 p-8 bg-black/[0.03] rounded-[2rem] transform hover:scale-[1.02] transition-transform duration-500">
-            <div className="bg-white/95 backdrop-blur-xl rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-black/5 w-full max-w-md mx-auto overflow-hidden">
-              <div className="flex items-center px-4 py-3 border-b border-black/5">
-                <input type="text" placeholder="Search emails..." className="flex-1 bg-transparent outline-none text-gray-800 placeholder-gray-400 text-sm font-medium" disabled />
-                <div className="text-[10px] bg-gray-100 text-gray-500 px-2 py-1 rounded font-semibold border border-gray-200">Tab for AI</div>
-              </div>
-              <div className="px-4 py-3">
-                <div className="text-[10px] font-bold text-gray-400 tracking-wider mb-2">SUGGESTIONS</div>
-                <div className="flex items-center gap-3 px-3 py-2 bg-gray-100/80 rounded-lg mb-1 cursor-pointer">
-                  <PencilSimple size={16} className="text-gray-500" />
-                  <span className="text-sm font-medium text-gray-700">Compose message</span>
+          <div className="relative z-10 order-1 md:order-2 flex justify-center items-center transform hover:scale-[1.02] transition-transform duration-500">
+            {/* Dark gray pill background container */}
+            <div className="w-full max-w-2xl aspect-[2/1] bg-black/15 rounded-[40px] shadow-inner flex items-center justify-center p-8 relative overflow-hidden backdrop-blur-sm border border-white/10">
+              {/* White command palette floating */}
+              <div className="bg-[#fcfcfc] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] w-full max-w-md mx-auto overflow-hidden">
+                <div className="flex items-center px-5 py-4 border-b border-black/5">
+                  <input type="text" placeholder="Search emails..." className="flex-1 bg-transparent outline-none text-gray-800 placeholder-gray-400 text-base font-medium" disabled />
+                  <div className="text-[11px] bg-gray-100 text-gray-500 px-3 py-1.5 rounded-md font-semibold">Tab for AI</div>
                 </div>
-                <div className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
-                  <Tray size={16} className="text-gray-400" />
-                  <span className="text-sm font-medium text-gray-500">Go to inbox</span>
+                <div className="px-5 py-4">
+                  <div className="text-[10px] font-bold text-gray-400 tracking-widest mb-3">SUGGESTIONS</div>
+                  <div className="flex items-center gap-4 px-4 py-3 bg-[#f1f3f5] rounded-xl mb-1.5 cursor-pointer">
+                    <PencilSimple size={18} weight="bold" className="text-gray-400" />
+                    <span className="text-sm font-semibold text-gray-700">Compose message</span>
+                  </div>
+                  <div className="flex items-center gap-4 px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl transition-colors">
+                    <Tray size={18} weight="bold" className="text-gray-400" />
+                    <span className="text-sm font-semibold text-gray-500">Go to inbox</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -115,49 +134,57 @@ export default function LandingPage() {
 
         {/* Feature 3: Composer */}
         <section className="py-24 px-12 md:px-24 max-w-[1400px] mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          <div className="relative z-10 p-4 transform hover:scale-[1.02] transition-transform duration-500">
-            <div className="bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-black/5 w-full max-w-md mx-auto flex flex-col overflow-hidden relative">
-              <div className="px-5 py-4 border-b border-black/5 flex items-center justify-between bg-[#fcfcfd]">
+          <div className="relative z-10 p-8 transform hover:scale-[1.02] transition-transform duration-500 md:pl-16">
+            <div className="bg-white rounded-lg shadow-[0_10px_30px_rgba(0,0,0,0.06)] border border-black/5 w-full max-w-2xl mx-auto flex flex-col overflow-hidden relative">
+              <div className="px-6 py-4 border-b border-black/5 flex items-center justify-between bg-white">
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Reply to...</div>
-                <div className="flex gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-gray-200"></div>
-                  <div className="w-2.5 h-2.5 rounded-full bg-gray-200"></div>
-                  <div className="w-2.5 h-2.5 rounded-full bg-gray-200"></div>
+                <div className="flex gap-2">
+                  <div className="text-[10px] font-medium text-gray-400">Saved</div>
                 </div>
               </div>
-              <div className="px-5 py-6 flex-1 min-h-[160px]">
+              <div className="px-6 py-8 flex-1 min-h-[200px]">
                 <p className="text-[15px] font-medium text-gray-700">Thanks for sharing this, I'll review it and work on it.</p>
               </div>
-              
-              {/* AI Context Menu Overlay */}
-              <div className="absolute top-24 left-8 bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-gray-100 p-1.5 w-56">
-                <div className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
-                  <div className="flex items-center gap-3">
-                    <Sparkle size={14} weight="fill" className="text-[#305a7d]" />
-                    <span className="text-sm font-semibold text-gray-700">Fix grammar</span>
-                  </div>
-                  <ArrowRight size={14} className="text-gray-300" />
-                </div>
-                <div className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
-                  <div className="flex items-center gap-3">
-                    <ArrowsOut size={14} weight="bold" className="text-gray-400" />
-                    <span className="text-sm font-medium text-gray-600">Expand on this</span>
-                  </div>
-                  <ArrowRight size={14} className="text-gray-300" />
-                </div>
-                <div className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
-                  <div className="flex items-center gap-3">
-                    <Briefcase size={14} weight="bold" className="text-gray-400" />
-                    <span className="text-sm font-medium text-gray-600">Make professional</span>
-                  </div>
-                  <ArrowRight size={14} className="text-gray-300" />
-                </div>
-              </div>
 
-              <div className="px-4 py-3 bg-[#fcfcfd] flex justify-end border-t border-black/5">
-                <button className="bg-[#305a7d] text-white px-5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 shadow-md">
+              <div className="px-6 py-4 flex justify-between items-center border-t border-black/5 bg-white">
+                <div className="flex gap-3">
+                  <button className="text-gray-400 hover:text-gray-600 transition-colors"><Paperclip size={18} /></button>
+                  <button className="text-gray-400 hover:text-gray-600 transition-colors"><Image size={18} /></button>
+                </div>
+                <button className="bg-[#495b6a] text-white px-6 py-2 rounded-md text-sm font-semibold flex items-center gap-2 shadow-sm hover:bg-[#394a59] transition-colors">
                   Send <PaperPlaneRight size={14} weight="fill" />
                 </button>
+              </div>
+            </div>
+            
+            {/* AI Context Menu Overlay - Floating off left edge */}
+            <div className="absolute top-28 left-0 md:-left-8 bg-white rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-gray-100 p-2 w-60 z-20">
+              <div className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
+                <div className="flex items-center gap-3">
+                  <Sparkle size={16} weight="fill" className="text-[#194060]" />
+                  <span className="text-sm font-semibold text-gray-800">Fix grammar</span>
+                </div>
+                <ArrowRight size={14} className="text-gray-300" />
+              </div>
+              <div className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
+                <div className="flex items-center gap-3">
+                  <ArrowsOut size={16} weight="bold" className="text-gray-400" />
+                  <span className="text-sm font-medium text-gray-600">Expand on this</span>
+                </div>
+                <ArrowRight size={14} className="text-gray-300" />
+              </div>
+              <div className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
+                <div className="flex items-center gap-3">
+                  <Briefcase size={16} weight="bold" className="text-gray-400" />
+                  <span className="text-sm font-medium text-gray-600">Make professional</span>
+                </div>
+                <ArrowRight size={14} className="text-gray-300" />
+              </div>
+              <div className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors border-t border-black/5 mt-1 pt-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-gray-600">Ask AI...</span>
+                </div>
+                <span className="text-[10px] text-gray-400 font-bold border border-gray-200 px-1.5 py-0.5 rounded shadow-sm">Ctrl K</span>
               </div>
             </div>
           </div>
@@ -181,65 +208,59 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="relative z-10 order-1 md:order-2 transform hover:scale-[1.02] transition-transform duration-500">
-            <div className="bg-[#fcfcfd] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-black/5 w-full h-[400px] flex overflow-hidden">
+            <div className="bg-white rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.08)] border border-black/5 w-full max-w-3xl mx-auto h-[480px] flex overflow-hidden">
               {/* Sidebar */}
-              <div className="w-48 bg-[#f2f4f5]/50 border-r border-black/5 p-4 flex flex-col gap-1.5">
-                <div className="flex items-center justify-between px-3 py-2 bg-[#e8ecef] rounded-lg text-[#305a7d]">
-                  <div className="flex items-center gap-2.5">
-                    <Tray size={16} weight="fill" />
-                    <span className="text-sm font-semibold">Inbox</span>
+              <div className="w-56 bg-[#f7f9fa] border-r border-black/5 flex flex-col py-6">
+                <div className="px-6 mb-8 flex items-center gap-2 text-[#194060]">
+                  <img src="/logo-vela.png" alt="Logo" className="w-5 h-5 opacity-80" />
+                  <span className="font-semibold text-lg">vela</span>
+                </div>
+                <div className="px-3 flex flex-col gap-1">
+                  <div className="flex items-center justify-between px-3 py-2.5 bg-[#e9ecef] rounded-lg text-[#194060]">
+                    <div className="flex items-center gap-3">
+                      <Tray size={18} weight="fill" />
+                      <span className="text-sm font-semibold">Inbox</span>
+                    </div>
+                    <span className="text-[10px] font-bold bg-white text-gray-600 px-2 py-0.5 rounded-full shadow-sm">24</span>
                   </div>
-                  <span className="text-xs font-bold bg-white px-2 py-0.5 rounded-full shadow-sm">24</span>
-                </div>
-                <div className="flex items-center gap-2.5 px-3 py-2 hover:bg-black/5 rounded-lg text-gray-500 transition-colors cursor-pointer">
-                  <FileText size={16} />
-                  <span className="text-sm font-medium">Drafts</span>
-                </div>
-                <div className="flex items-center gap-2.5 px-3 py-2 hover:bg-black/5 rounded-lg text-gray-500 transition-colors cursor-pointer">
-                  <PaperPlaneRight size={16} />
-                  <span className="text-sm font-medium">Sent</span>
+                  <div className="flex items-center gap-3 px-3 py-2.5 text-gray-500 hover:bg-black/5 rounded-lg transition-colors cursor-pointer">
+                    <FileText size={18} weight="bold" />
+                    <span className="text-sm font-semibold">Drafts</span>
+                  </div>
+                  <div className="flex items-center gap-3 px-3 py-2.5 text-gray-500 hover:bg-black/5 rounded-lg transition-colors cursor-pointer">
+                    <PaperPlaneRight size={18} weight="bold" />
+                    <span className="text-sm font-semibold">Sent</span>
+                  </div>
                 </div>
               </div>
               {/* Main List */}
               <div className="flex-1 flex flex-col bg-white">
-                <div className="px-6 py-4 border-b border-black/5 flex items-center justify-between bg-white/50 backdrop-blur-md sticky top-0">
-                  <h3 className="font-bold text-lg text-gray-800">Inbox</h3>
-                  <div className="flex gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400">
-                      <MagnifyingGlass size={14} weight="bold"/>
+                <div className="px-8 py-6 border-b border-black/5 flex items-center justify-between bg-white sticky top-0">
+                  <h3 className="font-bold text-xl text-gray-800">Inbox</h3>
+                  <div className="flex gap-3">
+                    <div className="w-8 h-8 flex items-center justify-center text-gray-400">
+                      <MagnifyingGlass size={18} weight="bold"/>
                     </div>
                   </div>
                 </div>
                 <div className="flex-1 overflow-hidden flex flex-col">
-                  {/* Email Item 1 */}
-                  <div className="px-6 py-3.5 border-b border-black/5 bg-[#f8fbff] flex items-center gap-4 cursor-pointer relative">
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#305a7d]"></div>
-                    <div className="w-2 h-2 rounded-full bg-[#305a7d] shadow-sm shadow-blue-200"></div>
-                    <div className="w-32 truncate text-[13px] font-bold text-[#194060]">Alex Morgan</div>
-                    <div className="flex-1 truncate text-[13px] font-semibold text-gray-800">Project Q3 Roadmap update <span className="font-normal text-gray-400 ml-1">— Here are the latest details...</span></div>
-                    <div className="text-[11px] text-[#305a7d] font-bold">10:42 AM</div>
-                  </div>
-                  {/* Email Item 2 */}
-                  <div className="px-6 py-3.5 border-b border-black/5 hover:bg-gray-50 flex items-center gap-4 cursor-pointer">
-                    <div className="w-2 h-2 rounded-full bg-transparent"></div>
-                    <div className="w-32 truncate text-[13px] font-semibold text-gray-600">Vercel</div>
-                    <div className="flex-1 truncate text-[13px] font-medium text-gray-700">Deployment successful <span className="font-normal text-gray-400 ml-1">— Your production deployment...</span></div>
-                    <div className="text-[11px] text-gray-400 font-semibold">Yesterday</div>
-                  </div>
-                  {/* Email Item 3 */}
-                  <div className="px-6 py-3.5 border-b border-black/5 hover:bg-gray-50 flex items-center gap-4 cursor-pointer">
-                    <div className="w-2 h-2 rounded-full bg-transparent"></div>
-                    <div className="w-32 truncate text-[13px] font-semibold text-gray-600">Figma</div>
-                    <div className="flex-1 truncate text-[13px] font-medium text-gray-700">Sarah commented on Landing Page <span className="font-normal text-gray-400 ml-1">— Can we move the button...</span></div>
-                    <div className="text-[11px] text-gray-400 font-semibold">Yesterday</div>
-                  </div>
-                  {/* Email Item 4 */}
-                  <div className="px-6 py-3.5 border-b border-black/5 hover:bg-gray-50 flex items-center gap-4 cursor-pointer">
-                    <div className="w-2 h-2 rounded-full bg-transparent"></div>
-                    <div className="w-32 truncate text-[13px] font-semibold text-gray-600">GitHub</div>
-                    <div className="flex-1 truncate text-[13px] font-medium text-gray-700">[IMX-MAX/vela] Pull request merged <span className="font-normal text-gray-400 ml-1">— Merged PR #42 by...</span></div>
-                    <div className="text-[11px] text-gray-400 font-semibold">Jan 22</div>
-                  </div>
+                  {/* Email List Items */}
+                  {[
+                    { sender: 'Alex Morgan', subj: 'Project Q3 Roadmap update', preview: 'Here are the latest details...', time: '10:42 AM', unread: true },
+                    { sender: 'Vercel', subj: 'Deployment successful', preview: 'Your production deployment...', time: 'Yesterday', unread: false },
+                    { sender: 'Figma', subj: 'Sarah commented on Landing Page', preview: 'Can we move the button...', time: 'Yesterday', unread: false },
+                    { sender: 'GitHub', subj: '[IMX-MAX/vela] Pull request merged', preview: 'Merged PR #42 by...', time: 'Jan 22', unread: false },
+                    { sender: 'Linear', subj: 'New issue assigned to you', preview: 'Issue #104 has been...', time: 'Jan 20', unread: false },
+                    { sender: 'Linear', subj: 'New issue assigned to you', preview: 'Issue #104 has been...', time: 'Jan 20', unread: false },
+                    { sender: 'Linear', subj: 'New issue assigned to you', preview: 'Issue #104 has been...', time: 'Jan 20', unread: false }
+                  ].map((email, i) => (
+                    <div key={i} className={`px-8 py-4 border-b border-black/5 flex items-center gap-6 cursor-pointer relative ${email.unread ? 'bg-[#f4f7f9]' : 'hover:bg-gray-50'}`}>
+                      {email.unread && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#194060]"></div>}
+                      <div className="w-36 truncate text-[13px] font-bold text-[#194060]">{email.sender}</div>
+                      <div className="flex-1 truncate text-[13px] font-semibold text-gray-800">{email.subj} <span className="font-normal text-gray-400 ml-1">— {email.preview}</span></div>
+                      <div className={`text-[11px] font-bold ${email.unread ? 'text-[#194060]' : 'text-gray-400'}`}>{email.time}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
