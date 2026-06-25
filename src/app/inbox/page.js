@@ -279,7 +279,7 @@ export default function InboxPage() {
     if (session) {
       initInbox();
     }
-  }, [session, user, filter, searchQuery, setInboxEmails]);
+  }, [session?.providerAccessToken, user?.$id, filter, searchQuery, setInboxEmails]);
 
   const handleLoadMore = useCallback(async () => {
     if (loadingMore || !nextPageToken || !resolvedToken) return;

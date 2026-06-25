@@ -261,7 +261,7 @@ export default function EmailDetailPage() {
     if (session) {
       load();
     }
-  }, [id, session, user]);
+  }, [id, session?.providerAccessToken, user?.$id]);
 
   useEffect(() => {
     // Resize iframe after it loads
