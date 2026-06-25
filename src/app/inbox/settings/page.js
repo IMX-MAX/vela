@@ -481,7 +481,29 @@ export default function SettingsPage() {
               </div>
               
               {/* Pro Plan */}
-              <div className={`bg-[#eceae6] rounded-xl border p-6 shadow-sm transition cursor-pointer ${plan === 'pro' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-[#dddcdc]/60 hover:border-gray-400'}`} onClick={() => handleSetPlan('pro')}>
+              <div 
+                className={`bg-[#eceae6] rounded-xl border p-6 shadow-sm transition ${plan === 'pro' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-[#dddcdc]/60 hover:border-gray-400 cursor-pointer'}`} 
+                onClick={async () => {
+                  if (plan === 'pro') return;
+                  
+                  try {
+                    const res = await fetch('/api/stripe/checkout', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ billingCycle })
+                    });
+                    const data = await res.json();
+                    
+                    if (data.url) {
+                      window.location.href = data.url;
+                    } else if (data.error) {
+                      alert('Checkout Error: ' + data.error);
+                    }
+                  } catch (error) {
+                    console.error('Failed to create checkout session', error);
+                  }
+                }}
+              >
                 <div className="font-semibold text-lg text-gray-800 mb-2">Pro Plan</div>
                 <div className="text-sm text-gray-600 mb-4">For power users.</div>
                 <div className="text-2xl font-bold text-[#2b323b] mb-4">${billingCycle === 'annual' ? '6' : '8'} <span className="text-sm font-normal text-gray-500">/mo</span></div>
@@ -491,7 +513,7 @@ export default function SettingsPage() {
                   <li>&bull; Advanced contextual replies</li>
                   <li>&bull; Connect up to 2 additional accounts</li>
                 </ul>
-                <div className={`text-center py-2 rounded-lg font-medium text-[13px] ${plan === 'pro' ? 'bg-blue-100 text-blue-700' : 'bg-white text-gray-800 border border-gray-300'}`}>
+                <div className={`text-center py-2 rounded-lg font-medium text-[13px] ${plan === 'pro' ? 'bg-blue-100 text-blue-700' : 'bg-[#2b323b] text-white hover:bg-[#1a1f24]'}`}>
                   {plan === 'pro' ? 'Current Plan' : 'Select Pro'}
                 </div>
               </div>
