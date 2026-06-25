@@ -537,6 +537,38 @@ export default function SettingsPage() {
               </div>
             </div>
 
+            {plan === 'pro' && (
+              <div className="mt-8 pt-8 border-t border-[#dddcdc]/60 flex items-center justify-between">
+                <div>
+                  <h3 className="text-[14px] font-medium text-[#2b323b] mb-1">Billing & Invoices</h3>
+                  <p className="text-[13px] text-gray-500">Manage your payment methods and billing history via Stripe.</p>
+                </div>
+                <button 
+                  onClick={async () => {
+                    try {
+                      const { account } = await import('@/lib/appwrite');
+                      const jwtResponse = await account.createJWT();
+                      const res = await fetch('/api/stripe/portal', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${jwtResponse.jwt}` }
+                      });
+                      const data = await res.json();
+                      if (data.url) {
+                        window.location.href = data.url;
+                      } else {
+                        alert('Portal Error: ' + data.error);
+                      }
+                    } catch(e) {
+                      console.error('Failed to open portal', e);
+                    }
+                  }}
+                  className="px-5 py-2.5 bg-white border border-[#dddcdc]/60 shadow-sm rounded-lg text-[13px] font-medium text-[#2b323b] hover:bg-gray-50 transition"
+                >
+                  Manage billing
+                </button>
+              </div>
+            )}
+
             {/* Downgrade Modal */}
             {showDowngradeModal && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
