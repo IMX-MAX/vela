@@ -187,18 +187,23 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Feature 4: Modern Age */}
-        <section className="py-24 px-12 md:px-24 max-w-[1400px] mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          <div className="flex flex-col gap-8 max-w-lg order-2 md:order-1">
-            <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[#194060]">The email client designed<br />for the modern age</h2>
-            <div className="space-y-6 text-[#1e2a3b]/80 font-medium leading-relaxed">
-              <p>Forget about bulky, bloated, and outdated email services.</p>
-              <p>Vela has been hand crafted to be lightweight. We don't serve you ads, nor do we sell your data. Vela runs with perceived interactions of &lt;100ms</p>
-              <p>Our ai models are hosted with strict data privacy laws in Europe.</p>
-            </div>
+        {/* Feature 4: Modern Age (Linear Style) */}
+        <section className="py-32 px-6 md:px-12 max-w-[1200px] mx-auto w-full flex flex-col items-center text-center">
+          <div className="max-w-3xl mb-16">
+            <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-[#194060] mb-6">
+              The email client designed<br />for the modern age
+            </h2>
+            <p className="text-lg md:text-xl text-[#1e2a3b]/70 font-medium leading-relaxed max-w-2xl mx-auto">
+              Forget about bulky, bloated, and outdated email services. Vela has been hand crafted to be lightweight. We don't serve you ads, nor do we sell your data. Vela runs with perceived interactions of &lt;100ms. Our ai models are hosted with strict data privacy laws in Europe.
+            </p>
           </div>
-          <div className="relative z-10 order-1 md:order-2 transform hover:scale-[1.02] transition-transform duration-500">
-            <div className="bg-[#dddcdc] rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-black/5 w-full max-w-4xl mx-auto h-[480px] flex overflow-hidden">
+          
+          <div className="relative w-full transform hover:scale-[1.01] transition-transform duration-700">
+            {/* Subtle glow behind the demo */}
+            <div className="absolute -inset-1 bg-gradient-to-b from-[#7f99b0]/30 to-transparent blur-2xl opacity-60 rounded-[2rem]"></div>
+            
+            {/* The Demo UI Container */}
+            <div className="bg-[#dddcdc] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.1)] border border-white/40 w-full h-[600px] flex overflow-hidden relative z-10 backdrop-blur-sm">
               {/* Sidebar */}
               <div className="w-56 bg-[#dddcdc] flex flex-col py-4 px-3 relative">
                 <div className="px-3 mb-6 flex items-center gap-2 text-[#2b323b]">
@@ -239,7 +244,7 @@ export default function LandingPage() {
               </div>
 
               {/* Main Area */}
-              <div className="flex-1 flex flex-col bg-[#eceae6] rounded-2xl m-1 ml-0 overflow-hidden relative shadow-sm border border-[#dddcdc]/50">
+              <div className="flex-1 flex flex-col bg-[#eceae6] rounded-[14px] m-1.5 ml-0 overflow-hidden relative shadow-sm border border-white/50">
                 {/* Top Bar */}
                 <div className="h-14 border-b border-[#dddcdc] flex items-center px-6 sticky top-0 bg-[#eceae6]/90 backdrop-blur-sm z-10">
                   <div className="flex items-center gap-1">
@@ -258,25 +263,26 @@ export default function LandingPage() {
                 {/* Email List */}
                 <div className="flex-1 overflow-hidden flex flex-col">
                   {[
-                    { sender: 'Alex Morgan', subj: 'Project Q3 Roadmap update', preview: 'Here are the latest details...', time: '10:42 AM', unread: true },
-                    { sender: 'Vercel', subj: 'Deployment successful', preview: 'Your production deployment...', time: 'Yesterday', unread: false },
-                    { sender: 'Figma', subj: 'Sarah commented on Landing Page', preview: 'Can we move the button...', time: 'Yesterday', unread: false },
-                    { sender: 'GitHub', subj: '[IMX-MAX/vela] Pull request merged', preview: 'Merged PR #42 by...', time: 'Jan 22', unread: false },
-                    { sender: 'Linear', subj: 'New issue assigned to you', preview: 'Issue #104 has been...', time: 'Jan 20', unread: false },
-                    { sender: 'Linear', subj: 'New issue assigned to you', preview: 'Issue #104 has been...', time: 'Jan 20', unread: false },
-                    { sender: 'Linear', subj: 'New issue assigned to you', preview: 'Issue #104 has been...', time: 'Jan 20', unread: false }
+                    { sender: 'Alex Morgan', subj: 'Project Q3 Roadmap update', preview: 'Here are the latest details on our upcoming launch...', time: '10:42 AM', unread: true },
+                    { sender: 'Vercel', subj: 'Deployment successful', preview: 'Your production deployment has been successfully completed...', time: 'Yesterday', unread: false },
+                    { sender: 'Figma', subj: 'Sarah commented on Landing Page', preview: 'Can we move the button a bit to the right...', time: 'Yesterday', unread: false },
+                    { sender: 'GitHub', subj: '[IMX-MAX/vela] Pull request merged', preview: 'Merged PR #42 by john-doe into main...', time: 'Jan 22', unread: false },
+                    { sender: 'Linear', subj: 'New issue assigned to you', preview: 'Issue #104 has been assigned to you by the team...', time: 'Jan 20', unread: false },
+                    { sender: 'Stripe', subj: 'Payment successful', preview: 'We received your payment of $49.00 for the Vela Pro plan...', time: 'Jan 19', unread: false },
+                    { sender: 'Google Workspace', subj: 'Security alert', preview: 'A new sign-in from an unrecognized device was detected...', time: 'Jan 18', unread: false },
+                    { sender: 'Notion', subj: 'Weekly Digest', preview: 'Here is what your team worked on this week...', time: 'Jan 15', unread: false }
                   ].map((email, i) => (
-                    <div key={i} className={`px-6 py-3 border-b border-[#2b323b]/5 flex items-center gap-4 cursor-pointer relative ${email.unread ? 'bg-white' : 'hover:bg-[#dddcdc]/50'}`}>
+                    <div key={i} className={`px-6 py-4 border-b border-[#2b323b]/5 flex items-center gap-4 cursor-pointer relative ${email.unread ? 'bg-white' : 'hover:bg-[#dddcdc]/50'}`}>
                       <div className="w-4 flex-shrink-0 flex items-center justify-center">
                         {email.unread && <div className="h-2 w-2 rounded-full bg-[#2b323b]"></div>}
                       </div>
-                      <div className={`w-36 truncate text-[13px] ${email.unread ? 'font-semibold text-[#2b323b]' : 'font-medium text-gray-700'}`}>{email.sender}</div>
+                      <div className={`w-40 truncate text-[14px] ${email.unread ? 'font-semibold text-[#2b323b]' : 'font-medium text-gray-700'}`}>{email.sender}</div>
                       <div className="flex-1 truncate flex items-center min-w-0">
-                        <div className={`truncate text-[13px] ${email.unread ? 'font-semibold text-[#2b323b]' : 'font-medium text-gray-800'}`}>{email.subj}</div>
-                        <span className="text-gray-500 mx-2 text-[13px]">&mdash;</span>
-                        <div className="text-gray-500 truncate text-[13px] flex-1">{email.preview}</div>
+                        <div className={`truncate text-[14px] ${email.unread ? 'font-semibold text-[#2b323b]' : 'font-medium text-gray-800'}`}>{email.subj}</div>
+                        <span className="text-gray-400 mx-2 text-[14px]">&mdash;</span>
+                        <div className="text-gray-500 truncate text-[14px] flex-1">{email.preview}</div>
                       </div>
-                      <div className={`text-[12px] flex-shrink-0 w-20 text-right ${email.unread ? 'font-medium text-[#2b323b]' : 'text-gray-500'}`}>{email.time}</div>
+                      <div className={`text-[13px] flex-shrink-0 w-20 text-right ${email.unread ? 'font-medium text-[#2b323b]' : 'text-gray-500'}`}>{email.time}</div>
                     </div>
                   ))}
                 </div>
@@ -285,16 +291,27 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-40 px-6 text-center w-full">
-          <h2 className="text-5xl md:text-7xl font-medium text-[#0f2136] tracking-tight mb-6">there's no need to wait.</h2>
-          <p className="text-xl md:text-2xl text-[#1e2a3b] max-w-2xl mx-auto font-medium leading-snug mb-12">
+        {/* CTA Section (Linear Style) */}
+        <section className="py-40 px-6 text-center w-full relative">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-px bg-gradient-to-r from-transparent via-[#7f99b0]/30 to-transparent"></div>
+          
+          <div className="mb-8 flex justify-center">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-white/60 to-white/10 shadow-lg flex items-center justify-center border border-white/50 backdrop-blur-md">
+              <img src="/logo-vela.png" alt="Vela Logo" className="w-8 h-8 opacity-80" />
+            </div>
+          </div>
+          
+          <h2 className="text-5xl md:text-7xl font-semibold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-[#0f2136] to-[#194060] mb-8 pb-2">
+            there's no need to wait.
+          </h2>
+          <p className="text-xl md:text-2xl text-[#1e2a3b]/70 max-w-2xl mx-auto font-medium leading-relaxed mb-12">
             try vela for free today — unlock the<br />
             email experience you've always been<br />
             promised.
           </p>
-          <Link href="/login" className="bg-[#194060] hover:bg-[#0f2136] text-white px-10 py-4 rounded-full font-medium text-lg transition-colors shadow-xl shadow-black/10 inline-block">
-            Get started
+          <Link href="/login" className="group relative inline-flex items-center justify-center gap-2 bg-[#194060] hover:bg-[#0f2136] text-white px-8 py-3.5 rounded-full font-medium text-[15px] transition-all duration-300 shadow-[0_0_40px_-10px_rgba(25,64,96,0.5)] hover:shadow-[0_0_60px_-15px_rgba(25,64,96,0.7)]">
+            <span>Get started</span>
+            <ArrowRight size={16} weight="bold" className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </section>
       </main>
