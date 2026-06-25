@@ -106,8 +106,14 @@ export default function SettingsPage() {
           });
         }
         
+        const { account } = await import('@/lib/appwrite');
+        const jwtResponse = await account.createJWT();
         await fetch('/api/user/update-accounts', {
           method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwtResponse.jwt}`
+          },
           body: JSON.stringify({ accounts: newAccounts })
         });
         await checkAuth();
@@ -166,7 +172,14 @@ export default function SettingsPage() {
     
     if (confirm("Are you sure you want to delete your account? This action cannot be undone. All your connected accounts and local data will be permanently removed.")) {
       try {
-        const res = await fetch('/api/account/delete', { method: 'POST' });
+        const { account } = await import('@/lib/appwrite');
+        const jwtResponse = await account.createJWT();
+        const res = await fetch('/api/account/delete', { 
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${jwtResponse.jwt}`
+          }
+        });
         if (!res.ok) throw new Error("Failed to delete");
         
         import('idb-keyval').then(({ clear }) => {
@@ -487,9 +500,14 @@ export default function SettingsPage() {
                   if (plan === 'pro') return;
                   
                   try {
+                    const { account } = await import('@/lib/appwrite');
+                    const jwtResponse = await account.createJWT();
                     const res = await fetch('/api/stripe/checkout', {
                       method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
+                      headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtResponse.jwt}`
+                      },
                       body: JSON.stringify({ billingCycle })
                     });
                     const data = await res.json();

@@ -87,7 +87,12 @@ export const useAuthStore = create((set) => ({
       const cachedProfile = await get('googleProfile');
 
       try {
-        const syncRes = await fetch('/api/user/sync');
+        const jwtResponse = await account.createJWT();
+        const syncRes = await fetch('/api/user/sync', {
+          headers: {
+            'Authorization': `Bearer ${jwtResponse.jwt}`
+          }
+        });
         if (syncRes.ok) {
           const { db } = await syncRes.json();
           user.db = db;

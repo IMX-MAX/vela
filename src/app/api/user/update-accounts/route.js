@@ -10,10 +10,11 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Invalid accounts format' }, { status: 400 });
     }
 
-    const sessionCookie = (await cookies()).get('a_session_' + process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID);
-    if (!sessionCookie) {
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const jwt = authHeader.split(' ')[1];
 
     const adminClient = new Client()
       .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || 'https://cloud.appwrite.io/v1')
@@ -25,7 +26,7 @@ export async function POST(req) {
     const userClient = new Client()
       .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || 'https://cloud.appwrite.io/v1')
       .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID)
-      .setSession(sessionCookie.value);
+      .setJWT(jwt);
     
     const userAccount = new (await import('node-appwrite')).Account(userClient);
     let currentUser;

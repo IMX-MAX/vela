@@ -239,8 +239,14 @@ export default function InboxPage() {
 
         if (updatedAccounts && user) {
           try {
+            const { account } = await import('@/lib/appwrite');
+            const jwtResponse = await account.createJWT();
             await fetch('/api/user/update-accounts', {
               method: 'POST',
+              headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${jwtResponse.jwt}`
+              },
               body: JSON.stringify({ accounts: additionalAccounts })
             });
           } catch(e) { console.error("Error saving refreshed tokens", e); }
