@@ -47,43 +47,33 @@ export default function LandingPage() {
         {/* Feature 1: Reply/Summarize */}
         <section className="py-24 px-12 md:px-24 max-w-[1400px] mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <div className="relative z-10 p-4 transform hover:scale-[1.02] transition-transform duration-500">
-            <div className="bg-white rounded-[4px] shadow-sm w-full max-w-2xl mx-auto overflow-hidden">
-              <div className="p-8">
-                <div className="flex justify-between items-center mb-10">
+            <div className="bg-white rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.08)] border border-black/5 w-full max-w-2xl mx-auto overflow-hidden">
+              <div className="px-6 md:px-8 py-6 border-b border-gray-100">
+                <div className="flex justify-between items-start">
                   <div className="flex gap-4 items-center">
-                    <div className="w-12 h-12 rounded-full bg-[#f1f3f5] flex items-center justify-center font-bold text-gray-400 text-lg">C</div>
+                    <div className="w-12 h-12 rounded-full bg-[#f1f3f5] flex items-center justify-center font-medium text-gray-700 text-lg">C</div>
                     <div>
-                      <div className="font-bold text-[#1e2a3b] text-base flex items-center gap-2">Crossway <span className="text-xs font-normal text-gray-400 uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded-sm">hello@crossway.org</span></div>
-                      <div className="text-xs text-gray-400 mt-1">To: me <span className="ml-1 text-[8px]">▼</span></div>
+                      <div className="font-semibold text-gray-800 text-[15px] flex items-center gap-2">
+                        Crossway <span className="text-[14px] font-normal text-gray-400">communications@crossway.org</span>
+                      </div>
+                      <div className="text-[13px] text-gray-400 mt-0.5">to me <span className="ml-1 text-[10px]">▼</span></div>
                     </div>
                   </div>
-                  <span className="text-xs font-medium text-gray-400 uppercase tracking-widest">Jan 22, 2026, 9:17 PM</span>
+                  <span className="text-[13px] text-gray-400 font-medium pt-1">Jun 22, 2026, 9:17 PM</span>
                 </div>
-                
-                <div className="flex gap-4 mb-16">
-                  <button className="flex items-center gap-2 px-5 py-2.5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-gray-100 rounded-lg text-sm font-semibold text-gray-600 transition-colors">
-                    <Sparkle size={16} weight="fill" className="text-gray-400" /> Summarize
+              </div>
+              
+              <div className="p-6 md:p-8">
+                <div className="flex gap-3 mb-8">
+                  <button className="flex items-center gap-2 px-5 py-2 bg-white border border-gray-200 hover:bg-gray-50 rounded-full text-[13px] font-semibold text-[#2b323b] transition-colors shadow-sm">
+                    <Sparkle size={16} weight="fill" className="text-[#2b323b]" /> Summarize
                   </button>
-                  <button className="flex items-center gap-2 px-5 py-2.5 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-gray-100 rounded-lg text-sm font-semibold text-gray-600 transition-colors">
-                    <ArrowBendUpLeft size={16} weight="bold" className="text-gray-400" /> Reply with AI
+                  <button className="flex items-center gap-2 px-5 py-2 bg-white border border-gray-200 hover:bg-gray-50 rounded-full text-[13px] font-semibold text-[#2b323b] transition-colors shadow-sm">
+                    <Sparkle size={16} weight="fill" className="text-[#2b323b]" /> Reply with AI
                   </button>
                 </div>
 
-                <div className="flex flex-col items-center justify-center mb-8">
-                  <div className="grid grid-cols-2 gap-1.5 mb-3 opacity-40">
-                    <div className="w-3.5 h-3.5 bg-gray-600 rounded-sm"></div>
-                    <div className="w-3.5 h-3.5 bg-gray-600 rounded-sm"></div>
-                    <div className="w-3.5 h-3.5 bg-gray-600 rounded-sm"></div>
-                    <div className="w-3.5 h-3.5 bg-gray-600 rounded-sm"></div>
-                  </div>
-                  <span className="text-sm font-bold tracking-[0.2em] text-[#305a7d] uppercase">Crossway</span>
-                </div>
-              </div>
-              <div className="w-full h-32 bg-[#a36b5e] flex items-end justify-center px-20">
-                <div className="w-48 h-20 bg-[#d9a58c] rounded-t-[40px] opacity-80 relative flex justify-center">
-                  <div className="absolute bottom-0 w-12 h-16 bg-[#b27d6d] rounded-t-full"></div>
-                  <div className="absolute bottom-0 w-16 h-12 bg-[#b27d6d] rounded-t-full translate-x-12"></div>
-                </div>
+                <div className="bg-[#f8f9fa] rounded-lg w-full h-64 border border-gray-100"></div>
               </div>
             </div>
           </div>
