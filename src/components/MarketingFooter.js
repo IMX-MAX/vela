@@ -19,6 +19,8 @@ export default function MarketingFooter() {
             <Link href="/login" className="hover:text-[#1e2a3b] transition-colors">log in</Link>
             <Link href="/pricing" className="hover:text-[#1e2a3b] transition-colors">pricing</Link>
             <Link href="/resources/vs-the-world" className="hover:text-[#1e2a3b] transition-colors">vela vs the world</Link>
+            <Link href="/privacy-policy" className="hover:text-[#1e2a3b] transition-colors">privacy policy</Link>
+            <Link href="/terms-of-service" className="hover:text-[#1e2a3b] transition-colors">terms of service</Link>
           </div>
           <div className="text-[13px] text-[#1e2a3b]/50 font-medium">
             © vela email 2026 - based in Canada
