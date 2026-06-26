@@ -94,13 +94,13 @@ export default function InboxLayout({ children }) {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/login");
+      router.push("/");
     }
   }, [user, loading, router]);
 
   const handleSignOut = async () => {
     await logout();
-    router.push("/login");
+    router.push("/");
   };
 
   const closeMobileMenu = useCallback(() => {

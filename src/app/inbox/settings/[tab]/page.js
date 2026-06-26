@@ -184,7 +184,7 @@ export default function SettingsPage() {
         import('idb-keyval').then(({ clear }) => {
           clear().then(() => {
             useAuthStore.getState().logout().then(() => {
-              router.push("/login");
+              router.push('/');
             });
           });
         });
@@ -208,7 +208,7 @@ export default function SettingsPage() {
       import('idb-keyval').then(({ clear }) => {
         clear().then(() => {
           useAuthStore.getState().logout().then(() => {
-            router.push("/login");
+            router.push('/');
           });
         });
       });

@@ -290,7 +290,7 @@ export default function InboxPage() {
         if (error) {
           if (!parsed || parsed.length === 0) {
             useAuthStore.getState().logout().then(() => {
-              router.push('/login');
+              router.push('/');
             });
             return;
           }
@@ -573,7 +573,7 @@ export default function InboxPage() {
               <div className="flex flex-col items-center justify-center py-20 text-gray-500">
                 <p className="text-red-500 font-medium max-w-md text-center">{authError}</p>
                 <button 
-                  onClick={async () => { await useAuthStore.getState().logout(); window.location.href = "/login"; }} 
+                  onClick={async () => { await useAuthStore.getState().logout(); window.location.href = "/"; }} 
                   className="mt-6 px-5 py-2.5 bg-[#2b323b] text-white hover:bg-[#2b323b] transition rounded-lg text-sm font-medium"
                 >
                   Sign out and re-login

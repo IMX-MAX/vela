@@ -14,8 +14,12 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
-  const { user } = useAuthStore();
+  const { user, checkAuth } = useAuthStore();
   const router = useRouter();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   useEffect(() => {
     if (user) {

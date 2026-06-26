@@ -59,6 +59,7 @@ export default function EmailDetailPage() {
   };
   
   const [email, setEmail] = useState(null);
+  const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(true);
   const [previewSubject, setPreviewSubject] = useState(() => {
     const cached = useAuthStore.getState().inboxEmails?.find((e) => e.id === id);
@@ -159,6 +160,7 @@ export default function EmailDetailPage() {
     setEmail(null);
     setThreadMessages([]);
     setAuthError(null);
+    setNotFound(false);
     setLoading(true);
     setFullThreadLoaded(false);
 
@@ -224,6 +226,14 @@ export default function EmailDetailPage() {
               setResolvedToken(token);
               rawMsg = await fetchEmailDetails(token, id);
             }
+          }
+          if (rawMsg.error) {
+             if (rawMsg.error.code === 404 || rawMsg.error.status === 'NOT_FOUND') {
+               setNotFound(true);
+               setLoading(false);
+               return;
+             }
+             throw new Error(rawMsg.error.message || "Failed to fetch email");
           }
           const { parseEmailContent } = await import("@/lib/emailParser");
           mainMsg = parseEmailContent(rawMsg);
@@ -554,12 +564,26 @@ export default function EmailDetailPage() {
     return <EmailDetailSkeleton subject={previewSubject} />;
   }
 
+  if (notFound) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full bg-[#eceae6] rounded-2xl p-8">
+        <p className="text-gray-600 font-medium max-w-md text-center text-lg mb-2">This email doesn't exist.</p>
+        <button 
+          onClick={() => router.push(getBackUrl())} 
+          className="mt-4 px-5 py-2.5 bg-[#2b323b] text-white hover:bg-[#3f4854] transition rounded-lg text-sm font-medium flex items-center gap-2"
+        >
+          <ArrowLeft size={16} /> Back to Inbox
+        </button>
+      </div>
+    );
+  }
+
   if (authError) {
     return (
       <div className="flex flex-col items-center justify-center h-full bg-[#eceae6] rounded-2xl p-8">
         <p className="text-red-500 font-medium max-w-md text-center">{authError}</p>
         <button 
-          onClick={async () => { await useAuthStore.getState().logout(); window.location.href = "/login"; }} 
+          onClick={async () => { await useAuthStore.getState().logout(); window.location.href = "/"; }} 
           className="mt-6 px-5 py-2.5 bg-[#2b323b] text-white hover:bg-[#2b323b] transition rounded-lg text-sm font-medium"
         >
           Sign out and re-login
@@ -895,7 +919,15 @@ export default function EmailDetailPage() {
                 AI Summary
               </div>
               <div className="text-[14px] text-gray-600 whitespace-pre-wrap leading-relaxed prose prose-sm prose-gray max-w-none ai-dust">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown 
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    a: ({node, href, ...props}) => {
+                      const absoluteHref = href && !href.startsWith('http') && !href.startsWith('mailto:') ? `https://${href}` : href;
+                      return <a href={absoluteHref} {...props} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" />;
+                    }
+                  }}
+                >
                   {summary}
                 </ReactMarkdown>
               </div>
