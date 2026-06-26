@@ -152,9 +152,10 @@ export const useAuthStore = create((set) => ({
   logout: async () => {
     try {
       await account.deleteSession('current');
-      set({ user: null, session: null });
     } catch (error) {
       console.error('Logout error', error);
+    } finally {
+      set({ user: null, session: null, googleProfile: null });
     }
   }
 }));

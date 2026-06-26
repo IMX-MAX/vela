@@ -204,6 +204,13 @@ export default function InboxPage() {
             if (res.ok) {
               const data = await res.json();
               token = data.access_token;
+              useAuthStore.setState((state) => ({
+                session: {
+                  ...state.session,
+                  providerAccessToken: data.access_token,
+                  providerAccessTokenExpiry: data.expiry_date ? new Date(data.expiry_date).toISOString() : new Date(Date.now() + 3500 * 1000).toISOString()
+                }
+              }));
             }
           } catch(err) {
             console.error("Failed to refresh primary token", err);
