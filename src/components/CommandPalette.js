@@ -14,7 +14,7 @@ export default function CommandPalette() {
   const router = useRouter();
   const pathname = usePathname();
   const { 
-    session, user, 
+    session, user, inboxEmails,
     isCommandPaletteOpen, toggleCommandPalette, closeCommandPalette,
     chatHistory, setChatHistory, clearChat,
     savedChats, loadChat, saveCurrentChat, initSavedChats, checkAuth
@@ -230,7 +230,14 @@ export default function CommandPalette() {
       if (user?.prefs) {
         context += `Job Title: ${user.prefs.jobName || 'Unknown'}, Company: ${user.prefs.company || 'Unknown'}. `;
         if (user.prefs.writingStyle) {
-          context += `Writing Style: ${user.prefs.writingStyle}`;
+          context += `Writing Style: ${user.prefs.writingStyle}. `;
+        }
+      }
+      
+      if (currentEmailId && inboxEmails) {
+        const activeEmail = inboxEmails.find(e => e.id === currentEmailId || e.threadId === currentEmailId);
+        if (activeEmail) {
+          context += `[SYSTEM NOTICE: The user is currently viewing an email titled "${activeEmail.subject}" from "${activeEmail.senderName || activeEmail.senderEmail}". You do NOT need to bring this up unless it's relevant to the user's prompt.] `;
         }
       }
       
