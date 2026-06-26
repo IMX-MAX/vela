@@ -50,6 +50,7 @@ export async function POST(req) {
     }
 
     const checkoutSession = await stripe.checkout.sessions.create({
+      ui_mode: 'embedded',
       mode: 'subscription',
       managed_payments: { enabled: true },
       allow_promotion_codes: true,
@@ -61,11 +62,10 @@ export async function POST(req) {
       ],
       client_reference_id: userId,
       customer_email: currentUser.email,
-      success_url: `${req.headers.get('origin')}/inbox/settings?session_id={CHECKOUT_SESSION_ID}&success=true`,
-      cancel_url: `${req.headers.get('origin')}/inbox/settings?canceled=true`,
+      return_url: `${req.headers.get('origin')}/inbox/settings?session_id={CHECKOUT_SESSION_ID}&success=true`,
     });
 
-    return NextResponse.json({ url: checkoutSession.url });
+    return NextResponse.json({ client_secret: checkoutSession.client_secret });
 
   } catch (error) {
     console.error('Stripe checkout error:', error);

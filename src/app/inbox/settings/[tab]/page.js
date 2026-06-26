@@ -536,25 +536,9 @@ export default function SettingsPage() {
               {/* Pro Plan */}
               <div 
                 className={`relative bg-white rounded-2xl border p-7 shadow-sm transition-all duration-300 ${plan === 'pro' ? 'border-gray-300 ring-2 ring-gray-200' : 'border-gray-200 hover:border-gray-300 hover:shadow-md cursor-pointer'}`} 
-                onClick={async () => {
+                onClick={() => {
                   if (plan === 'pro') return;
-                  try {
-                    const { account } = await import('@/lib/appwrite');
-                    const jwtResponse = await account.createJWT();
-                    const res = await fetch('/api/stripe/checkout', {
-                      method: 'POST',
-                      headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${jwtResponse.jwt}`
-                      },
-                      body: JSON.stringify({ billingCycle })
-                    });
-                    const data = await res.json();
-                    if (data.url) window.location.href = data.url;
-                    else if (data.error) alert('Checkout Error: ' + data.error);
-                  } catch (error) {
-                    console.error('Failed to create checkout session', error);
-                  }
+                  router.push(`/checkout?billingCycle=${billingCycle}`);
                 }}
               >
                 <div className="relative z-20">
