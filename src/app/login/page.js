@@ -2,15 +2,22 @@
 
 import { useAuthStore } from "@/lib/store";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeSlash } from "@phosphor-icons/react";
 
-export default function LoginPage() {
+function LoginForm() {
   const { loginWithGoogle, user } = useAuthStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
   
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (searchParams.get("upgrade") === "true") {
+      sessionStorage.setItem("upgradeIntent", "true");
+    }
+  }, [searchParams]);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -90,5 +97,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center bg-[#2b323b]">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

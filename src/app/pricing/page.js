@@ -93,9 +93,9 @@ export default function PricingPage() {
               </li>
             </ul>
             
-            <button disabled className="w-full text-center py-3 rounded-xl font-medium text-sm bg-[#1e2a3b]/10 text-[#1e2a3b]/50 cursor-not-allowed transition-colors">
-              Unavailable during beta
-            </button>
+            <Link href="/login?upgrade=true" className="w-full text-center py-3 rounded-xl font-medium text-sm bg-[#1e2a3b] text-white hover:bg-[#1e2a3b]/90 transition-colors block">
+              Get Pro
+            </Link>
           </div>
         </div>
       </main>

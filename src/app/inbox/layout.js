@@ -26,6 +26,7 @@ import { useShortcuts, checkShortcut } from "@/lib/shortcuts";
 
 const CommandPalette = dynamic(() => import("@/components/CommandPalette"), { ssr: false });
 const UpgradeModal = dynamic(() => import("@/components/UpgradeModal"), { ssr: false });
+const WelcomeUpgradeModal = dynamic(() => import("@/components/WelcomeUpgradeModal"), { ssr: false });
 
 function SidebarNavigation() {
   const searchParams = useSearchParams();
@@ -84,8 +85,19 @@ export default function InboxLayout({ children }) {
   const { user, loading, checkAuth, logout, googleProfile, toggleCommandPalette, showUpgradeModal, setShowUpgradeModal } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showWelcomeUpgradeModal, setShowWelcomeUpgradeModal] = useState(false);
   const usageStatus = user ? getUsageStatus(user) : null;
   const shortcuts = useShortcuts();
+
+  useEffect(() => {
+    if (!loading && user) {
+      const intent = sessionStorage.getItem("upgradeIntent");
+      if (intent === "true") {
+        setShowWelcomeUpgradeModal(true);
+        sessionStorage.removeItem("upgradeIntent");
+      }
+    }
+  }, [user, loading]);
 
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
@@ -286,6 +298,9 @@ export default function InboxLayout({ children }) {
 
       {/* Upgrade Modal */}
       {showUpgradeModal && <UpgradeModal onClose={() => setShowUpgradeModal(false)} />}
+      
+      {/* Welcome Upgrade Modal */}
+      {showWelcomeUpgradeModal && <WelcomeUpgradeModal onClose={() => setShowWelcomeUpgradeModal(false)} />}
     </div>
   );
 }
