@@ -16,8 +16,8 @@ export default function InboxPage() {
   const searchParams = useSearchParams();
   const filter = searchParams.get("filter") || "inbox";
   const searchQuery = searchParams.get("search");
-  
   const { session, user, setInboxEmails, inboxSplits, setInboxSplits } = useAuthStore();
+  const shortcuts = useShortcuts();
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
