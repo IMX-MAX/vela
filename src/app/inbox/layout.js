@@ -20,6 +20,7 @@ import {
   AddressBook
 } from "@phosphor-icons/react";
 
+import { getUsageStatus } from "@/lib/usage";
 import dynamic from "next/dynamic";
 
 const CommandPalette = dynamic(() => import("@/components/CommandPalette"), { ssr: false });
@@ -82,6 +83,7 @@ export default function InboxLayout({ children }) {
   const { user, loading, checkAuth, logout, googleProfile, toggleCommandPalette, showUpgradeModal, setShowUpgradeModal } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const usageStatus = user ? getUsageStatus(user) : null;
 
   useEffect(() => {
     const initAuth = async () => {
@@ -228,6 +230,33 @@ export default function InboxLayout({ children }) {
         <Suspense fallback={<nav className="flex-1 space-y-0.5 px-3"></nav>}>
           <SidebarNavigation />
         </Suspense>
+
+        {usageStatus && usageStatus.plan === "free" && (
+          <div className="px-5 mt-auto pt-6 pb-2">
+            <div className="bg-[#eceae6] rounded-xl p-4 border border-[#dddcdc] shadow-sm">
+              <h4 className="text-[13px] font-semibold text-[#2b323b] mb-1">Free Plan</h4>
+              <p className="text-[12px] text-gray-500 mb-4 leading-relaxed">Upgrade to Pro for 60x more AI actions.</p>
+              <Link href="/inbox/settings/billing" className="block w-full py-2 bg-[#2b323b] text-white text-[13px] font-medium rounded-lg text-center hover:bg-[#50686c] transition">
+                Upgrade to Pro
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {usageStatus && usageStatus.plan === "pro" && (
+          <div className="px-5 mt-auto pt-6 pb-2">
+            <div className="bg-[#eceae6] rounded-xl p-4 border border-[#dddcdc] shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-[13px] font-semibold text-[#2b323b]">Pro Usage</h4>
+                <span className="text-[12px] text-gray-500 font-medium">{usageStatus.current} <span className="text-gray-400">/ {usageStatus.limit}</span></span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2 overflow-hidden shadow-inner">
+                <div className="bg-emerald-500 h-1.5 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (usageStatus.current / usageStatus.limit) * 100)}%` }}></div>
+              </div>
+              <p className="text-[11px] text-gray-400 mt-1">Resets daily at midnight</p>
+            </div>
+          </div>
+        )}
       </aside>
 
       <main className="flex-1 overflow-hidden md:m-2 md:ml-0 md:rounded-2xl bg-[#eceae6] shadow-sm flex flex-col">
