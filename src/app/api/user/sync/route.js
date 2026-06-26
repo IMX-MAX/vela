@@ -53,6 +53,10 @@ export async function GET(req) {
           await resend.events.send({
             event: 'new_user_signup',
             email: currentUser.email,
+            data: {
+              unsubscribe: 'https://getvela.email/unsubscribe',
+              name: currentUser.name || 'there',
+            }
           });
         } catch (emailError) {
           console.error("Failed to send welcome email:", emailError);
