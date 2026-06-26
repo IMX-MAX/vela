@@ -553,7 +553,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   
-                  <div className={`text-center py-2 rounded-lg font-medium text-[14px] border transition-colors mb-8 ${plan === 'pro' ? (user?.db?.cancelAtPeriodEnd ? 'bg-orange-50 text-orange-600 border-orange-200 cursor-default' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-default') : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
+                  <div className={`text-center py-2 rounded-lg font-medium text-[14px] border transition-colors mb-8 ${plan === 'pro' ? (user?.db?.cancelAtPeriodEnd ? 'bg-red-50 text-red-600 border-red-200 cursor-default' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-default') : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
                     {plan === 'pro' 
                       ? (user?.db?.cancelAtPeriodEnd 
                           ? `Subscription ending on ${new Date(user?.db?.currentPeriodEnd).toLocaleDateString()}` 
