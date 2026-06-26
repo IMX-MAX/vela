@@ -50,27 +50,9 @@ export async function GET(req) {
       if (process.env.RESEND_API_KEY) {
         try {
           const resend = new Resend(process.env.RESEND_API_KEY);
-          await resend.emails.send({
-            from: 'Vela <onboarding@resend.dev>',
-            to: currentUser.email,
-            subject: 'Welcome to Vela! 🚀',
-            html: `
-              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h1 style="color: #194060;">Welcome to Vela, ${currentUser.name || 'there'}!</h1>
-                <p style="color: #1e2a3b; font-size: 16px; line-height: 1.5;">We're thrilled to have you on board. Vela is the email client built for the modern age, specifically designed to make you faster and more organized.</p>
-                
-                <h3 style="color: #305a7d; margin-top: 30px;">Here are a few things to try:</h3>
-                <ul style="color: #1e2a3b; font-size: 15px; line-height: 1.6;">
-                  <li><strong>Command Palette:</strong> Hit <code>Cmd/Ctrl + K</code> anywhere to search your inbox and ask Vela Intelligence questions.</li>
-                  <li><strong>AI Summaries:</strong> Get instant bullet-point summaries of long email threads to catch up quickly.</li>
-                  <li><strong>Smart Drafting:</strong> Type <code>/</code> in the composer to have our specialized AI draft or modify your emails, preserving your natural tone.</li>
-                  <li><strong>Split Inboxes:</strong> (Pro) Organize your inbox by custom rules to keep the noise out and focus on what matters.</li>
-                </ul>
-                
-                <p style="color: #1e2a3b; font-size: 16px; margin-top: 30px;">Happy emailing!</p>
-                <p style="color: #7f99b0; font-size: 14px;">- The Vela Team</p>
-              </div>
-            `
+          await resend.events.send({
+            event: 'new_user_signup',
+            email: currentUser.email,
           });
         } catch (emailError) {
           console.error("Failed to send welcome email:", emailError);
