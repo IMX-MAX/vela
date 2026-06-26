@@ -205,18 +205,29 @@ export default function LandingPage() {
         </section>
 
         {/* Feature 3.5: AI Models */}
-        <section className="py-24 px-12 md:px-24 max-w-[1400px] mx-auto w-full flex flex-col items-center text-center">
-          <div className="max-w-3xl mx-auto flex flex-col items-center gap-6">
-            <div className="bg-[#194060]/10 p-4 rounded-full inline-block mb-2">
-              <Sparkle size={32} weight="fill" className="text-[#194060]" />
+        <section className="py-24 px-6 md:px-12 max-w-[1200px] mx-auto w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="flex flex-col gap-6 max-w-lg">
+              <div className="bg-[#194060]/10 w-12 h-12 flex items-center justify-center rounded-xl mb-2">
+                <Sparkle size={24} weight="fill" className="text-[#194060]" />
+              </div>
+              <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-[#194060] leading-tight">
+                AI email apps are only as good as the models driving them.
+              </h2>
+              <div className="space-y-6 text-[#1e2a3b]/80 font-medium leading-relaxed text-lg mt-4">
+                <p>We've specially trained our models to excel at one thing: <span className="text-[#194060] font-semibold">Emails.</span></p>
+                <p>Unlike generic AI that outputs robotic, overly-formal text, Vela Intelligence writes natural, highly-structured, and context-aware responses designed to save you time and preserve your voice.</p>
+                <p>Don't believe it? <Link href="/login" className="text-[#7f99b0] hover:text-[#194060] underline underline-offset-4 transition-colors">Test it out yourself in the app.</Link></p>
+              </div>
             </div>
-            <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-[#194060] leading-tight">
-              AI email apps are only as good as the models driving them.
-            </h2>
-            <div className="space-y-6 text-[#1e2a3b]/80 font-medium leading-relaxed text-lg md:text-xl mt-4">
-              <p>We've specially trained our models to excel at one thing: <span className="text-[#194060] font-semibold">Emails.</span></p>
-              <p>Unlike generic AI that outputs robotic, overly-formal text, Vela Intelligence writes natural, highly-structured, and context-aware responses designed to save you time and preserve your voice.</p>
-              <p>Don't believe it? <Link href="/login" className="text-[#7f99b0] hover:text-[#194060] underline underline-offset-4 transition-colors">Test it out yourself in the app.</Link></p>
+            <div className="bg-gradient-to-br from-[#dddcdc] to-white rounded-3xl p-8 border border-[#dddcdc] shadow-xl relative overflow-hidden h-[400px] flex items-center justify-center">
+               <div className="absolute inset-0 bg-[#194060]/5 mix-blend-multiply opacity-50" style={{ backgroundImage: 'radial-gradient(#194060 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+               <div className="relative z-10 flex gap-4 items-end h-full py-12">
+                 <div className="w-12 bg-gradient-to-t from-[#194060]/20 to-[#194060]/40 rounded-t-full h-[40%] animate-pulse"></div>
+                 <div className="w-12 bg-gradient-to-t from-[#194060]/40 to-[#194060]/60 rounded-t-full h-[70%] animate-pulse" style={{animationDelay: '150ms'}}></div>
+                 <div className="w-12 bg-gradient-to-t from-[#194060]/60 to-[#194060]/80 rounded-t-full h-[100%] animate-pulse" style={{animationDelay: '300ms'}}></div>
+                 <div className="w-12 bg-gradient-to-t from-[#194060]/30 to-[#194060]/50 rounded-t-full h-[55%] animate-pulse" style={{animationDelay: '450ms'}}></div>
+               </div>
             </div>
           </div>
         </section>
@@ -327,26 +338,28 @@ export default function LandingPage() {
 
         {/* Support Section */}
         <section className="py-20 px-6 max-w-[1200px] mx-auto w-full">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <Link href="https://tally.so/r/A702L0" target="_blank" className="bg-[#dddcdc]/50 border border-[#dddcdc] rounded-2xl p-8 hover:bg-[#dddcdc] transition-colors group flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center mb-4">
+          <div className="bg-[#194060] rounded-3xl overflow-hidden flex flex-col md:flex-row relative shadow-2xl">
+            <div className="absolute inset-0 bg-[#0f2136] opacity-50 mix-blend-overlay"></div>
+            
+            <Link href="https://tally.so/r/A702L0" target="_blank" className="flex-1 p-10 md:p-12 hover:bg-white/5 transition-colors border-b md:border-b-0 md:border-r border-white/10 group relative z-10">
+              <div className="w-12 h-12 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center mb-6">
                 <WarningOctagon size={24} weight="fill" />
               </div>
-              <h3 className="text-xl font-semibold text-[#194060] mb-2">Report a Bug</h3>
-              <p className="text-[#1e2a3b]/70 font-medium text-[15px] mb-6">Spotted something weird? Let us know so we can fix it.</p>
-              <div className="text-[#194060] font-semibold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-2 mt-auto">
-                File bug report <ArrowRight size={14} weight="bold" />
+              <h3 className="text-2xl font-semibold text-white mb-3">Report a Bug</h3>
+              <p className="text-white/70 font-medium text-[17px] mb-8 max-w-[280px] leading-relaxed">Spotted something weird? Let us know so we can fix it.</p>
+              <div className="text-white font-semibold flex items-center gap-2 group-hover:gap-4 transition-all">
+                File bug report <ArrowRight size={16} weight="bold" />
               </div>
             </Link>
             
-            <Link href="https://tally.so/r/RGgMRp" target="_blank" className="bg-[#dddcdc]/50 border border-[#dddcdc] rounded-2xl p-8 hover:bg-[#dddcdc] transition-colors group flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
+            <Link href="https://tally.so/r/RGgMRp" target="_blank" className="flex-1 p-10 md:p-12 hover:bg-white/5 transition-colors group relative z-10">
+              <div className="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-6">
                 <ChatCircle size={24} weight="fill" />
               </div>
-              <h3 className="text-xl font-semibold text-[#194060] mb-2">Customer Support</h3>
-              <p className="text-[#1e2a3b]/70 font-medium text-[15px] mb-6">Need help with your account or have a question? We're here.</p>
-              <div className="text-[#194060] font-semibold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-2 mt-auto">
-                Get support <ArrowRight size={14} weight="bold" />
+              <h3 className="text-2xl font-semibold text-white mb-3">Customer Support</h3>
+              <p className="text-white/70 font-medium text-[17px] mb-8 max-w-[280px] leading-relaxed">Need help with your account or have a question? We're here.</p>
+              <div className="text-white font-semibold flex items-center gap-2 group-hover:gap-4 transition-all">
+                Get support <ArrowRight size={16} weight="bold" />
               </div>
             </Link>
           </div>
