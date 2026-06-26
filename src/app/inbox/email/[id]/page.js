@@ -348,15 +348,16 @@ export default function EmailDetailPage() {
   const handleSummarize = async () => {
     if (!email) return;
 
+    setIsSummarizing(true);
+
     try {
       const { incrementAiUsage } = await import("@/lib/usage");
       await incrementAiUsage(user, checkAuth);
     } catch (error) {
+      setIsSummarizing(false);
       if (!error.message?.includes("limit reached")) alert(error.message);
       return;
     }
-
-    setIsSummarizing(true);
     
     let context = "";
     if (user?.prefs) {
@@ -420,15 +421,17 @@ export default function EmailDetailPage() {
   const handleDraftReply = async () => {
     if (!email) return;
     
+    setIsDrafting(true);
+
     try {
       const { incrementAiUsage } = await import("@/lib/usage");
       await incrementAiUsage(user, checkAuth);
     } catch (error) {
+      setIsDrafting(false);
       if (!error.message?.includes("limit reached")) alert(error.message);
       return;
     }
 
-    setIsDrafting(true);
     const promptToUse = aiPrompt.trim() ? aiPrompt : "Reply professionally acknowledging receipt.";
     
     let context = "";

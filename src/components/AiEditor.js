@@ -94,18 +94,19 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
       return;
     }
 
+    setIsProcessing(true);
+
     try {
       const { incrementAiUsage } = await import("@/lib/usage");
       await incrementAiUsage(user, checkAuth);
     } catch (error) {
+      setIsProcessing(false);
       if (!error.message?.includes("limit reached")) alert(error.message);
       setShowSlashCustomPrompt(false);
       setSlashCustomPrompt("");
       setShowSlashMenu(false);
       return;
     }
-
-    setIsProcessing(true);
     let context = `Here is the full text of the email draft for context:\n\n${editor.getText()}\n\n`;
     if (user?.prefs) {
       context += `User details - Job Title: ${user?.prefs?.jobName || 'Unknown'}, Company: ${user?.prefs?.company || 'Unknown'}`;

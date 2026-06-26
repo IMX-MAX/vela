@@ -171,7 +171,7 @@ export default function CommandPalette() {
       router.push(`/inbox?search=${encodeURIComponent(input.trim())}`);
       closeCommandPalette();
     } else if (option.type === 'settings') {
-      router.push(`/inbox/settings`);
+      router.push(`/inbox/settings/profile`);
       closeCommandPalette();
     } else if (option.type === 'nav') {
       router.push(option.href);

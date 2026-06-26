@@ -147,7 +147,7 @@ export default function InboxLayout({ children }) {
       {/* Mobile Profile Dropdown (simplified) */}
       {isProfileOpen && (
         <div className="md:hidden absolute top-14 right-4 w-48 bg-white border border-[#dddcdc] rounded-xl shadow-lg z-50 overflow-hidden text-[14px] py-1 text-gray-800">
-          <Link href="/inbox/settings" onClick={() => setIsProfileOpen(false)} className="block px-4 py-2.5 hover:bg-[#eceae6]">Settings</Link>
+          <Link href="/inbox/settings/profile" onClick={() => setIsProfileOpen(false)} className="block px-4 py-2.5 hover:bg-[#eceae6]">Settings</Link>
           <button onClick={handleSignOut} className="w-full text-left px-4 py-2.5 hover:bg-[#eceae6] text-red-600">Sign out</button>
         </div>
       )}
@@ -194,7 +194,7 @@ export default function InboxLayout({ children }) {
           {isProfileOpen && (
             <div className="absolute top-12 right-5 w-56 bg-[#eceae6] border border-[#dddcdc] rounded-xl shadow-lg z-50 overflow-hidden text-[15px] py-1 text-gray-800">
               <Link 
-                href="/inbox/settings"
+                href="/inbox/settings/profile"
                 onClick={() => setIsProfileOpen(false)}
                 className="w-full text-left px-4 py-2.5 hover:bg-[#eceae6] transition flex items-center justify-between"
               >

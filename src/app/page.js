@@ -8,8 +8,20 @@ import {
 } from "@phosphor-icons/react";
 import MarketingNavbar from "@/components/MarketingNavbar";
 import MarketingFooter from "@/components/MarketingFooter";
+import { useAuthStore } from "@/lib/store";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
+  const { user } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      router.push("/inbox");
+    }
+  }, [user, router]);
+
   return (
     <div className="min-h-screen bg-[#b9c2c8] text-[#1e2a3b] font-[Inter] selection:bg-[#7f99b0] selection:text-white flex flex-col relative overflow-x-hidden">
       

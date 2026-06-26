@@ -22,7 +22,7 @@ export default function UpgradeModal({ onClose }) {
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">Usage Limit Reached</h2>
           <p className="text-[#c7d4ce] text-[15px] leading-relaxed">
-            You've hit your free AI action limit for the month. Upgrade to Pro for up to 30x more usage.
+            You've hit your free AI action limit for the month. Upgrade to Pro for up to 60x more usage.
           </p>
         </div>
         
@@ -34,7 +34,7 @@ export default function UpgradeModal({ onClose }) {
             </li>
             <li className="flex items-center gap-3">
               <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-[10px]">✓</div>
-              Up to 30x more AI usage
+              Up to 60x more AI usage
             </li>
             <li className="flex items-center gap-3">
               <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-[10px]">✓</div>
@@ -58,7 +58,7 @@ export default function UpgradeModal({ onClose }) {
               Maybe later
             </button>
             <Link 
-              href="/inbox/settings"
+              href="/inbox/settings/profile"
               onClick={onClose}
               className="flex-1 py-2.5 rounded-xl bg-[#2b323b] text-white font-medium text-[14px] hover:bg-[#50686c] transition flex items-center justify-center"
             >

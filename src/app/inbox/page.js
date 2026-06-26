@@ -192,6 +192,25 @@ export default function InboxPage() {
       
       let token = session?.providerAccessToken;
 
+      // Auto-refresh primary token if expired or about to expire
+      if (token && session?.providerRefreshToken && session?.providerAccessTokenExpiry) {
+        if (new Date(session.providerAccessTokenExpiry) < new Date(Date.now() + 5 * 60000)) {
+          try {
+            const res = await fetch('/api/oauth/google/refresh', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ refresh_token: session.providerRefreshToken })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              token = data.access_token;
+            }
+          } catch(err) {
+            console.error("Failed to refresh primary token", err);
+          }
+        }
+      }
+
       if (session?.provider === 'google') {
         if (!token) {
            setAuthError("No Google access token found. Please ensure 'Store access tokens' is enabled in your Appwrite Google Provider settings, then sign out and sign in again.");
@@ -262,6 +281,12 @@ export default function InboxPage() {
         ]);
         
         if (error) {
+          if (!parsed || parsed.length === 0) {
+            useAuthStore.getState().logout().then(() => {
+              router.push('/login');
+            });
+            return;
+          }
           setAuthError(`Gmail API Error: ${error}. Please ensure you checked all permission boxes during Google sign-in.`);
         } else {
           setEmails(parsed);
