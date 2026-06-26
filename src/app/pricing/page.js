@@ -19,10 +19,7 @@ export default function PricingPage() {
       
       <main className="flex-1 pt-40 pb-32 px-12 md:px-24 max-w-[1400px] mx-auto w-full relative z-10">
         <div className="text-center mb-16 animate-fade-in-up">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1e2a3b]/[0.04] border border-[#1e2a3b]/[0.08] text-xs font-medium text-[#1e2a3b]/70 mb-6 backdrop-blur-md">
-            <div className="h-1.5 w-1.5 rounded-full bg-[#5a768c] animate-pulse"></div>
-            Early Access Pricing
-          </div>
+
           <h1 className="text-4xl md:text-5xl font-medium tracking-tight text-[#1e2a3b] mb-4">Simple, transparent pricing.</h1>
           <p className="text-[#1e2a3b]/60 max-w-xl mx-auto text-lg leading-relaxed">
             Get started for free during our beta. Upgrade when you need more power.
