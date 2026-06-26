@@ -412,6 +412,8 @@ export default function EmailDetailPage() {
       const currentIndex = inboxEmails.findIndex(e => e.id === id);
       if (currentIndex === -1) return;
 
+      if (e.ctrlKey || e.metaKey) return;
+
       if (e.key === "j") {
         e.preventDefault();
         if (currentIndex < inboxEmails.length - 1) {
