@@ -40,7 +40,7 @@ export async function POST(req) {
       return NextResponse.json({ url: '/inbox/settings?stripe=mock_success' });
     }
 
-    const stripe = new Stripe(stripeKey, { apiVersion: '2023-10-16' });
+    const stripe = new Stripe(stripeKey, { apiVersion: '2025-03-31.basil' });
 
     const priceId = billingCycle === 'annual' 
       ? process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID 
@@ -51,8 +51,8 @@ export async function POST(req) {
     }
 
     const checkoutSession = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
       mode: 'subscription',
+      managed_payments: { enabled: true },
       line_items: [
         {
           price: priceId,
