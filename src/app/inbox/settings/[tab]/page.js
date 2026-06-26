@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import { useAuthStore } from "@/lib/store";
 import { account } from "@/lib/appwrite";
 import { getUsageStatus } from "@/lib/usage";
-import { ArrowLeft, CaretLeft, DotsThree } from "@phosphor-icons/react";
+import { ArrowLeft, CaretLeft, DotsThree, Question } from "@phosphor-icons/react";
 import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 
 
 export default function SettingsPage() {
@@ -20,7 +21,7 @@ export default function SettingsPage() {
   const [plan, setPlan] = useState("free");
   const [billingCycle, setBillingCycle] = useState("annual");
   const [showDowngradeModal, setShowDowngradeModal] = useState(false);
-
+  const [copiedId, setCopiedId] = useState(false);
   useEffect(() => {
     if (user) {
       setUserName(user.name || "");
@@ -191,6 +192,14 @@ export default function SettingsPage() {
         console.error("Failed to delete account", error);
         alert("Failed to delete account. Please try again.");
       }
+    }
+  };
+
+  const handleCopyId = () => {
+    if (user?.$id) {
+      navigator.clipboard.writeText(user.$id);
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2000);
     }
   };
 
@@ -618,8 +627,36 @@ export default function SettingsPage() {
 
         {tab === 'privacy' && (
           <div className="max-w-2xl">
-            <h1 className="text-2xl font-medium text-[#2b323b] mb-8">Privacy & Data</h1>
+            <h1 className="text-2xl font-medium text-[#2b323b] mb-4">Privacy & Data</h1>
             
+            <div className="flex gap-4 mb-8 text-[14px]">
+              <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline">Privacy Policy</Link>
+              <Link href="/terms" target="_blank" className="text-blue-600 hover:underline">Terms of Service</Link>
+            </div>
+            
+            <h2 className="text-[15px] font-medium text-gray-800 mb-3">Account data</h2>
+            <div className="bg-[#eceae6] rounded-xl border border-[#dddcdc]/60 p-6 mb-10 shadow-sm flex items-center justify-between">
+              <div>
+                <div className="font-medium text-[#2b323b] mb-1 flex items-center gap-2">
+                  User ID
+                  <div className="relative group flex items-center">
+                    <Question size={16} className="text-gray-400 hover:text-gray-600 cursor-help" />
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-2 bg-gray-800 text-white text-[12px] leading-tight rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center shadow-lg">
+                      This ID is used to provide support. Do not share it publicly as it contains confidential information.
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-[13px] text-gray-500 max-w-sm">Unique identifier for your Vela account.</div>
+              </div>
+              <button 
+                onClick={handleCopyId}
+                className="px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg text-[13px] font-medium shadow-sm transition"
+              >
+                {copiedId ? "Copied!" : "Copy ID"}
+              </button>
+            </div>
+
             <h2 className="text-[15px] font-medium text-gray-800 mb-3">Local data</h2>
             <div className="bg-[#eceae6] rounded-xl border border-[#dddcdc]/60 p-6 mb-10 shadow-sm flex items-center justify-between">
               <div>
