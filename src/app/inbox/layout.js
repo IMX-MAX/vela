@@ -276,10 +276,10 @@ export default function InboxLayout({ children }) {
             <div className="bg-[#eceae6] rounded-xl p-4 border border-[#dddcdc] shadow-sm">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-[13px] font-semibold text-[#2b323b]">Pro Usage</h4>
-                <span className="text-[12px] text-gray-500 font-medium">{usageStatus.current} <span className="text-gray-400">/ {usageStatus.limit}</span></span>
+                <span className="text-[12px] text-gray-500 font-medium">~{Math.round((usageStatus.current / usageStatus.limit) * 100)}% <span className="text-gray-400">used</span></span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2 overflow-hidden shadow-inner">
-                <div className="bg-emerald-500 h-1.5 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (usageStatus.current / usageStatus.limit) * 100)}%` }}></div>
+                <div className="bg-[#50686c] h-1.5 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (usageStatus.current / usageStatus.limit) * 100)}%` }}></div>
               </div>
               <p className="text-[11px] text-gray-400 mt-1">Resets daily at midnight</p>
             </div>
