@@ -34,8 +34,19 @@ export async function POST(req) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object;
-        const userId = session.client_reference_id;
+        let userId = session.client_reference_id;
         const customerId = session.customer;
+        const customerEmail = session.customer_details?.email || session.customer_email;
+
+        if (!userId && customerEmail) {
+          const { Query } = await import('node-appwrite');
+          const users = await databases.listDocuments('default', 'users', [
+            Query.equal('email', customerEmail)
+          ]);
+          if (users.documents.length > 0) {
+            userId = users.documents[0].$id;
+          }
+        }
 
         if (userId) {
           await databases.updateDocument('default', 'users', userId, {
