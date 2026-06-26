@@ -37,6 +37,7 @@ export default function TermsOfService() {
               <li>Maintain the security of your password and account</li>
               <li>Accept responsibility for all activities that occur under your account</li>
               <li>Notify us immediately of any unauthorized use of your account</li>
+              <li>Consent to receive service-related, promotional, and marketing emails from Vela (you may unsubscribe from non-essential emails at any time)</li>
             </ul>
             <p className="mt-2">Your use of Vela via your Google account is also subject to Google's Terms of Service and Privacy Policy. You are responsible for maintaining the confidentiality of your account credentials.</p>
           </section>
