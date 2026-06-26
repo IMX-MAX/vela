@@ -7,6 +7,7 @@ import { getUsageStatus } from "@/lib/usage";
 import { ArrowLeft, CaretLeft, DotsThree, Question, WarningOctagon, ChatCircle, ArrowRight } from "@phosphor-icons/react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import ShortcutsTab from "@/components/ShortcutsTab";
 
 
 export default function SettingsPage() {
@@ -253,6 +254,12 @@ export default function SettingsPage() {
             Billing
           </div>
           <div 
+            className={`whitespace-nowrap px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'shortcuts' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
+            onClick={() => router.push('/inbox/settings/shortcuts')}
+          >
+            Keyboard Shortcuts
+          </div>
+          <div 
             className={`whitespace-nowrap px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'usage' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
             onClick={() => router.push('/inbox/settings/usage')}
           >
@@ -366,6 +373,8 @@ export default function SettingsPage() {
 
           </div>
         )}
+
+        {tab === 'shortcuts' && <ShortcutsTab />}
 
         {tab === 'accounts' && (
           <div className="max-w-2xl">

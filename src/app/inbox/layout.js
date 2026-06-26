@@ -22,6 +22,7 @@ import {
 
 import { getUsageStatus } from "@/lib/usage";
 import dynamic from "next/dynamic";
+import { useShortcuts, checkShortcut } from "@/lib/shortcuts";
 
 const CommandPalette = dynamic(() => import("@/components/CommandPalette"), { ssr: false });
 const UpgradeModal = dynamic(() => import("@/components/UpgradeModal"), { ssr: false });
@@ -84,6 +85,21 @@ export default function InboxLayout({ children }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const usageStatus = user ? getUsageStatus(user) : null;
+  const shortcuts = useShortcuts();
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+      
+      if (checkShortcut(e, shortcuts.compose)) {
+        e.preventDefault();
+        router.push('/inbox/compose');
+      }
+    };
+    
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [router, shortcuts.compose]);
 
   useEffect(() => {
     const initAuth = async () => {

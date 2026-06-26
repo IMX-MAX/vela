@@ -6,6 +6,7 @@ import { fetchEmails } from "@/lib/gmail";
 import { parseEmailContent } from "@/lib/emailParser";
 import { useAuthStore } from "@/lib/store";
 import { format, isToday } from "date-fns";
+import { useShortcuts, checkShortcut } from "@/lib/shortcuts";
 import { Check, Trash, MagnifyingGlass, Command, Link as LinkIcon, Spinner, FadersHorizontal, X, Plus, ToggleLeft, ToggleRight } from "@phosphor-icons/react";
 import { EmailListSkeleton } from "@/components/Skeletons";
 
@@ -386,22 +387,35 @@ export default function InboxPage() {
     await trashEmail(tokenToUse, id);
   };
 
+  const handleUnread = async (e, id) => {
+    if (e) e.stopPropagation();
+    setEmails(emails.map(email => email.id === id ? { ...email, isUnread: true } : email));
+    setInboxEmails(emails.map(email => email.id === id ? { ...email, isUnread: true } : email), filter);
+    const emailObj = emails.find(email => email.id === id);
+    const tokenToUse = emailObj && emailObj._accountIndex !== undefined && Array.isArray(resolvedToken) ? resolvedToken[emailObj._accountIndex] : (Array.isArray(resolvedToken) ? resolvedToken[0] : resolvedToken);
+    const { markEmailAsUnread } = await import("@/lib/gmail");
+    await markEmailAsUnread(tokenToUse, id);
+  };
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (!hoveredEmailId) return;
 
-      if (e.key.toLowerCase() === 'e' && filter !== 'done') {
+      if (checkShortcut(e, shortcuts.archive) && filter !== 'done') {
         e.preventDefault();
         handleDone(null, hoveredEmailId);
-      } else if (e.key === 'Backspace' && filter !== 'trash') {
+      } else if (checkShortcut(e, shortcuts.trash) && filter !== 'trash') {
         e.preventDefault();
         handleTrash(null, hoveredEmailId);
+      } else if (checkShortcut(e, shortcuts.unread)) {
+        e.preventDefault();
+        handleUnread(null, hoveredEmailId);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [hoveredEmailId, filter, emails, resolvedToken, setInboxEmails]);
+  }, [hoveredEmailId, filter, emails, resolvedToken, setInboxEmails, shortcuts]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

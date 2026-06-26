@@ -9,6 +9,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
 import AiComposeBox from "./AiComposeBox";
+import { useShortcuts, checkShortcut } from "@/lib/shortcuts";
 
 export default function CommandPalette() {
   const router = useRouter();
@@ -40,6 +41,8 @@ export default function CommandPalette() {
   const inputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
+  
+  const shortcuts = useShortcuts();
 
   // Resolve token
   useEffect(() => {
@@ -51,10 +54,10 @@ export default function CommandPalette() {
     loadToken();
   }, [session, user]);
 
-  // Ctrl+K toggle
+  // Toggle via Shortcut
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      if (checkShortcut(e, shortcuts.commandPalette)) {
         e.preventDefault();
         toggleCommandPalette();
       }
@@ -65,7 +68,7 @@ export default function CommandPalette() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [toggleCommandPalette, closeCommandPalette, isCommandPaletteOpen]);
+  }, [toggleCommandPalette, closeCommandPalette, isCommandPaletteOpen, shortcuts.commandPalette]);
 
   // Auto-focus input on open
   useEffect(() => {

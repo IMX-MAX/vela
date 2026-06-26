@@ -12,6 +12,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import dynamic from "next/dynamic";
 import { EmailDetailSkeleton } from "@/components/Skeletons";
+import { useShortcuts, checkShortcut } from "@/lib/shortcuts";
 
 const AiEditor = dynamic(() => import("@/components/AiEditor"), { ssr: false });
 
@@ -38,6 +39,7 @@ export default function EmailDetailPage() {
   const { session, user, inboxEmails, checkAuth } = useAuthStore();
   const iframeRef = useRef(null);
   const isSendingRef = useRef(false);
+  const shortcuts = useShortcuts();
   
   const filter = searchParams.get('filter');
   const searchQ = searchParams.get('search');
@@ -320,6 +322,18 @@ export default function EmailDetailPage() {
     router.push(getBackUrl());
   };
 
+  const handleUnread = async () => {
+    if (!resolvedToken) return;
+    const { markEmailAsUnread } = await import("@/lib/gmail");
+    await markEmailAsUnread(resolvedToken, id);
+    
+    const { inboxEmails, setInboxEmails } = useAuthStore.getState();
+    if (inboxEmails) {
+      setInboxEmails(inboxEmails.map(e => e.id === id ? { ...e, isUnread: true } : e));
+    }
+    router.push(getBackUrl());
+  };
+
   const handleUnsubscribe = async () => {
     if (!resolvedToken || !email) return;
     setIsUnsubscribing(true);
@@ -405,21 +419,39 @@ export default function EmailDetailPage() {
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.isContentEditable) {
         return;
       }
-      
+
       const { inboxEmails } = useAuthStore.getState();
-      if (!inboxEmails || inboxEmails.length === 0) return;
+      const currentIndex = (inboxEmails && inboxEmails.length > 0) ? inboxEmails.findIndex(e => e.id === id) : -1;
       
-      const currentIndex = inboxEmails.findIndex(e => e.id === id);
-      if (currentIndex === -1) return;
-
-      if (e.ctrlKey || e.metaKey) return;
-
-      if (e.key === "j") {
+      if (checkShortcut(e, shortcuts.archive)) {
+        e.preventDefault();
+        handleDone();
+      } else if (checkShortcut(e, shortcuts.trash)) {
+        e.preventDefault();
+        handleTrash();
+      } else if (checkShortcut(e, shortcuts.unread)) {
+        e.preventDefault();
+        handleUnread();
+      } else if (checkShortcut(e, shortcuts.replyAll)) {
+        e.preventDefault();
+        setReplyType("replyAll");
+        setReplyMode(true);
+        setTimeout(() => {
+          document.querySelector('.ProseMirror')?.focus();
+        }, 100);
+      } else if (checkShortcut(e, shortcuts.reply)) {
+        e.preventDefault();
+        setReplyType("reply");
+        setReplyMode(true);
+        setTimeout(() => {
+          document.querySelector('.ProseMirror')?.focus();
+        }, 100);
+      } else if (!e.ctrlKey && !e.metaKey && e.key === "j") {
         e.preventDefault();
         if (currentIndex < inboxEmails.length - 1) {
           router.push(getEmailUrl(inboxEmails[currentIndex + 1].id));
         }
-      } else if (e.key === "k") {
+      } else if (!e.ctrlKey && !e.metaKey && e.key === "k") {
         e.preventDefault();
         if (currentIndex > 0) {
           router.push(getEmailUrl(inboxEmails[currentIndex - 1].id));
@@ -429,7 +461,7 @@ export default function EmailDetailPage() {
     
     window.addEventListener("keydown", handleGlobalKeyDown);
     return () => window.removeEventListener("keydown", handleGlobalKeyDown);
-  }, [id, router]);
+  }, [id, router, shortcuts, handleDone, handleTrash, handleUnread, inboxEmails]);
 
   const handleDraftReply = async () => {
     if (!email) return;
