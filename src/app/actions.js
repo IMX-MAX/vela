@@ -51,13 +51,13 @@ export async function draftReplyAction(emailContent, userPrompt, userContext = "
     emailContent = clamp(emailContent, MAX_CONTENT_CHARS);
     userPrompt = clamp(userPrompt, MAX_PROMPT_CHARS);
     userContext = clamp(userContext, MAX_CONTEXT_CHARS);
-    const systemPrompt = `You are Vela Intelligence, an advanced AI built directly into the Vela email client. You have been specifically trained to be exceptionally good at handling and writing emails. Your purpose is to help the user communicate effectively by DRAFTING EMAIL REPLIES.${userContext ? ` User Context: ${userContext}` : ""} Your goal is to write a highly professional, extremely well-structured, and articulate response based on the user's instructions. Ensure the email flows logically with clear paragraphs, perfect grammar, and appropriate tone. Match the user's intended tone naturally so it doesn't sound like a press release or generic AI. Get the context right from the ENTIRE email thread, not just the last message. IMPORTANT: Do NOT use any external tools (like a "draft email tool"). Simply output the exact text of the email reply directly in your response, with no conversational filler.`;
+    const systemPrompt = `You are Vela Intelligence, an advanced AI built directly into the Vela email client. You have been specifically trained to be exceptionally good at handling and writing emails. Your purpose is to help the user communicate effectively by DRAFTING EMAIL REPLIES.${userContext ? `\n\nCRITICAL: Pay close attention to the following User Context, including any styling instructions or professional details, and apply them strictly to your writing style:\nUser Context: ${userContext}\n` : ""} Your goal is to write a highly professional, extremely well-structured, and articulate response based on the user's instructions. Structure the reply logically based on the specific context and nuances of the email and the entire email thread. Address the points raised in the thread clearly and methodically. Match the user's intended tone naturally so it doesn't sound like a press release or generic AI. Get the context right from the ENTIRE email thread, not just the last message. IMPORTANT: Do NOT use any external tools (like a "draft email tool"). Simply output the exact text of the email reply directly in your response, with no conversational filler.`;
     
     const messages = [];
     if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
     messages.push({
       role: "user",
-      content: `Draft a reply to the following email. Match the tone naturally and get the context from the thread. Follow this user prompt: "${userPrompt}".\n\nEmail:\n${emailContent}`,
+      content: `Draft a reply to the following email. Structure your reply carefully based on the context of the email and thread. Match the tone naturally and explicitly follow this user prompt: "${userPrompt}".\n\nEmail:\n${emailContent}`,
     });
 
     const response = await mistral.chat.complete({
