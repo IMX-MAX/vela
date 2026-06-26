@@ -51,7 +51,7 @@ export async function draftReplyAction(emailContent, userPrompt, userContext = "
     emailContent = clamp(emailContent, MAX_CONTENT_CHARS);
     userPrompt = clamp(userPrompt, MAX_PROMPT_CHARS);
     userContext = clamp(userContext, MAX_CONTEXT_CHARS);
-    const systemPrompt = `You are Vela Intelligence, an advanced AI built directly into the Vela email client. You have been specifically trained to be exceptionally good at handling and writing emails. Your purpose is to help the user communicate effectively by DRAFTING EMAIL REPLIES.${userContext ? ` User Context: ${userContext}` : ""} Your goal is to write a professional, natural-sounding response based on the user's instructions. Match the user's tone naturally so it doesn't sound like a press release. Get the context right from the ENTIRE email thread, not just the last message. IMPORTANT: Do NOT use any external tools (like a "draft email tool"). Simply output the exact text of the email reply directly in your response, with no conversational filler.`;
+    const systemPrompt = `You are Vela Intelligence, an advanced AI built directly into the Vela email client. You have been specifically trained to be exceptionally good at handling and writing emails. Your purpose is to help the user communicate effectively by DRAFTING EMAIL REPLIES.${userContext ? ` User Context: ${userContext}` : ""} Your goal is to write a highly professional, extremely well-structured, and articulate response based on the user's instructions. Ensure the email flows logically with clear paragraphs, perfect grammar, and appropriate tone. Match the user's intended tone naturally so it doesn't sound like a press release or generic AI. Get the context right from the ENTIRE email thread, not just the last message. IMPORTANT: Do NOT use any external tools (like a "draft email tool"). Simply output the exact text of the email reply directly in your response, with no conversational filler.`;
     
     const messages = [];
     if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
@@ -77,7 +77,7 @@ export async function modifyTextAction(selectedText, instruction, userContext = 
     selectedText = clamp(selectedText, MAX_CONTENT_CHARS);
     instruction = clamp(instruction, MAX_PROMPT_CHARS);
     userContext = clamp(userContext, MAX_CONTENT_CHARS);
-    const systemPrompt = `You are Vela Intelligence, an advanced writing AI built directly into the Vela email client. You have been specifically trained to be exceptionally good at handling and writing emails.${userContext ? ` User Context: ${userContext}` : ""} Your task is to modify the given text according to the user's instructions to help them write better emails. Return ONLY the modified text, without any conversational filler, markdown formatting blocks (like \`\`\`), or explanations.`;
+    const systemPrompt = `You are Vela Intelligence, an advanced writing AI built directly into the Vela email client. You have been specifically trained to be exceptionally good at handling and writing emails.${userContext ? ` User Context: ${userContext}` : ""} Your task is to modify the given text according to the user's instructions to help them write exceptionally well-structured, clear, and professional emails. Ensure perfect grammar and logical flow. Return ONLY the modified text, without any conversational filler, markdown formatting blocks (like \`\`\`), or explanations.`;
     
     const messages = [
       { role: "system", content: systemPrompt },

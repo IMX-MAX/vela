@@ -88,6 +88,11 @@ export default function InboxPage() {
 
   const getAvailableTabs = useCallback(() => {
     let tabs = [];
+    const plan = user?.prefs?.plan || 'free';
+    if (plan !== 'pro') {
+      return ['Inbox'];
+    }
+
     const importantSplit = inboxSplits.find(s => s.id === 'important');
     if (importantSplit && importantSplit.enabled) {
       tabs.push('Important', 'Other');
@@ -99,7 +104,7 @@ export default function InboxPage() {
       tabs.push(s.name);
     });
     return tabs;
-  }, [inboxSplits]);
+  }, [inboxSplits, user]);
 
   const tabs = getAvailableTabs();
   useEffect(() => {

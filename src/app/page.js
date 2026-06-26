@@ -204,6 +204,23 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Feature 3.5: AI Models */}
+        <section className="py-24 px-12 md:px-24 max-w-[1400px] mx-auto w-full flex flex-col items-center text-center">
+          <div className="max-w-3xl mx-auto flex flex-col items-center gap-6">
+            <div className="bg-[#194060]/10 p-4 rounded-full inline-block mb-2">
+              <Sparkle size={32} weight="fill" className="text-[#194060]" />
+            </div>
+            <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-[#194060] leading-tight">
+              AI email apps are only as good as the models driving them.
+            </h2>
+            <div className="space-y-6 text-[#1e2a3b]/80 font-medium leading-relaxed text-lg md:text-xl mt-4">
+              <p>We've specially trained our models to excel at one thing: <span className="text-[#194060] font-semibold">Emails.</span></p>
+              <p>Unlike generic AI that outputs robotic, overly-formal text, Vela Intelligence writes natural, highly-structured, and context-aware responses designed to save you time and preserve your voice.</p>
+              <p>Don't believe it? <Link href="/login" className="text-[#7f99b0] hover:text-[#194060] underline underline-offset-4 transition-colors">Test it out yourself in the app.</Link></p>
+            </div>
+          </div>
+        </section>
+
         {/* Feature 4: Modern Age (Linear Style) */}
         <section className="py-32 px-6 md:px-12 max-w-[1200px] mx-auto w-full flex flex-col items-center text-center">
           <div className="max-w-3xl mb-16">
