@@ -4,7 +4,8 @@ import Link from "next/link";
 import { 
   PaperPlaneRight, Sparkle, ArrowBendUpLeft, PencilSimple, 
   Tray, ArrowRight, ArrowsOut, Briefcase, FileText, MagnifyingGlass,
-  Paperclip, Image, Star, CheckCircle, Trash, FadersHorizontal
+  Paperclip, Image, Star, CheckCircle, Trash, FadersHorizontal,
+  WarningOctagon, ChatCircle
 } from "@phosphor-icons/react";
 import MarketingNavbar from "@/components/MarketingNavbar";
 import MarketingFooter from "@/components/MarketingFooter";
@@ -300,6 +301,33 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Support Section */}
+        <section className="py-20 px-6 max-w-[1200px] mx-auto w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <Link href="https://tally.so/r/A702L0" target="_blank" className="bg-[#dddcdc]/50 border border-[#dddcdc] rounded-2xl p-8 hover:bg-[#dddcdc] transition-colors group flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center mb-4">
+                <WarningOctagon size={24} weight="fill" />
+              </div>
+              <h3 className="text-xl font-semibold text-[#194060] mb-2">Report a Bug</h3>
+              <p className="text-[#1e2a3b]/70 font-medium text-[15px] mb-6">Spotted something weird? Let us know so we can fix it.</p>
+              <div className="text-[#194060] font-semibold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-2 mt-auto">
+                File bug report <ArrowRight size={14} weight="bold" />
+              </div>
+            </Link>
+            
+            <Link href="https://tally.so/r/RGgMRp" target="_blank" className="bg-[#dddcdc]/50 border border-[#dddcdc] rounded-2xl p-8 hover:bg-[#dddcdc] transition-colors group flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
+                <ChatCircle size={24} weight="fill" />
+              </div>
+              <h3 className="text-xl font-semibold text-[#194060] mb-2">Customer Support</h3>
+              <p className="text-[#1e2a3b]/70 font-medium text-[15px] mb-6">Need help with your account or have a question? We're here.</p>
+              <div className="text-[#194060] font-semibold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-2 mt-auto">
+                Get support <ArrowRight size={14} weight="bold" />
+              </div>
+            </Link>
           </div>
         </section>
 

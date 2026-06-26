@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuthStore } from "@/lib/store";
 import { account } from "@/lib/appwrite";
 import { getUsageStatus } from "@/lib/usage";
-import { ArrowLeft, CaretLeft, DotsThree, Question } from "@phosphor-icons/react";
+import { ArrowLeft, CaretLeft, DotsThree, Question, WarningOctagon, ChatCircle, ArrowRight } from "@phosphor-icons/react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 
@@ -262,7 +262,13 @@ export default function SettingsPage() {
             className={`whitespace-nowrap px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'privacy' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
             onClick={() => router.push('/inbox/settings/privacy')}
           >
-            Privacy
+            Privacy & Data
+          </div>
+          <div 
+            className={`whitespace-nowrap px-3 py-1.5 rounded-lg font-medium cursor-pointer transition ${tab === 'support' ? 'bg-[#c7d4ce] text-[#2b323b]' : 'text-gray-600 hover:bg-[#c7d4ce]/50'}`} 
+            onClick={() => router.push('/inbox/settings/support')}
+          >
+            Support
           </div>
         </div>
       </div>
@@ -683,6 +689,36 @@ export default function SettingsPage() {
               >
                 Delete account
               </button>
+            </div>
+          </div>
+        )}
+
+        {tab === 'support' && (
+          <div className="max-w-2xl">
+            <h1 className="text-2xl font-medium text-[#2b323b] mb-8">Need help?</h1>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Link href="https://tally.so/r/A702L0" target="_blank" className="bg-[#eceae6] border border-[#dddcdc]/60 rounded-xl p-6 hover:bg-[#dddcdc]/50 transition-colors group flex flex-col items-start text-left shadow-sm">
+                <div className="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center mb-4">
+                  <WarningOctagon size={20} weight="fill" />
+                </div>
+                <h3 className="text-[15px] font-semibold text-[#2b323b] mb-1">Report a Bug</h3>
+                <p className="text-[13px] text-gray-500 mb-4 leading-relaxed">Spotted something weird? Let us know so we can fix it.</p>
+                <div className="text-blue-600 font-medium text-[13px] group-hover:translate-x-1 transition-transform flex items-center gap-1.5 mt-auto">
+                  File bug report <ArrowRight size={12} weight="bold" />
+                </div>
+              </Link>
+              
+              <Link href="https://tally.so/r/RGgMRp" target="_blank" className="bg-[#eceae6] border border-[#dddcdc]/60 rounded-xl p-6 hover:bg-[#dddcdc]/50 transition-colors group flex flex-col items-start text-left shadow-sm">
+                <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
+                  <ChatCircle size={20} weight="fill" />
+                </div>
+                <h3 className="text-[15px] font-semibold text-[#2b323b] mb-1">Customer Support</h3>
+                <p className="text-[13px] text-gray-500 mb-4 leading-relaxed">Need help with your account or have a question? We're here.</p>
+                <div className="text-blue-600 font-medium text-[13px] group-hover:translate-x-1 transition-transform flex items-center gap-1.5 mt-auto">
+                  Get support <ArrowRight size={12} weight="bold" />
+                </div>
+              </Link>
             </div>
           </div>
         )}
