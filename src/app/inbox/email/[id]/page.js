@@ -37,6 +37,7 @@ export default function EmailDetailPage() {
   const searchParams = useSearchParams();
   const { session, user, inboxEmails, checkAuth } = useAuthStore();
   const iframeRef = useRef(null);
+  const isSendingRef = useRef(false);
   
   const filter = searchParams.get('filter');
   const searchQ = searchParams.get('search');
@@ -502,7 +503,9 @@ export default function EmailDetailPage() {
   const handleSend = async () => {
     if (!email || !replyText || !resolvedToken) return;
     if (replyType === 'forward' && !forwardTo) return;
+    if (isSendingRef.current) return;
     
+    isSendingRef.current = true;
     setIsSending(true);
     try {
       let toField = email.senderEmail;
@@ -542,6 +545,8 @@ export default function EmailDetailPage() {
       setReplyHtml("");
       setDraft("");
       setAttachments([]);
+      
+      isSendingRef.current = false;
       setIsSending(false);
       
       // Re-fetch the thread to show the new message
@@ -556,6 +561,7 @@ export default function EmailDetailPage() {
       }
     } catch (error) {
       console.error("Failed to send", error);
+      isSendingRef.current = false;
       setIsSending(false);
     }
   };
