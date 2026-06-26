@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Client, Databases } from 'node-appwrite';
 import { cookies } from 'next/headers';
-
+import Stripe from 'stripe';
 export async function POST(req) {
   try {
     const { billingCycle } = await req.json();
@@ -32,13 +32,40 @@ export async function POST(req) {
 
     const userId = currentUser.$id;
 
-    const annualLink = "https://buy.stripe.com/8x25kC59r7LKbQW10Xebu00";
-    const monthlyLink = "https://buy.stripe.com/14A9ASeK12rqf388tpebu01";
-    
-    const baseUrl = billingCycle === 'annual' ? annualLink : monthlyLink;
-    const checkoutUrl = `${baseUrl}?client_reference_id=${userId}&prefilled_email=${encodeURIComponent(currentUser.email)}`;
+    // Initialize Stripe
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeKey) {
+      // Return a mock URL if Stripe is not configured yet
+      return NextResponse.json({ url: '/inbox/settings?stripe=mock_success' });
+    }
 
-    return NextResponse.json({ url: checkoutUrl });
+    const stripe = new Stripe(stripeKey, { apiVersion: '2025-03-31.basil' });
+
+    const priceId = billingCycle === 'annual' 
+      ? process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID 
+      : process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID;
+
+    if (!priceId) {
+      return NextResponse.json({ error: 'Stripe price IDs not configured' }, { status: 500 });
+    }
+
+    const checkoutSession = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      managed_payments: { enabled: true },
+      allow_promotion_codes: true,
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      client_reference_id: userId,
+      customer_email: currentUser.email,
+      success_url: `${req.headers.get('origin')}/inbox/settings?session_id={CHECKOUT_SESSION_ID}&success=true`,
+      cancel_url: `${req.headers.get('origin')}/inbox/settings?canceled=true`,
+    });
+
+    return NextResponse.json({ url: checkoutSession.url });
 
   } catch (error) {
     console.error('Stripe checkout error:', error);
