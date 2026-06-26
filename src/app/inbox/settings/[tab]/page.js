@@ -500,7 +500,7 @@ export default function SettingsPage() {
                 <ul className="text-[14px] text-gray-700 space-y-3">
                   <li className="flex items-start gap-2.5">
                     <svg className="w-3.5 h-3.5 text-gray-800 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> 
-                    <span>27 AI runs per month</span>
+                    <span>limited monthly AI usage</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <svg className="w-3.5 h-3.5 text-gray-800 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> 
