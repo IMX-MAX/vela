@@ -61,6 +61,8 @@ export async function POST(req) {
         const subscription = event.data.object;
         const customerId = subscription.customer;
         const status = subscription.status; // 'active', 'past_due', 'canceled', etc.
+        const cancelAtPeriodEnd = subscription.cancel_at_period_end || false;
+        const currentPeriodEnd = subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : null;
 
         // Find user by stripeCustomerId
         const { Query } = await import('node-appwrite');
@@ -72,7 +74,9 @@ export async function POST(req) {
           const userDoc = users.documents[0];
           await databases.updateDocument('default', 'users', userDoc.$id, {
             subscriptionPlan: status === 'active' ? 'pro' : 'free',
-            subscriptionStatus: status
+            subscriptionStatus: status,
+            cancelAtPeriodEnd: cancelAtPeriodEnd,
+            currentPeriodEnd: currentPeriodEnd
           });
         }
         break;
@@ -90,7 +94,8 @@ export async function POST(req) {
           const userDoc = users.documents[0];
           await databases.updateDocument('default', 'users', userDoc.$id, {
             subscriptionPlan: 'free',
-            subscriptionStatus: 'canceled'
+            subscriptionStatus: 'canceled',
+            cancelAtPeriodEnd: false
           });
         }
         break;
