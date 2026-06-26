@@ -82,9 +82,11 @@ export default function AiEditor({ value, onChange, placeholder = "Write somethi
     
     let isFallback = false;
     if (!selectedText) {
+      const textBefore = editor.state.doc.textBetween(0, from, ' ');
+      const textAfter = editor.state.doc.textBetween(to, editor.state.doc.content.size, ' ');
+      selectedText = textBefore + " [CURSOR] " + textAfter;
       from = 0;
       to = editor.state.doc.content.size;
-      selectedText = editor.getText();
     }
 
     const promptText = isCustom ? inputPrompt : instruction;

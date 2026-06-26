@@ -77,7 +77,7 @@ export async function modifyTextAction(selectedText, instruction, userContext = 
     selectedText = clamp(selectedText, MAX_CONTENT_CHARS);
     instruction = clamp(instruction, MAX_PROMPT_CHARS);
     userContext = clamp(userContext, MAX_CONTENT_CHARS);
-    const systemPrompt = `You are Vela Intelligence, an advanced writing AI built directly into the Vela email client. You have been specifically trained to be exceptionally good at handling and writing emails.${userContext ? ` User Context: ${userContext}` : ""} Your task is to modify the given text according to the user's instructions to help them write exceptionally well-structured, clear, and professional emails. Ensure perfect grammar and logical flow. Return ONLY the modified text, without any conversational filler, markdown formatting blocks (like \`\`\`), or explanations.`;
+    const systemPrompt = `You are Vela Intelligence, an advanced writing AI built directly into the Vela email client. You have been specifically trained to be exceptionally good at handling and writing emails.${userContext ? ` User Context: ${userContext}` : ""} Your task is to modify the given text according to the user's instructions. Ensure perfect grammar and logical flow. If the text contains the marker "[CURSOR]", that indicates exactly where the user invoked the AI command (e.g. if they asked to "Expand on this", they want you to expand the text specifically around the [CURSOR]). Return ONLY the complete modified text, without any conversational filler, markdown formatting blocks (like \`\`\`), or the [CURSOR] marker itself.`;
     
     const messages = [
       { role: "system", content: systemPrompt },
