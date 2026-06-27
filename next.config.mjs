@@ -31,7 +31,6 @@ const nextConfig = {
   poweredByHeader: false,
   experimental: {
     reactCompiler: true,
-    instrumentationHook: true,
   },
   async headers() {
     return [
