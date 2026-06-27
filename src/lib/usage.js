@@ -69,12 +69,12 @@ export async function incrementAiUsage(user, checkAuth) {
   }
 
   // Increment securely via API
-  const { account } = await import("./appwrite");
-  const jwtResponse = await account.createJWT();
+  const { getValidJWT } = await import('@/lib/appwrite');
+  const jwt = await getValidJWT();
   const res = await fetch('/api/user/increment-usage', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${jwtResponse.jwt}`
+      'Authorization': `Bearer ${jwt}`
     }
   });
 

@@ -263,13 +263,13 @@ export default function InboxPage() {
 
         if (updatedAccounts && user) {
           try {
-            const { account } = await import('@/lib/appwrite');
-            const jwtResponse = await account.createJWT();
-            await fetch('/api/user/update-accounts', {
+            const { getValidJWT } = await import('@/lib/appwrite');
+            const jwt = await getValidJWT();
+            const res = await fetch('/api/user/update-accounts', {
               method: 'POST',
               headers: { 
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${jwtResponse.jwt}`
+                'Authorization': `Bearer ${jwt}`
               },
               body: JSON.stringify({ accounts: additionalAccounts })
             });

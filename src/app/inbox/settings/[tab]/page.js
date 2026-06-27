@@ -123,13 +123,13 @@ export default function SettingsPage() {
           });
         }
         
-        const { account } = await import('@/lib/appwrite');
-        const jwtResponse = await account.createJWT();
+        const { getValidJWT } = await import('@/lib/appwrite');
+        const jwt = await getValidJWT();
         await fetch('/api/user/update-accounts', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${jwtResponse.jwt}`
+            'Authorization': `Bearer ${jwt}`
           },
           body: JSON.stringify({ accounts: newAccounts })
         });
@@ -145,11 +145,12 @@ export default function SettingsPage() {
 
   const openStripePortal = async () => {
     try {
-      const { account } = await import('@/lib/appwrite');
-      const jwtResponse = await account.createJWT();
+      const { getValidJWT } = await import('@/lib/appwrite');
+      const jwt = await getValidJWT();
+      
       const res = await fetch('/api/stripe/portal', {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${jwtResponse.jwt}` }
+        headers: { 'Authorization': `Bearer ${jwt}` }
       });
       const data = await res.json();
       if (data.url) {
@@ -189,12 +190,13 @@ export default function SettingsPage() {
     
     if (confirm("Are you sure you want to delete your account? This action cannot be undone. All your connected accounts and local data will be permanently removed.")) {
       try {
-        const { account } = await import('@/lib/appwrite');
-        const jwtResponse = await account.createJWT();
-        const res = await fetch('/api/account/delete', { 
+        const { getValidJWT } = await import('@/lib/appwrite');
+        const jwt = await getValidJWT();
+        
+        const res = await fetch('/api/account/delete', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${jwtResponse.jwt}`
+            'Authorization': `Bearer ${jwt}`
           }
         });
         if (!res.ok) throw new Error("Failed to delete");

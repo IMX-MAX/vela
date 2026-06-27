@@ -32,14 +32,14 @@ function CheckoutContent() {
     async function initializeCheckout() {
       try {
         setIsLoading(true);
-        const { account } = await import('@/lib/appwrite');
-        const jwtResponse = await account.createJWT();
+        const { getValidJWT } = await import('@/lib/appwrite');
+        const jwt = await getValidJWT();
         
         const res = await fetch('/api/stripe/checkout', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${jwtResponse.jwt}`
+            'Authorization': `Bearer ${jwt}`
           },
           body: JSON.stringify({ billingCycle })
         });
