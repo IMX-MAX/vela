@@ -28,12 +28,33 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (searchParams.get('success') === 'true') {
-      setShowSuccess(true);
-      // Clean up URL params
-      const url = new URL(window.location.href);
-      url.searchParams.delete('success');
-      url.searchParams.delete('session_id');
-      window.history.replaceState({}, '', url.pathname);
+      const sessionId = searchParams.get('session_id');
+      
+      const verifyPayment = async () => {
+        if (sessionId) {
+          try {
+            await fetch('/api/stripe/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ session_id: sessionId })
+            });
+            // Instantly re-sync local auth state with the newly updated Appwrite db
+            await useAuthStore.getState().checkAuth();
+          } catch(e) {
+            console.error('Failed to verify session', e);
+          }
+        }
+      };
+
+      verifyPayment().then(() => {
+        setShowSuccess(true);
+        // Clean up URL params
+        const url = new URL(window.location.href);
+        url.searchParams.delete('success');
+        url.searchParams.delete('session_id');
+        window.history.replaceState({}, '', url.pathname);
+      });
+      
       // Auto-dismiss after 5 seconds
       const timer = setTimeout(() => setShowSuccess(false), 5000);
       return () => clearTimeout(timer);

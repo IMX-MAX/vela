@@ -83,7 +83,7 @@ export async function POST(req) {
         },
       ],
       client_reference_id: userId,
-      return_url: `${baseUrl}/inbox/settings/billing?success=true`,
+      return_url: `${baseUrl}/inbox/settings/billing?success=true&session_id={CHECKOUT_SESSION_ID}`,
     };
 
     if (userDoc?.stripeCustomerId) {
