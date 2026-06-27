@@ -92,7 +92,30 @@ export async function POST(req) {
       sessionParams.customer_email = currentUser.email;
     }
 
-    const checkoutSession = await stripe.checkout.sessions.create(sessionParams);
+    let checkoutSession;
+    try {
+      checkoutSession = await stripe.checkout.sessions.create(sessionParams);
+    } catch (stripeErr) {
+      if (stripeErr.code === 'resource_missing' && stripeErr.message.includes('No such customer')) {
+        console.warn('Invalid Stripe customer ID found, retrying without it...');
+        delete sessionParams.customer;
+        if (currentUser.email) {
+          sessionParams.customer_email = currentUser.email;
+        }
+        checkoutSession = await stripe.checkout.sessions.create(sessionParams);
+        
+        // Try to clear the invalid ID from the database
+        try {
+          await databases.updateDocument('default', 'users', userId, {
+            stripeCustomerId: ''
+          });
+        } catch (dbErr) {
+          console.error('Failed to clear invalid stripe customer id', dbErr);
+        }
+      } else {
+        throw stripeErr;
+      }
+    }
 
     return NextResponse.json({ client_secret: checkoutSession.client_secret });
 
