@@ -29,6 +29,9 @@ const securityHeaders = [
 
 const nextConfig = {
   poweredByHeader: false,
+  experimental: {
+    reactCompiler: true,
+  },
   async headers() {
     return [
       {
