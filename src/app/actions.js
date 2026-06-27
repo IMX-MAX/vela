@@ -10,6 +10,9 @@ function getMistralClient() {
   return new Mistral({ apiKey: process.env.MISTRAL_API_KEY });
 }
 
+import { sanitizeInput } from '@/lib/validation';
+import { headers } from 'next/headers';
+
 // Defensive caps so a malicious/oversized payload can't run up unbounded LLM costs.
 const MAX_CONTENT_CHARS = 24000;
 const MAX_CONTEXT_CHARS = 2000;
@@ -20,8 +23,36 @@ function clamp(value, max) {
   return value.length > max ? value.slice(0, max) : value;
 }
 
+// Rate limiting check
+const rateLimiter = new Map();
+
+async function checkRateLimit() {
+  const ip = (await headers()).get('x-forwarded-for') || 'unknown';
+  const now = Date.now();
+  const window = 60000; // 1 minute
+  const maxRequests = 10;
+  
+  const userRequests = rateLimiter.get(ip) || [];
+  const recentRequests = userRequests.filter(t => now - t < window);
+  
+  if (recentRequests.length >= maxRequests) {
+    throw new Error("Rate limit exceeded");
+  }
+  
+  recentRequests.push(now);
+  rateLimiter.set(ip, recentRequests);
+  
+  // Cleanup old entries
+  setTimeout(() => rateLimiter.delete(ip), window);
+}
+
 export async function summarizeEmailAction(emailContent, userContext = "") {
   try {
+    await checkRateLimit();
+    emailContent = sanitizeInput(emailContent);
+    userContext = sanitizeInput(userContext);
+    if (!emailContent) return "No content to summarize";
+    
     const mistral = getMistralClient();
     emailContent = clamp(emailContent, MAX_CONTENT_CHARS);
     userContext = clamp(userContext, MAX_CONTEXT_CHARS);
@@ -47,6 +78,11 @@ export async function summarizeEmailAction(emailContent, userContext = "") {
 
 export async function draftReplyAction(emailContent, userPrompt, userContext = "") {
   try {
+    await checkRateLimit();
+    emailContent = sanitizeInput(emailContent);
+    userPrompt = sanitizeInput(userPrompt);
+    userContext = sanitizeInput(userContext);
+    
     const mistral = getMistralClient();
     emailContent = clamp(emailContent, MAX_CONTENT_CHARS);
     userPrompt = clamp(userPrompt, MAX_PROMPT_CHARS);
@@ -73,6 +109,11 @@ export async function draftReplyAction(emailContent, userPrompt, userContext = "
 
 export async function modifyTextAction(selectedText, instruction, userContext = "") {
   try {
+    await checkRateLimit();
+    selectedText = sanitizeInput(selectedText);
+    instruction = sanitizeInput(instruction);
+    userContext = sanitizeInput(userContext);
+    
     const mistral = getMistralClient();
     selectedText = clamp(selectedText, MAX_CONTENT_CHARS);
     instruction = clamp(instruction, MAX_PROMPT_CHARS);
@@ -97,6 +138,8 @@ export async function modifyTextAction(selectedText, instruction, userContext = 
 
 export async function chatStepAction(messages, tokenOrConnectionId, userContext = "") {
   try {
+    await checkRateLimit();
+    userContext = sanitizeInput(userContext);
     const mistral = getMistralClient();
     userContext = clamp(userContext, MAX_CONTEXT_CHARS);
 
@@ -234,6 +277,8 @@ export async function chatStepAction(messages, tokenOrConnectionId, userContext 
 
 export async function chatWithAiAction(messages, tokenOrConnectionId, userContext = "") {
   try {
+    await checkRateLimit();
+    userContext = sanitizeInput(userContext);
     const mistral = getMistralClient();
     userContext = clamp(userContext, MAX_CONTEXT_CHARS);
 
@@ -400,6 +445,10 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
 
 export async function analyzeWritingStyleAction(emailBody, currentStyle = "") {
   try {
+    await checkRateLimit();
+    emailBody = sanitizeInput(emailBody);
+    currentStyle = sanitizeInput(currentStyle);
+    
     const mistral = getMistralClient();
     emailBody = clamp(emailBody, MAX_CONTENT_CHARS);
     currentStyle = clamp(currentStyle, MAX_CONTEXT_CHARS);

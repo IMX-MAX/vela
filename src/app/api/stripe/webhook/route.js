@@ -119,6 +119,96 @@ export async function POST(req) {
         }
         break;
       }
+      case 'customer.subscription.paused': {
+        const subscription = event.data.object;
+        const customerId = subscription.customer;
+        
+        const { Query } = await import('node-appwrite');
+        const users = await databases.listDocuments('default', 'users', [
+          Query.equal('stripeCustomerId', customerId)
+        ]);
+        
+        if (users.documents.length > 0) {
+          const userDoc = users.documents[0];
+          await databases.updateDocument('default', 'users', userDoc.$id, {
+            subscriptionStatus: 'paused',
+            cancelAtPeriodEnd: subscription.cancel_at_period_end || false
+          });
+        }
+        break;
+      }
+      case 'customer.subscription.resumed': {
+        const subscription = event.data.object;
+        const customerId = subscription.customer;
+        
+        const { Query } = await import('node-appwrite');
+        const users = await databases.listDocuments('default', 'users', [
+          Query.equal('stripeCustomerId', customerId)
+        ]);
+        
+        if (users.documents.length > 0) {
+          const userDoc = users.documents[0];
+          await databases.updateDocument('default', 'users', userDoc.$id, {
+            subscriptionPlan: 'pro',
+            subscriptionStatus: 'active',
+            cancelAtPeriodEnd: false
+          });
+        }
+        break;
+      }
+      case 'invoice.payment_succeeded': {
+        const invoice = event.data.object;
+        const customerId = invoice.customer;
+        
+        const { Query } = await import('node-appwrite');
+        const users = await databases.listDocuments('default', 'users', [
+          Query.equal('stripeCustomerId', customerId)
+        ]);
+        
+        if (users.documents.length > 0) {
+          const userDoc = users.documents[0];
+          await databases.updateDocument('default', 'users', userDoc.$id, {
+            aiUsageCount: 0,
+            lastUsageReset: new Date().toISOString()
+          });
+        }
+        break;
+      }
+      case 'customer.subscription.trial_will_end': {
+        const subscription = event.data.object;
+        const customerId = subscription.customer;
+        
+        const { Query } = await import('node-appwrite');
+        const users = await databases.listDocuments('default', 'users', [
+          Query.equal('stripeCustomerId', customerId)
+        ]);
+        
+        if (users.documents.length > 0) {
+          const userDoc = users.documents[0];
+          if (process.env.RESEND_API_KEY) {
+            const { Resend } = await import('resend');
+            const resend = new Resend(process.env.RESEND_API_KEY);
+            await resend.emails.send({
+              from: 'Vela <noreply@getvela.email>',
+              to: userDoc.email,
+              subject: 'Your Vela trial is ending soon',
+              html: `<p>Your trial ends in 3 days. <a href="${process.env.NEXT_PUBLIC_URL}/pricing">Upgrade now</a> to keep using Pro features.</p>`
+            });
+          }
+        }
+        break;
+      }
+      case 'checkout.session.expired': {
+        const session = event.data.object;
+        const userId = session.client_reference_id;
+        
+        if (userId) {
+          await databases.updateDocument('default', 'users', userId, {
+            stripeCheckoutSessionId: null
+          });
+        }
+        break;
+      }
       default:
         console.log(`Unhandled event type ${event.type}`);
     }

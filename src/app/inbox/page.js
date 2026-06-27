@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { fetchEmails } from "@/lib/gmail";
 import { parseEmailContent } from "@/lib/emailParser";
 import { useAuthStore } from "@/lib/store";
-import { format, isToday } from "date-fns";
+import Image from "next/image";
+import { format, isToday, isYesterday, formatDistanceToNowStrict } from "date-fns";
+import { refreshTokenSafely } from "@/lib/tokenLock";
 import { useShortcuts, checkShortcut } from "@/lib/shortcuts";
 import { Check, Trash, MagnifyingGlass, Command, Link as LinkIcon, Spinner, FadersHorizontal, X, Plus, ToggleLeft, ToggleRight } from "@phosphor-icons/react";
 import { EmailListSkeleton } from "@/components/Skeletons";
@@ -202,13 +204,8 @@ export default function InboxPage() {
       if (token && session?.providerRefreshToken && session?.providerAccessTokenExpiry) {
         if (new Date(session.providerAccessTokenExpiry) < new Date(Date.now() + 5 * 60000)) {
           try {
-            const res = await fetch('/api/oauth/google/refresh', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ refresh_token: session.providerRefreshToken })
-            });
-            if (res.ok) {
-              const data = await res.json();
+            const data = await refreshTokenSafely(session.providerRefreshToken, user.email);
+            if (data && data.access_token) {
               token = data.access_token;
               useAuthStore.setState((state) => ({
                 session: {
@@ -251,13 +248,8 @@ export default function InboxPage() {
               return { ...acc, isPaused: true };
             }
             try {
-              const res = await fetch('/api/oauth/google/refresh', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ refresh_token: acc.refreshToken })
-              });
-              if (!res.ok) throw new Error('Refresh failed');
-              const data = await res.json();
+              const data = await refreshTokenSafely(acc.refreshToken, acc.email);
+              if (!data || !data.access_token) throw new Error('Refresh failed');
               updatedAccounts = true;
               return { ...acc, token: data.access_token, tokenExpiry: data.expiry_date, isPaused: false };
             } catch (err) {
@@ -339,33 +331,47 @@ export default function InboxPage() {
     }
   }, [loading, loadingMore, nextPageToken, filteredEmails.length, authError, emptyFetches, handleLoadMore]);
 
-  const prefetchEmailBody = useCallback(async (id) => {
-    if (!resolvedToken) return;
-    try {
-      const { getCachedEmailBody, saveCachedEmailBody } = await import("@/lib/db");
-      const cached = await getCachedEmailBody(id);
-      if (cached) return;
-      
-      const { fetchEmailDetails } = await import("@/lib/gmail");
-      const { parseEmailContent } = await import("@/lib/emailParser");
-      const emailObj = emails.find(e => e.id === id) || useAuthStore.getState().inboxEmails?.find(e => e.id === id);
-      const tokenToUse = emailObj && emailObj._accountIndex !== undefined && Array.isArray(resolvedToken) ? resolvedToken[emailObj._accountIndex] : (Array.isArray(resolvedToken) ? resolvedToken[0] : resolvedToken);
-      const rawMsg = await fetchEmailDetails(tokenToUse, id);
-      const parsed = parseEmailContent(rawMsg);
-      await saveCachedEmailBody(id, parsed);
-    } catch (e) {
-      console.error("Prefetch error:", e);
-    }
-  }, [resolvedToken]);
-
   useEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
+    
+    const prefetchEmailBody = async (id) => {
+      if (!resolvedToken) return;
+      try {
+        const { getCachedEmailBody, saveCachedEmailBody } = await import("@/lib/db");
+        const cached = await getCachedEmailBody(id);
+        if (cached) return;
+        
+        const { fetchEmailDetails } = await import("@/lib/gmail");
+        const { parseEmailContent } = await import("@/lib/emailParser");
+        const emailObj = emails.find(e => e.id === id) || useAuthStore.getState().inboxEmails?.find(e => e.id === id);
+        const tokenToUse = emailObj && emailObj._accountIndex !== undefined && Array.isArray(resolvedToken) ? resolvedToken[emailObj._accountIndex] : (Array.isArray(resolvedToken) ? resolvedToken[0] : resolvedToken);
+        
+        const rawMsg = await fetchEmailDetails(tokenToUse, id, { signal });
+        if (!rawMsg) return; // aborted or error
+        const parsed = parseEmailContent(rawMsg);
+        await saveCachedEmailBody(id, parsed);
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          console.error("Prefetch error:", e);
+        }
+      }
+    };
+
     if (emails.length > 0 && resolvedToken) {
       const topEmails = emails.slice(0, 20);
       topEmails.forEach((email) => {
         prefetchEmailBody(email.id);
       });
     }
-  }, [emails, resolvedToken, prefetchEmailBody]);
+
+    // Attach to window so onMouseEnter can trigger it manually without recreating hooks
+    window.__prefetchEmailBody = prefetchEmailBody;
+
+    return () => {
+      controller.abort();
+    };
+  }, [emails, resolvedToken]);
 
   const handleDone = async (e, id) => {
     e.stopPropagation();
@@ -538,7 +544,7 @@ export default function InboxPage() {
                     router.push(`/inbox/email/${email.id}${qs ? `?${qs}` : ''}`);
                   }
                 }}
-                onMouseEnter={() => { setHoveredEmailId(email.id); prefetchEmailBody(email.id); }}
+                onMouseEnter={() => { setHoveredEmailId(email.id); if (window.__prefetchEmailBody) window.__prefetchEmailBody(email.id); }}
                 onMouseLeave={() => setHoveredEmailId(null)}
                 className={`group flex flex-col md:flex-row md:items-center px-4 md:px-6 py-3 md:py-2.5 cursor-pointer border-b border-[#2b323b]/5 hover:bg-[#dddcdc]/50 transition gap-0.5 md:gap-0 ${
                   email.isUnread ? "bg-white" : ""
