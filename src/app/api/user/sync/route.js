@@ -4,6 +4,14 @@ import { cookies } from 'next/headers';
 import { Resend } from 'resend';
 
 export async function GET(req) {
+  return handleSync(req);
+}
+
+export async function POST(req) {
+  return handleSync(req);
+}
+
+async function handleSync(req) {
   try {
     const authHeader = req.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
