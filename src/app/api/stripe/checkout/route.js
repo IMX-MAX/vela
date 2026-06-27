@@ -79,12 +79,12 @@ export async function POST(req) {
         },
       ],
       client_reference_id: userId,
-      return_url: `${req.headers.get('origin')}/inbox/settings/billing?success=true`,
+      return_url: `${new URL(req.url).origin}/inbox/settings/billing?success=true`,
     };
 
     if (userDoc?.stripeCustomerId) {
       sessionParams.customer = userDoc.stripeCustomerId;
-    } else {
+    } else if (currentUser.email) {
       sessionParams.customer_email = currentUser.email;
     }
 
