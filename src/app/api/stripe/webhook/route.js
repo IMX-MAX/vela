@@ -64,7 +64,8 @@ export async function POST(req) {
         const customerId = subscription.customer;
         const status = subscription.status; // 'active', 'past_due', 'canceled', etc.
         const cancelAtPeriodEnd = subscription.cancel_at_period_end || false;
-        const currentPeriodEnd = subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : null;
+        const periodEndTimestamp = subscription.current_period_end || subscription.cancel_at || subscription.items?.data?.[0]?.current_period_end;
+        const currentPeriodEnd = periodEndTimestamp ? new Date(periodEndTimestamp * 1000).toISOString() : null;
 
         // Find user by stripeCustomerId
         const { Query } = await import('node-appwrite');
