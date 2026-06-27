@@ -107,7 +107,7 @@ export async function chatStepAction(messages, tokenOrConnectionId, userContext 
     }
 
     let updatedMessages = [...messages];
-    const systemContent = `You are Vela AI, an advanced email assistant powering the Command Palette. Your goal is to help the user manage their inbox efficiently. You have access to tools to search the user's inbox, search their contacts, and draft new emails. When referencing emails from search results, always use markdown links like [Subject](/inbox/email/MESSAGE_ID). Be concise, helpful, and proactive.${userContext ? ` User Context: ${userContext}` : ""}`;
+    const systemContent = `You are Vela AI, an advanced email assistant powering the Command Palette. Your goal is to help the user manage their inbox efficiently. You have access to tools to search the user's inbox, read specific emails, search their contacts, and draft new emails. When referencing emails from search results, always use markdown links like [Subject](/inbox/email/MESSAGE_ID). Be concise, helpful, and proactive.${userContext ? ` User Context: ${userContext}` : ""}`;
     if (!updatedMessages.some(m => m.role === "system")) {
       updatedMessages = [{ role: "system", content: systemContent }, ...updatedMessages];
     }
@@ -159,6 +159,20 @@ export async function chatStepAction(messages, tokenOrConnectionId, userContext 
               required: ["to", "subject", "body"]
             }
           }
+        },
+        {
+          type: "function",
+          function: {
+            name: "read_email",
+            description: "Read the full content of a specific email by its message ID.",
+            parameters: {
+              type: "object",
+              properties: {
+                messageId: { type: "string", description: "The ID of the email to read." }
+              },
+              required: ["messageId"]
+            }
+          }
         }
       ],
       toolChoice: "auto"
@@ -195,6 +209,18 @@ export async function chatStepAction(messages, tokenOrConnectionId, userContext 
       } else if (toolCall.function.name === "draft_email") {
         const result = `I've prepared a draft for you to review:\n\n\`\`\`draft-email\n${JSON.stringify({ to: args.to, subject: args.subject, body: args.body }, null, 2)}\n\`\`\``;
         return { type: 'text', content: result, message: choice };
+      } else if (toolCall.function.name === "read_email") {
+        const { fetchEmailDetails } = await import("@/lib/gmail");
+        const { parseEmailContent } = await import("@/lib/emailParser");
+        try {
+          const rawMsg = await fetchEmailDetails(tokenOrConnectionId, args.messageId);
+          if (rawMsg.error) throw new Error(rawMsg.error.message || "Failed to fetch email");
+          const parsed = parseEmailContent(rawMsg);
+          const toolResult = `Subject: ${parsed.subject}\nFrom: ${parsed.from}\nDate: ${parsed.date}\nBody:\n${parsed.body || parsed.htmlBody || "No body content"}`.slice(0, 10000);
+          return { type: 'tool', name: toolCall.function.name, args, result: toolResult, message: choice, toolCallId: toolCall.id, thought: choice.content };
+        } catch (error) {
+          return { type: 'tool', name: toolCall.function.name, args, result: "Failed to read email: " + error.message, message: choice, toolCallId: toolCall.id, thought: choice.content };
+        }
       }
     }
 
@@ -220,7 +246,7 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
 
     // Inject system prompt if there is user context, but only if we haven't already
     let updatedMessages = [...messages];
-    const systemContent = `You are Vela AI, an advanced email assistant powering the Command Palette. Your goal is to help the user manage their inbox efficiently. You have access to tools to search the user's inbox, search their contacts, and draft new emails. When referencing emails from search results, always use markdown links like [Subject](/inbox/email/MESSAGE_ID). Be concise, helpful, and proactive.${userContext ? ` User Context: ${userContext}` : ""}`;
+    const systemContent = `You are Vela AI, an advanced email assistant powering the Command Palette. Your goal is to help the user manage their inbox efficiently. You have access to tools to search the user's inbox, read specific emails, search their contacts, and draft new emails. When referencing emails from search results, always use markdown links like [Subject](/inbox/email/MESSAGE_ID). Be concise, helpful, and proactive.${userContext ? ` User Context: ${userContext}` : ""}`;
     if (!updatedMessages.some(m => m.role === "system")) {
       updatedMessages = [{ role: "system", content: systemContent }, ...updatedMessages];
     }
@@ -340,6 +366,28 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
         ], tokenOrConnectionId, userContext);
       } else if (toolCall.function.name === "draft_email") {
         return `I've prepared a draft for you to review:\n\n\`\`\`draft-email\n${JSON.stringify({ to: args.to, subject: args.subject, body: args.body }, null, 2)}\n\`\`\``;
+      } else if (toolCall.function.name === "read_email") {
+        const { fetchEmailDetails } = await import("@/lib/gmail");
+        const { parseEmailContent } = await import("@/lib/emailParser");
+        let toolResult = "";
+        try {
+          const rawMsg = await fetchEmailDetails(tokenOrConnectionId, args.messageId);
+          if (rawMsg.error) throw new Error(rawMsg.error.message || "Failed to fetch email");
+          const parsed = parseEmailContent(rawMsg);
+          toolResult = `Subject: ${parsed.subject}\nFrom: ${parsed.from}\nDate: ${parsed.date}\nBody:\n${parsed.body || parsed.htmlBody || "No body content"}`.slice(0, 10000);
+        } catch (error) {
+          toolResult = "Failed to read email: " + error.message;
+        }
+        return await chatWithAiAction([
+          ...updatedMessages,
+          choice,
+          {
+            role: "tool",
+            name: "read_email",
+            content: toolResult,
+            toolCallId: toolCall.id
+          }
+        ], tokenOrConnectionId, userContext);
       }
     }
 
