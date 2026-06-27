@@ -64,29 +64,35 @@ export async function POST(req) {
     }
 
     const userId = currentUser.$id;
-    let userDoc = await databases.getDocument('default', 'users', userId);
+    
+    // Import our lock
+    const { withUsageLock } = await import('@/lib/usageLock');
+    
+    return await withUsageLock(userId, async () => {
+      let userDoc = await databases.getDocument('default', 'users', userId);
 
-    const plan = userDoc.subscriptionPlan === 'pro' ? 'pro' : 'free';
-    const limit = plan === 'pro' ? 100 : 27;
-    let current = userDoc.aiUsageCount || 0;
-    let lastReset = userDoc.lastUsageReset;
+      const plan = userDoc.subscriptionPlan === 'pro' ? 'pro' : 'free';
+      const limit = plan === 'pro' ? 100 : 27;
+      let current = userDoc.aiUsageCount || 0;
+      let lastReset = userDoc.lastUsageReset;
 
-    if (shouldResetUsage(plan, lastReset)) {
-      current = 0;
-      lastReset = new Date().toISOString();
-    }
+      if (shouldResetUsage(plan, lastReset)) {
+        current = 0;
+        lastReset = new Date().toISOString();
+      }
 
-    if (current >= limit) {
-      return NextResponse.json({ error: 'limit_reached' }, { status: 403 });
-    }
+      if (current >= limit) {
+        return NextResponse.json({ error: 'limit_reached' }, { status: 403 });
+      }
 
-    // Standard read-modify-write since { increment: 1 } caused 500 error on Appwrite
-    userDoc = await databases.updateDocument('default', 'users', userId, {
-      aiUsageCount: current + 1, 
-      lastUsageReset: lastReset
+      // Standard read-modify-write since { increment: 1 } caused 500 error on Appwrite
+      userDoc = await databases.updateDocument('default', 'users', userId, {
+        aiUsageCount: current + 1, 
+        lastUsageReset: lastReset
+      });
+
+      return NextResponse.json({ success: true, db: userDoc });
     });
-
-    return NextResponse.json({ success: true, db: userDoc });
 
   } catch (error) {
     console.error('Increment usage error:', error);
