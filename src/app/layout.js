@@ -1,4 +1,5 @@
 import "./app.css";
+import { CSPostHogProvider } from './providers';
 
 export const metadata = {
   metadataBase: new URL("https://getvela.email"),
@@ -72,7 +73,9 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="bg-[#eceae6] text-[#1e1e1e] antialiased font-[Inter] text-[14px]">
-        {children}
+        <CSPostHogProvider>
+          {children}
+        </CSPostHogProvider>
       </body>
     </html>
   );
