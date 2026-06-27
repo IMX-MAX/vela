@@ -7,7 +7,8 @@ if (typeof window !== 'undefined') {
   const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN || process.env.NEXT_PUBLIC_POSTHOG_KEY;
   if (token) {
     posthog.init(token, {
-      api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
+      api_host: '/ingest',
+      ui_host: 'https://us.posthog.com',
       person_profiles: 'identified_only',
     });
   } else {
