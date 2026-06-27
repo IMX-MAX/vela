@@ -68,34 +68,25 @@ export async function POST(req) {
 
     const plan = userDoc.subscriptionPlan === 'pro' ? 'pro' : 'free';
     const limit = plan === 'pro' ? 100 : 27;
+    let current = userDoc.aiUsageCount || 0;
     let lastReset = userDoc.lastUsageReset;
 
     if (shouldResetUsage(plan, lastReset)) {
-      // If we need to reset, we just reset it to 1 since this is the first use in the new period
-      userDoc = await databases.updateDocument('default', 'users', userId, {
-        aiUsageCount: 1,
-        lastUsageReset: new Date().toISOString()
-      });
-      return NextResponse.json({ success: true, db: userDoc });
+      current = 0;
+      lastReset = new Date().toISOString();
     }
 
-    // Use Appwrite's atomic increment
-    userDoc = await databases.updateDocument('default', 'users', userId, {
-      aiUsageCount: { increment: 1 }, 
-      lastUsageReset: lastReset
-    });
-
-    const updatedUser = await databases.getDocument('default', 'users', userId);
-
-    if (updatedUser.aiUsageCount > limit) {
-      // Rollback (rare edge case)
-      await databases.updateDocument('default', 'users', userId, {
-        aiUsageCount: { decrement: 1 }
-      });
+    if (current >= limit) {
       return NextResponse.json({ error: 'limit_reached' }, { status: 403 });
     }
 
-    return NextResponse.json({ success: true, db: updatedUser });
+    // Standard read-modify-write since { increment: 1 } caused 500 error on Appwrite
+    userDoc = await databases.updateDocument('default', 'users', userId, {
+      aiUsageCount: current + 1, 
+      lastUsageReset: lastReset
+    });
+
+    return NextResponse.json({ success: true, db: userDoc });
 
   } catch (error) {
     console.error('Increment usage error:', error);
