@@ -15,7 +15,7 @@ async function makeGmailRequest(tokenOrConnectionId, url, options = {}) {
 
 export async function fetchGoogleProfile(tokenOrConnectionId) {
   try {
-    const data = await makeGmailRequest(tokenOrConnectionId, "https://www.googleapis.com/oauth2/v1/userinfo?alt=json");
+    const data = await makeGmailRequest(tokenOrConnectionId, `https://www.googleapis.com/oauth2/v3/userinfo?_=${Date.now()}`);
     return data;
   } catch (error) {
     console.error("Failed to fetch google profile", error);

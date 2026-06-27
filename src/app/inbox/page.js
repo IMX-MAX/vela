@@ -28,6 +28,19 @@ export default function InboxPage() {
   const [resolvedToken, setResolvedToken] = useState(null);
   const [authError, setAuthError] = useState(null);
   const [hoveredEmailId, setHoveredEmailId] = useState(null);
+  const [showTokenWarning, setShowTokenWarning] = useState(false);
+
+  useEffect(() => {
+    let timer;
+    if (loading) {
+      timer = setTimeout(() => {
+        setShowTokenWarning(true);
+      }, 3000);
+    } else {
+      setShowTokenWarning(false);
+    }
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   useEffect(() => {
     if (!resolvedToken || !user) return;
@@ -287,9 +300,8 @@ export default function InboxPage() {
         
         if (error) {
           if (!parsed || parsed.length === 0) {
-            useAuthStore.getState().logout().then(() => {
-              router.push('/');
-            });
+            setAuthError(`Gmail API Error: ${error}. Please sign out and sign in again to refresh your connection.`);
+            setLoading(false);
             return;
           }
           setAuthError(`Gmail API Error: ${error}. Please ensure you checked all permission boxes during Google sign-in.`);
@@ -527,7 +539,22 @@ export default function InboxPage() {
 
       <div className="flex-1 overflow-y-auto pb-24">
         {loading ? (
-          <EmailListSkeleton rows={12} />
+          <div className="relative">
+            <EmailListSkeleton rows={12} />
+            {showTokenWarning && (
+              <div className="absolute top-1/3 left-1/2 -translate-x-1/2 bg-white p-6 rounded-xl shadow-lg border border-gray-200 flex flex-col items-center justify-center text-center max-w-sm z-10">
+                <p className="text-gray-600 font-medium mb-4">
+                  Emails are taking a while to load. This might be because your Google tokens have expired.
+                </p>
+                <button 
+                  onClick={async () => { await useAuthStore.getState().logout(); window.location.href = "/"; }} 
+                  className="px-4 py-2 bg-[#2b323b] text-white rounded-md text-sm font-medium hover:bg-[#1a1f24] transition-colors"
+                >
+                  Log Out and Back In
+                </button>
+              </div>
+            )}
+          </div>
         ) : (
           <div className="flex flex-col">
             {filteredEmails.map((email) => (
