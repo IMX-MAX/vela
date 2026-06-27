@@ -10,15 +10,29 @@ const databases = new Databases(client);
 let cachedJWT = null;
 let jwtExpiry = null;
 
+let jwtLock = null;
+
 async function getValidJWT() {
   if (cachedJWT && jwtExpiry && Date.now() < jwtExpiry) {
     return cachedJWT;
   }
-  const response = await account.createJWT();
-  cachedJWT = response.jwt;
-  // Appwrite JWTs expire in 15 minutes. Cache for 13 minutes to be safe.
-  jwtExpiry = Date.now() + 13 * 60 * 1000;
-  return cachedJWT;
+  
+  if (jwtLock) {
+    return jwtLock;
+  }
+  
+  jwtLock = (async () => {
+    try {
+      const response = await account.createJWT();
+      cachedJWT = response.jwt;
+      jwtExpiry = Date.now() + 13 * 60 * 1000;
+      return cachedJWT;
+    } finally {
+      jwtLock = null;
+    }
+  })();
+  
+  return jwtLock;
 }
 
 export { client, account, databases, getValidJWT };
