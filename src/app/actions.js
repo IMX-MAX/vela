@@ -221,7 +221,7 @@ export async function chatStepAction(messages, tokenOrConnectionId, userContext 
       toolChoice: "auto"
     });
 
-    const choice = response.choices[0].message;
+    const choice = JSON.parse(JSON.stringify(response.choices[0].message));
 
     if (choice.toolCalls && choice.toolCalls.length > 0) {
       const toolCall = choice.toolCalls[0];
@@ -236,7 +236,7 @@ export async function chatStepAction(messages, tokenOrConnectionId, userContext 
           return `Message ID: ${m.id}\nDate: ${getHeader("Date")}\nFrom: ${getHeader("From")}\nSubject: ${getHeader("Subject")}\nSnippet: ${m.snippet || ""}`;
         }).join("\n\n---\n\n");
         const toolResult = parsedEmails || "No emails found.";
-        return { type: 'tool', name: toolCall.function.name, args, result: toolResult, message: choice, tool_call_id: toolCall.id, thought: choice.content };
+        return { type: 'tool', name: toolCall.function.name, args, result: toolResult, message: choice, toolCallId: toolCall.id, thought: choice.content };
       } else if (toolCall.function.name === "search_contacts") {
         const { fetchContacts } = await import("@/lib/contacts");
         const { contacts } = await fetchContacts(tokenOrConnectionId);
@@ -248,7 +248,7 @@ export async function chatStepAction(messages, tokenOrConnectionId, userContext 
         });
         const parsedContacts = matched.map(c => `Name: ${c.names?.[0]?.givenName || "Unknown"}\nEmail: ${c.emailAddresses?.[0]?.value || "None"}\nPhone: ${c.phoneNumbers?.[0]?.value || "None"}`).join("\n\n---\n\n");
         const toolResult = parsedContacts || "No contacts found matching the query.";
-        return { type: 'tool', name: toolCall.function.name, args, result: toolResult, message: choice, tool_call_id: toolCall.id, thought: choice.content };
+        return { type: 'tool', name: toolCall.function.name, args, result: toolResult, message: choice, toolCallId: toolCall.id, thought: choice.content };
       } else if (toolCall.function.name === "draft_email") {
         const result = `I've prepared a draft for you to review:\n\n\`\`\`draft-email\n${JSON.stringify({ to: args.to, subject: args.subject, body: args.body }, null, 2)}\n\`\`\``;
         return { type: 'text', content: result, message: choice };
@@ -260,9 +260,9 @@ export async function chatStepAction(messages, tokenOrConnectionId, userContext 
           if (rawMsg.error) throw new Error(rawMsg.error.message || "Failed to fetch email");
           const parsed = parseEmailContent(rawMsg);
           const toolResult = `Subject: ${parsed.subject}\nFrom: ${parsed.from}\nDate: ${parsed.date}\nBody:\n${parsed.body || parsed.htmlBody || "No body content"}`.slice(0, 10000);
-          return { type: 'tool', name: toolCall.function.name, args, result: toolResult, message: choice, tool_call_id: toolCall.id, thought: choice.content };
+          return { type: 'tool', name: toolCall.function.name, args, result: toolResult, message: choice, toolCallId: toolCall.id, thought: choice.content };
         } catch (error) {
-          return { type: 'tool', name: toolCall.function.name, args, result: "Failed to read email: " + error.message, message: choice, tool_call_id: toolCall.id, thought: choice.content };
+          return { type: 'tool', name: toolCall.function.name, args, result: "Failed to read email: " + error.message, message: choice, toolCallId: toolCall.id, thought: choice.content };
         }
       }
     }
@@ -354,7 +354,7 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
       toolChoice: "auto"
     });
 
-    const choice = response.choices[0].message;
+    const choice = JSON.parse(JSON.stringify(response.choices[0].message));
 
     if (choice.toolCalls && choice.toolCalls.length > 0) {
       const toolCall = choice.toolCalls[0];
@@ -379,7 +379,7 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
             role: "tool",
             name: "search_inbox",
             content: toolResult,
-            tool_call_id: toolCall.id
+            toolCallId: toolCall.id
           }
         ], tokenOrConnectionId, userContext);
       } else if (toolCall.function.name === "search_contacts") {
@@ -406,7 +406,7 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
             role: "tool",
             name: "search_contacts",
             content: toolResult,
-            tool_call_id: toolCall.id
+            toolCallId: toolCall.id
           }
         ], tokenOrConnectionId, userContext);
       } else if (toolCall.function.name === "draft_email") {
@@ -430,7 +430,7 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
             role: "tool",
             name: "read_email",
             content: toolResult,
-            tool_call_id: toolCall.id
+            toolCallId: toolCall.id
           }
         ], tokenOrConnectionId, userContext);
       }
