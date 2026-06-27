@@ -74,7 +74,7 @@ export default function PricingPage() {
               </li>
               <li className="flex items-start gap-3 text-sm text-[#1e2a3b]/70">
                 <CheckCircle size={20} weight="fill" className="text-[#5a768c] shrink-0" />
-                <span title="Significantly higher usage limits (summary and AI draft replies are not counted)" className="cursor-help border-b border-dashed border-[#1e2a3b]/40 hover:text-[#1e2a3b] transition-colors">Up to 30x higher AI usage</span>
+                <span title="Significantly higher usage limits (summary and AI draft replies are not counted)" className="cursor-help border-b border-dashed border-[#1e2a3b]/40 hover:text-[#1e2a3b] transition-colors">Up to 110x more usage than free</span>
               </li>
               <li className="flex items-start gap-3 text-sm text-[#1e2a3b]/70">
                 <CheckCircle size={20} weight="fill" className="text-[#5a768c] shrink-0" />

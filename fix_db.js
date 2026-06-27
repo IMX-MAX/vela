@@ -1,6 +1,5 @@
 require('dotenv').config({ path: '.env.local' });
 const { Client, Databases } = require('node-appwrite');
-const Stripe = require('stripe');
 
 async function fixUser() {
   const adminClient = new Client()
@@ -9,22 +8,14 @@ async function fixUser() {
     .setKey(process.env.APPWRITE_API_KEY);
 
   const databases = new Databases(adminClient);
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2025-03-31.basil' });
   
   try {
     const users = await databases.listDocuments('default', 'users');
-    const user = users.documents.find(u => u.email === 'innometrixbusiness@gmail.com');
+    const user = users.documents.find(u => u.email === 'timeinfinityapparel@gmail.com');
     
-    const subscriptions = await stripe.subscriptions.list({
-      customer: 'cus_UmaS0Gtpr4rczO',
-      status: 'active'
-    });
-    
+    // Set to 1814123950 which is what Stripe returned for cancel_at / current_period_end
     await databases.updateDocument('default', 'users', user.$id, {
-      subscriptionPlan: 'pro',
-      subscriptionStatus: 'active',
-      stripeCustomerId: 'cus_UmaS0Gtpr4rczO',
-      stripeSubscriptionId: subscriptions.data[0]?.id || null
+      currentPeriodEnd: new Date(1814123950 * 1000).toISOString()
     });
     
     console.log(`Successfully fixed user!`);

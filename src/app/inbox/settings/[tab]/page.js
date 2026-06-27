@@ -573,7 +573,7 @@ export default function SettingsPage() {
                 <ul className="text-[14px] text-gray-700 space-y-3">
                   <li className="flex items-start gap-2.5">
                     <svg className="w-3.5 h-3.5 text-gray-800 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> 
-                    <span>limited monthly AI usage</span>
+                    <span>limited monthly usage</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <svg className="w-3.5 h-3.5 text-gray-800 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> 
@@ -614,7 +614,7 @@ export default function SettingsPage() {
                   <ul className="text-[14px] text-gray-700 space-y-3">
                     <li className="flex items-start gap-2.5">
                       <svg className="w-3.5 h-3.5 text-gray-800 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> 
-                      <span>Up to 60x more usage than free</span>
+                      <span>Up to 110x more usage than free</span>
                     </li>
                     <li className="flex items-start gap-2.5">
                       <svg className="w-3.5 h-3.5 text-gray-800 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> 
@@ -656,8 +656,8 @@ export default function SettingsPage() {
                   <div className="text-3xl font-semibold text-[#2b323b]">{Math.round((usageStatus.current / usageStatus.limit) * 100)}% <span className="text-lg font-normal text-gray-500">used</span></div>
                   <div className="text-[13px] text-gray-600 mt-1">
                     {usageStatus.plan === 'pro' 
-                      ? 'Your Pro plan gives you up to 60x more usage.' 
-                      : 'Your free plan offers limited AI runs per month. Upgrade to Pro for up to 60x more usage.'}
+                      ? 'Your Pro plan gives you up to 110x more usage than free.' 
+                      : 'Your free plan offers limited monthly usage. Upgrade to Pro for up to 110x more usage than free.'}
                   </div>
                 </div>
               </div>

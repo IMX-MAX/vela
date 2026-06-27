@@ -9,7 +9,7 @@ import Link from 'next/link';
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 const features = [
-  { label: 'Up to 60x more AI usage', description: '100 AI actions per day' },
+  { label: 'Up to 110x more usage than free', description: 'Significantly higher usage limits' },
   { label: 'AI-powered composer', description: 'Draft, rewrite & summarize' },
   { label: 'Connect multiple accounts', description: 'Up to 2 additional inboxes' },
   { label: 'Split Inboxes', description: 'Smart inbox categorization' },
