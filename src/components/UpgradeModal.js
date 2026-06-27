@@ -58,7 +58,7 @@ export default function UpgradeModal({ onClose }) {
               Maybe later
             </button>
             <Link 
-              href="/inbox/settings/profile"
+              href="/inbox/settings/billing"
               onClick={onClose}
               className="flex-1 py-2.5 rounded-xl bg-[#2b323b] text-white font-medium text-[14px] hover:bg-[#50686c] transition flex items-center justify-center"
             >

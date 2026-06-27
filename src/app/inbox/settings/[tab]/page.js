@@ -5,7 +5,7 @@ import { useAuthStore } from "@/lib/store";
 import { account } from "@/lib/appwrite";
 import { getUsageStatus } from "@/lib/usage";
 import { ArrowLeft, CaretLeft, DotsThree, Question, WarningOctagon, ChatCircle, ArrowRight } from "@phosphor-icons/react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ShortcutsTab from "@/components/ShortcutsTab";
 
@@ -23,6 +23,23 @@ export default function SettingsPage() {
   const [billingCycle, setBillingCycle] = useState("annual");
   const [showDowngradeModal, setShowDowngradeModal] = useState(false);
   const [copiedId, setCopiedId] = useState(false);
+  const searchParams = useSearchParams();
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('success') === 'true') {
+      setShowSuccess(true);
+      // Clean up URL params
+      const url = new URL(window.location.href);
+      url.searchParams.delete('success');
+      url.searchParams.delete('session_id');
+      window.history.replaceState({}, '', url.pathname);
+      // Auto-dismiss after 5 seconds
+      const timer = setTimeout(() => setShowSuccess(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     if (user) {
       setUserName(user.name || "");
@@ -482,6 +499,15 @@ export default function SettingsPage() {
 
         {tab === 'billing' && (
           <div className="max-w-2xl relative">
+            {showSuccess && (
+              <div className="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-center justify-between animate-in slide-in-from-top duration-300">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <span className="text-[14px] font-medium">Welcome to Vela Pro! Your subscription is now active.</span>
+                </div>
+                <button onClick={() => setShowSuccess(false)} className="text-emerald-600 hover:text-emerald-800 transition"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
+              </div>
+            )}
             <h1 className="text-2xl font-medium text-[#2b323b] mb-8">Billing & Plans</h1>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-[15px] font-medium text-gray-800">Choose your plan</h2>
@@ -503,7 +529,7 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
               {/* Free Plan */}
               <div 
-                className={`relative bg-white rounded-2xl border p-7 shadow-sm transition-all duration-300 ${plan === 'free' ? 'border-gray-300 ring-2 ring-gray-200' : 'border-gray-200 hover:border-gray-300 hover:shadow-md cursor-pointer'}`} 
+                className={`relative bg-white rounded-2xl border p-7 shadow-sm transition-all duration-300 ${plan === 'free' || user?.db?.cancelAtPeriodEnd ? 'border-gray-300 ring-2 ring-gray-200' : 'border-gray-200 hover:border-gray-300 hover:shadow-md cursor-pointer'}`} 
                 onClick={() => handleSetPlan('free')}
               >
                 <div className="font-bold text-2xl text-gray-900 mb-1">Free</div>
@@ -516,8 +542,8 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className={`text-center py-2 rounded-lg font-medium text-[14px] border transition-colors mb-8 ${plan === 'free' ? 'bg-gray-50 text-gray-400 border-gray-200 cursor-default' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
-                  {plan === 'free' ? 'Current Plan' : 'Downgrade'}
+                <div className={`text-center py-2 rounded-lg font-medium text-[14px] border transition-colors mb-8 ${plan === 'free' || user?.db?.cancelAtPeriodEnd ? 'bg-gray-50 text-gray-400 border-gray-200 cursor-default' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
+                  {plan === 'free' ? 'Current Plan' : (user?.db?.cancelAtPeriodEnd ? 'Cancellation pending' : 'Downgrade')}
                 </div>
                 
                 <div className="font-bold text-[13px] text-gray-900 mb-4">Includes</div>
@@ -558,7 +584,7 @@ export default function SettingsPage() {
                       ? (user?.db?.cancelAtPeriodEnd 
                           ? `Subscription ending on ${new Date(user?.db?.currentPeriodEnd).toLocaleDateString()}` 
                           : 'Current Plan') 
-                      : 'Switch now'}
+                      : 'Upgrade to Pro'}
                   </div>
                   
                   <div className="font-bold text-[13px] text-gray-900 mb-4">Everything in Free, plus</div>
@@ -678,7 +704,7 @@ export default function SettingsPage() {
             <div className="bg-red-50 rounded-xl border border-red-200 p-6 shadow-sm flex items-center justify-between">
               <div>
                 <div className="font-medium text-red-700 mb-1">Delete account</div>
-                <div className="text-[13px] text-red-600/80 max-w-sm">Permanently delete your Vela account and all associated data. Active subscriptions must be canceled first.</div>
+                <div className="text-[13px] text-red-600/80 max-w-sm">Permanently delete your Vela account and all associated data. Any active subscriptions will be automatically canceled.</div>
               </div>
               <button 
                 onClick={handleDeleteAccount}

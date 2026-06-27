@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { Client, Databases } from 'node-appwrite';
-import { cookies } from 'next/headers';
+import { Client, Databases, Query } from 'node-appwrite';
 import Stripe from 'stripe';
+
 export async function POST(req) {
   try {
     const { billingCycle } = await req.json();
@@ -35,11 +35,29 @@ export async function POST(req) {
     // Initialize Stripe
     const stripeKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeKey) {
-      // Return a mock URL if Stripe is not configured yet
-      return NextResponse.json({ url: '/inbox/settings?stripe=mock_success' });
+      return NextResponse.json({ error: 'Stripe is not configured. Please set STRIPE_SECRET_KEY.' }, { status: 500 });
     }
 
     const stripe = new Stripe(stripeKey, { apiVersion: '2025-03-31.basil' });
+
+    // Check for existing subscription to prevent duplicates
+    const adminClient = new Client()
+      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || 'https://cloud.appwrite.io/v1')
+      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID)
+      .setKey(process.env.APPWRITE_API_KEY);
+
+    const databases = new Databases(adminClient);
+    let userDoc;
+    try {
+      userDoc = await databases.getDocument('default', 'users', userId);
+    } catch (err) {
+      // User document may not exist yet, that's fine
+    }
+
+    // Prevent duplicate subscriptions
+    if (userDoc?.subscriptionPlan === 'pro' && userDoc?.subscriptionStatus === 'active') {
+      return NextResponse.json({ error: 'You already have an active Pro subscription.' }, { status: 400 });
+    }
 
     const priceId = billingCycle === 'annual' 
       ? process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID 
@@ -49,10 +67,10 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Stripe price IDs not configured' }, { status: 500 });
     }
 
-    const checkoutSession = await stripe.checkout.sessions.create({
+    // Reuse existing Stripe customer if available to prevent duplicates
+    const sessionParams = {
       ui_mode: 'embedded',
       mode: 'subscription',
-      managed_payments: { enabled: true },
       allow_promotion_codes: true,
       line_items: [
         {
@@ -61,9 +79,16 @@ export async function POST(req) {
         },
       ],
       client_reference_id: userId,
-      customer_email: currentUser.email,
-      return_url: `${req.headers.get('origin')}/inbox/settings?session_id={CHECKOUT_SESSION_ID}&success=true`,
-    });
+      return_url: `${req.headers.get('origin')}/inbox/settings/billing?success=true`,
+    };
+
+    if (userDoc?.stripeCustomerId) {
+      sessionParams.customer = userDoc.stripeCustomerId;
+    } else {
+      sessionParams.customer_email = currentUser.email;
+    }
+
+    const checkoutSession = await stripe.checkout.sessions.create(sessionParams);
 
     return NextResponse.json({ client_secret: checkoutSession.client_secret });
 

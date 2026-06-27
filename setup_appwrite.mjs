@@ -71,6 +71,9 @@ async function setup() {
             () => databases.createIntegerAttribute('default', 'users', 'aiUsageCount', false, 0, 1000000, 0),
             () => databases.createStringAttribute('default', 'users', 'lastUsageReset', 255, false),
             () => databases.createStringAttribute('default', 'users', 'connectedAccounts', 50000, false),
+            () => databases.createBooleanAttribute('default', 'users', 'cancelAtPeriodEnd', false, false),
+            () => databases.createStringAttribute('default', 'users', 'currentPeriodEnd', 255, false),
+            () => databases.createStringAttribute('default', 'users', 'stripeSubscriptionId', 255, false),
             
             () => databases.createStringAttribute('default', 'retained_usage', 'email', 255, true),
             () => databases.createStringAttribute('default', 'retained_usage', 'deletedAt', 255, true)

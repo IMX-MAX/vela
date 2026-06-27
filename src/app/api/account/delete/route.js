@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Client, Databases, Users } from 'node-appwrite';
-import { cookies } from 'next/headers';
+
 
 export async function POST(req) {
   try {
@@ -39,9 +39,11 @@ export async function POST(req) {
     try {
       const userDoc = await databases.getDocument('default', 'users', userId);
       if (userDoc.stripeCustomerId && process.env.STRIPE_SECRET_KEY) {
-        const stripe = new (await import('stripe')).default(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
-        const subscriptions = await stripe.subscriptions.list({ customer: userDoc.stripeCustomerId, status: 'active' });
-        for (const sub of subscriptions.data) {
+        const stripe = new (await import('stripe')).default(process.env.STRIPE_SECRET_KEY, { apiVersion: '2025-03-31.basil' });
+        const subscriptions = await stripe.subscriptions.list({ customer: userDoc.stripeCustomerId });
+        // Filter to only non-terminal subscriptions
+        const activeSubscriptions = subscriptions.data.filter(sub => ['active', 'past_due', 'trialing'].includes(sub.status));
+        for (const sub of activeSubscriptions) {
           await stripe.subscriptions.cancel(sub.id);
         }
       }

@@ -52,7 +52,9 @@ export async function POST(req) {
           await databases.updateDocument('default', 'users', userId, {
             subscriptionPlan: 'pro',
             subscriptionStatus: 'active',
-            stripeCustomerId: customerId
+            stripeCustomerId: customerId,
+            stripeSubscriptionId: session.subscription || null,
+            cancelAtPeriodEnd: false
           });
         }
         break;
@@ -62,7 +64,7 @@ export async function POST(req) {
         const customerId = subscription.customer;
         const status = subscription.status; // 'active', 'past_due', 'canceled', etc.
         const cancelAtPeriodEnd = subscription.cancel_at_period_end || false;
-        const currentPeriodEnd = subscription.cancel_at ? new Date(subscription.cancel_at * 1000).toISOString() : null;
+        const currentPeriodEnd = subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : null;
 
         // Find user by stripeCustomerId
         const { Query } = await import('node-appwrite');
@@ -73,10 +75,11 @@ export async function POST(req) {
         if (users.documents.length > 0) {
           const userDoc = users.documents[0];
           await databases.updateDocument('default', 'users', userDoc.$id, {
-            subscriptionPlan: status === 'active' ? 'pro' : 'free',
+            subscriptionPlan: (status === 'active' || status === 'past_due' || status === 'trialing') ? 'pro' : 'free',
             subscriptionStatus: status,
             cancelAtPeriodEnd: cancelAtPeriodEnd,
-            currentPeriodEnd: currentPeriodEnd
+            currentPeriodEnd: currentPeriodEnd,
+            stripeSubscriptionId: subscription.id
           });
         }
         break;
@@ -97,6 +100,22 @@ export async function POST(req) {
             subscriptionStatus: 'canceled',
             cancelAtPeriodEnd: false
           });
+        }
+        break;
+      }
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object;
+        const customerId = invoice.customer;
+
+        const { Query } = await import('node-appwrite');
+        const users = await databases.listDocuments('default', 'users', [
+          Query.equal('stripeCustomerId', customerId)
+        ]);
+
+        if (users.documents.length > 0) {
+          const userDoc = users.documents[0];
+          console.warn(`Payment failed for user ${userDoc.$id}, customer ${customerId}, invoice ${invoice.id}`);
+          // Subscription status will be updated via customer.subscription.updated event
         }
         break;
       }
