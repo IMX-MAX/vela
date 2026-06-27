@@ -282,7 +282,7 @@ export default function CommandPalette() {
             role: "tool",
             name: stepResponse.name,
             content: stepResponse.result,
-            tool_call_id: stepResponse.toolCallId
+            tool_call_id: stepResponse.tool_call_id
           });
           
           setChatHistory([...newHistory, { ...assistantMsg }]);
