@@ -20,9 +20,9 @@ export default function PricingPage() {
       <main className="flex-1 pt-40 pb-32 px-12 md:px-24 max-w-[1400px] mx-auto w-full relative z-10">
         <div className="text-center mb-16 animate-fade-in-up">
 
-          <h1 className="text-4xl md:text-5xl font-medium tracking-tight text-[#1e2a3b] mb-4">Simple, transparent pricing.</h1>
+          <h1 className="text-4xl md:text-5xl font-medium tracking-tight text-[#1e2a3b] mb-4">Simple pricing for your AI email client.</h1>
           <p className="text-[#1e2a3b]/60 max-w-xl mx-auto text-lg leading-relaxed">
-            Get started for free during our beta. Upgrade when you need more power.
+            Get started for free during our beta. Upgrade when you need more power for your inbox.
           </p>
         </div>
 

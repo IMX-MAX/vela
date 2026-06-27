@@ -6,11 +6,11 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 const markdownContent = `
-# Vela Competitive Analysis: Why Vela Dominates the Modern Email Landscape
+# Vela Competitive Analysis: Why Vela Dominates the Modern AI Email Client Landscape
 
 ## Executive Summary
 
-Vela is not your every day email client. We've designed Vela to reimagine emails for the AI-native era. While our competitors remain stuck in the past with bloated interfaces, distracting ads, and clunky workflows, Vela delivers **blazing speed, AI-first intelligence, and respect for your time and privacy**.
+Vela is not your every day email client. We've designed Vela to reimagine your inbox for the AI-native era. While our competitors remain stuck in the past with bloated interfaces, distracting ads, and clunky workflows, Vela delivers **blazing speed, AI-first intelligence, and respect for your time and privacy**.
 
 ---
 
@@ -70,7 +70,7 @@ Vela is not your every day email client. We've designed Vela to reimagine emails
 
 ---
 
-## 🤖 AI Intelligence: The Game Changer
+## 🤖 AI Intelligence: Ask AI to manage your Inbox
 
 ### Vela's AI Superpowers
 
