@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Exclude application pages
+Disallow: /inbox/
+Disallow: /checkout/
+
+Sitemap: https://getvela.email/sitemap.xml

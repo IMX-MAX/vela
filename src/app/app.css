@@ -1,6 +1,23 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+.bg-radial-pattern {
+  background-image: radial-gradient(#194060 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.delay-150 {
+  animation-delay: 150ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-450 {
+  animation-delay: 450ms;
+}
+
 summary::-webkit-details-marker {
   display: none
 }

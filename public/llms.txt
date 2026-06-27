@@ -1,0 +1,20 @@
+# Vela Intelligence
+# https://getvela.email
+
+Vela is a modern AI email client designed for speed, clarity, and focus. It sits on top of your existing Gmail account to provide a lightweight, incredibly fast email workflow.
+
+## Key Features
+- **AI-Powered Inbox:** Summarize long email threads instantly and reply using contextual AI models trained specifically on email correspondence.
+- **Privacy First:** We don't serve ads and we don't sell data. LLM providers used by Vela adhere to strict zero-retention policies.
+- **Speed & Design:** Vela boasts perceived interactions under 100ms with a clean, distraction-free interface inspired by modern notes apps.
+- **Command Palette (Cmd+K):** Navigate your inbox, search emails, and ask the AI questions using a quick keyboard shortcut.
+- **Markdown Composer:** Write emails easily using markdown syntax for structured and beautiful messages.
+
+## Pricing
+- **Free Plan:** Perfect for casual use. Includes standard inbox features and basic AI summarization with a limited monthly usage allowance.
+- **Pro Plan:** $8/month. Offers up to 30x higher AI usage, multiple email accounts, split inboxes, and advanced AI composer tools.
+
+## Organization
+Vela Email
+Website: https://getvela.email
+Contact: Support available within the app.

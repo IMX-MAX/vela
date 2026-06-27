@@ -71,7 +71,7 @@ export default function LandingPage() {
                     <div className="w-12 h-12 rounded-full bg-[#f1f3f5] flex items-center justify-center font-medium text-gray-700 text-lg">C</div>
                     <div>
                       <div className="font-semibold text-gray-800 text-[15px] flex items-center gap-2">
-                        Crossway <span className="text-[14px] font-normal text-gray-400">john@example.com</span>
+                        Crossway <span className="text-[14px] font-normal text-gray-400">john&#64;example.com</span>
                       </div>
                       <div className="text-[13px] text-gray-400 mt-0.5">to me <span className="ml-1 text-[10px]">▼</span></div>
                     </div>
@@ -95,7 +95,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="flex flex-col gap-8 max-w-lg">
-            <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[#7f99b0]">reply to and summarize emails</h2>
+            <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[#7f99b0]">an ai email client that replies and summarizes</h2>
             <div className="space-y-6 text-[#1e2a3b]/80 font-medium leading-relaxed">
               <p>Use ai to automate the easy things.</p>
               <p>Get instant summaries of emails, to instantly understand what's going on.</p>
@@ -107,7 +107,7 @@ export default function LandingPage() {
         {/* Feature 2: Search */}
         <section className="py-24 px-12 md:px-24 max-w-[1400px] mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <div className="flex flex-col gap-8 max-w-lg order-2 md:order-1">
-            <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[#7f99b0]">ai that knows what you're<br />looking for</h2>
+            <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[#7f99b0]">manage your inbox with an ai<br />that knows what you need</h2>
             <div className="space-y-6 text-[#1e2a3b]/80 font-medium leading-relaxed">
               <p>just hit cmd + k on your keyboard to bring up Command Palette.</p>
               <p>Search anything, navigate to any page, or ask ai any question about your inbox.</p>
@@ -196,7 +196,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="flex flex-col gap-8 max-w-lg">
-            <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[#305a7d]">email writing experience that<br />feels like your favorite notes<br />apps</h2>
+            <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[#305a7d]">an ai email experience that<br />feels like your favorite notes<br />apps</h2>
             <div className="space-y-6 text-[#1e2a3b]/80 font-medium leading-relaxed">
               <p>Our email composer supports markdown writing so you can craft beautiful emails without the stress.</p>
               <p>Hit / to open the AI Actions menu, allowing you to use our tools to help you write better emails. Our models have been trained to write emails specifically, outperforming most general LLMs.</p>
@@ -221,18 +221,31 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="bg-gradient-to-br from-[#dddcdc] to-white rounded-3xl p-8 border border-[#dddcdc] shadow-xl relative overflow-hidden h-[400px] flex items-center justify-center">
-               <div className="absolute inset-0 bg-[#194060]/5 mix-blend-multiply opacity-50" style={{ backgroundImage: 'radial-gradient(#194060 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+               <div className="absolute inset-0 bg-[#194060]/5 mix-blend-multiply opacity-50 bg-radial-pattern"></div>
                <div className="relative z-10 flex gap-4 items-end h-full py-12">
                  <div className="w-12 bg-gradient-to-t from-[#194060]/20 to-[#194060]/40 rounded-t-full h-[40%] animate-pulse"></div>
-                 <div className="w-12 bg-gradient-to-t from-[#194060]/40 to-[#194060]/60 rounded-t-full h-[70%] animate-pulse" style={{animationDelay: '150ms'}}></div>
-                 <div className="w-12 bg-gradient-to-t from-[#194060]/60 to-[#194060]/80 rounded-t-full h-[100%] animate-pulse" style={{animationDelay: '300ms'}}></div>
-                 <div className="w-12 bg-gradient-to-t from-[#194060]/30 to-[#194060]/50 rounded-t-full h-[55%] animate-pulse" style={{animationDelay: '450ms'}}></div>
+                 <div className="w-12 bg-gradient-to-t from-[#194060]/40 to-[#194060]/60 rounded-t-full h-[70%] animate-pulse delay-150"></div>
+                 <div className="w-12 bg-gradient-to-t from-[#194060]/60 to-[#194060]/80 rounded-t-full h-[100%] animate-pulse delay-300"></div>
+                 <div className="w-12 bg-gradient-to-t from-[#194060]/30 to-[#194060]/50 rounded-t-full h-[55%] animate-pulse delay-450"></div>
                </div>
             </div>
           </div>
         </section>
 
-        {/* Feature 4: Modern Age (Linear Style) */}
+        {/* Feature 4: Text Content Block for SEO */}
+        <section className="py-24 px-12 md:px-24 max-w-[1200px] mx-auto w-full">
+          <div className="bg-white/40 border border-white/60 p-10 rounded-3xl shadow-sm backdrop-blur-xl animate-fade-in-up">
+            <h3 className="text-2xl font-semibold tracking-tight text-[#194060] mb-4">A smarter approach to your inbox</h3>
+            <p className="text-lg text-[#1e2a3b]/80 font-medium leading-relaxed mb-6">
+              Dealing with a cluttered inbox shouldn't be a full-time job. We spend way too many hours every week just reading, sorting, and trying to keep up with emails. Instead of just slapping an AI tool onto a tired, old platform, we decided to rethink the entire email client workflow from the ground up.
+            </p>
+            <p className="text-lg text-[#1e2a3b]/80 font-medium leading-relaxed">
+              Because we trained our AI models specifically for email, Vela actually understands context. It can parse those impossibly long threads and draft replies that sound like you. Think of it as a smart assistant that helps you spot what's important, so you can breeze through your inbox and get back to the work that actually matters.
+            </p>
+          </div>
+        </section>
+
+        {/* Feature 5: Modern Age (Linear Style) */}
         <section className="py-32 px-6 md:px-12 max-w-[1200px] mx-auto w-full flex flex-col items-center text-center">
           <div className="max-w-3xl mb-16">
             <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-[#194060] mb-6">

@@ -121,7 +121,7 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="text-xl font-semibold mb-3 text-[#2b323b]">13. Contact Information</h2>
-            <p>If you have any questions about these Terms, please contact us at support@vela.nafen.sbs.</p>
+            <p>If you have any questions about these Terms, please contact us at support&#64;vela.nafen.sbs.</p>
           </section>
         </div>
       </div>

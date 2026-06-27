@@ -2,15 +2,18 @@ import "./app.css";
 
 export const metadata = {
   metadataBase: new URL("https://getvela.email"),
-  title: "Vela | The Fastest AI Email Client",
+  title: "Vela | The Fastest AI Email Client for Modern Workflows",
   description: "Vela is a fast, modern AI email client spearheading UI and artificial intelligence in email. Experience the fastest email workflow.",
-  keywords: ["vela", "ai email client", "email client", "AI email", "fast email client"],
+  keywords: ["vela", "ai email client", "email client", "AI email", "fast email client", "inbox"],
+  alternates: {
+    canonical: "https://getvela.email",
+  },
   icons: {
     icon: "/logo.png",
     apple: "/logo.png",
   },
   openGraph: {
-    title: "Vela | The Fastest AI Email Client",
+    title: "Vela | The Fastest AI Email Client for Modern Workflows",
     description: "Vela is a fast, modern AI email client spearheading UI and artificial intelligence in email.",
     url: "https://getvela.email",
     siteName: "Vela",
@@ -25,7 +28,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Vela | The Fastest AI Email Client",
+    title: "Vela | The Fastest AI Email Client for Modern Workflows",
     description: "Vela is a fast, modern AI email client spearheading UI and artificial intelligence in email.",
     images: ["/og-image.png"],
   },
@@ -37,12 +40,36 @@ export const viewport = {
 };
 
 export default function RootLayout({ children }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Vela",
+    "url": "https://getvela.email",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Vela Email",
+      "url": "https://getvela.email",
+      "logo": "https://getvela.email/logo.png"
+    }
+  };
+
   return (
     <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body className="bg-[#eceae6] text-[#1e1e1e] antialiased font-[Inter] text-[14px]">
         {children}
