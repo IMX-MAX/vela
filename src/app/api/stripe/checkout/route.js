@@ -67,6 +67,10 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Stripe price IDs not configured' }, { status: 500 });
     }
 
+    const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || 'www.getvela.email';
+    const protocol = req.headers.get('x-forwarded-proto') || 'https';
+    const baseUrl = `${protocol}://${host}`;
+
     // Reuse existing Stripe customer if available to prevent duplicates
     const sessionParams = {
       ui_mode: 'embedded',
@@ -79,7 +83,7 @@ export async function POST(req) {
         },
       ],
       client_reference_id: userId,
-      return_url: `${new URL(req.url).origin}/inbox/settings/billing?success=true`,
+      return_url: `${baseUrl}/inbox/settings/billing?success=true`,
     };
 
     if (userDoc?.stripeCustomerId) {
@@ -94,6 +98,9 @@ export async function POST(req) {
 
   } catch (error) {
     console.error('Stripe checkout error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    // Return the actual error message so we can see what's failing in the UI
+    return NextResponse.json({ 
+      error: error.message || 'Internal Server Error' 
+    }, { status: 500 });
   }
 }
