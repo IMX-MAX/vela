@@ -379,7 +379,7 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
             role: "tool",
             name: "search_inbox",
             content: toolResult,
-            toolCallId: toolCall.id
+            tool_call_id: toolCall.id
           }
         ], tokenOrConnectionId, userContext);
       } else if (toolCall.function.name === "search_contacts") {
@@ -406,7 +406,7 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
             role: "tool",
             name: "search_contacts",
             content: toolResult,
-            toolCallId: toolCall.id
+            tool_call_id: toolCall.id
           }
         ], tokenOrConnectionId, userContext);
       } else if (toolCall.function.name === "draft_email") {
@@ -430,7 +430,7 @@ export async function chatWithAiAction(messages, tokenOrConnectionId, userContex
             role: "tool",
             name: "read_email",
             content: toolResult,
-            toolCallId: toolCall.id
+            tool_call_id: toolCall.id
           }
         ], tokenOrConnectionId, userContext);
       }
