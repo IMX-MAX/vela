@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { PaperPlaneTilt } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 export default function MarketingNavbar() {
@@ -14,25 +13,21 @@ export default function MarketingNavbar() {
   }, []);
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? "bg-white/40 backdrop-blur-xl border-b border-black/[0.04] py-4" : "bg-transparent py-8"}`}>
-      <div className="max-w-[1400px] mx-auto px-12 md:px-24 flex items-center justify-between">
-        
-        {/* Left: Logo */}
-        <Link href="/" className="flex items-center gap-2 text-[#1e2a3b] opacity-80 hover:opacity-100 transition-opacity">
-          <img src="/logo-vela.png" alt="Vela Logo" className="h-6 w-auto" />
-          <span className="font-semibold text-xl tracking-tight mt-0.5">vela</span>
-        </Link>
-        
-        {/* Right: Links */}
-        <div className="flex items-center gap-8">
-          <Link href="/pricing" className="text-[15px] font-medium text-[#1e2a3b]/70 hover:text-[#1e2a3b] transition-colors">pricing</Link>
-          <Link href="/resources/vs-the-world" className="text-[15px] font-medium text-[#1e2a3b]/70 hover:text-[#1e2a3b] transition-colors">resources</Link>
-          <Link href="/login" className="px-6 py-2.5 rounded-full bg-[#305a7d] hover:bg-[#194060] text-white text-[15px] font-medium transition-colors ml-2 shadow-lg shadow-black/5">
-            sign in
+    <div className="fixed top-6 left-0 right-0 w-full z-50 flex justify-center pointer-events-none">
+      <nav className={`pointer-events-auto flex items-center justify-between px-2 py-1.5 rounded-full border transition-all duration-500 ${isScrolled ? 'bg-white/90 backdrop-blur-md border-gray-200 shadow-sm' : 'bg-white/50 backdrop-blur-sm border-gray-200/50'}`}>
+        <div className="flex items-center gap-6 px-4">
+          <Link href="/" className="flex items-center gap-2 text-black hover:opacity-80 transition-opacity">
+            <span className="font-semibold text-[15px] tracking-tight">vela</span>
           </Link>
+          <div className="flex items-center gap-5">
+            <Link href="/pricing" className="text-[13px] font-medium text-gray-500 hover:text-black transition-colors">Pricing</Link>
+            <Link href="/resources/vs-the-world" className="text-[13px] font-medium text-gray-500 hover:text-black transition-colors">Resources</Link>
+          </div>
         </div>
-        
-      </div>
-    </nav>
+        <Link href="/login" className="bg-white border border-gray-200 hover:bg-gray-50 text-black px-4 py-1.5 rounded-full text-[13px] font-semibold transition-colors shadow-sm ml-4">
+          Get started
+        </Link>
+      </nav>
+    </div>
   );
 }

@@ -1,28 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { PaperPlaneTilt } from "@phosphor-icons/react";
 
 export default function MarketingFooter() {
   return (
-    <footer className="py-24 w-full">
-      <div className="max-w-[1400px] mx-auto px-12 md:px-24 flex flex-col md:flex-row justify-between items-end gap-12">
+    <footer className="py-24 w-full border-t border-gray-100">
+      <div className="max-w-[1200px] mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-end gap-12">
         
         {/* Left: Logo */}
-        <div className="flex items-center gap-3 text-[#1e2a3b] opacity-60">
-          <span className="font-medium text-4xl tracking-tight">vela</span>
+        <div className="flex items-center gap-3 text-gray-500 hover:text-black transition-colors">
+          <Link href="/" className="font-semibold text-xl tracking-tight">vela</Link>
         </div>
         
         {/* Right: Links & Copyright */}
-        <div className="flex flex-col items-end gap-12">
-          <div className="flex flex-col items-end gap-1 text-[15px] font-medium text-[#1e2a3b]/70">
-            <Link href="/login" className="hover:text-[#1e2a3b] transition-colors">log in</Link>
-            <Link href="/pricing" className="hover:text-[#1e2a3b] transition-colors">pricing</Link>
-            <Link href="/resources/vs-the-world" className="hover:text-[#1e2a3b] transition-colors">vela vs the world</Link>
-            <Link href="/privacy-policy" className="hover:text-[#1e2a3b] transition-colors">privacy policy</Link>
-            <Link href="/terms-of-service" className="hover:text-[#1e2a3b] transition-colors">terms of service</Link>
+        <div className="flex flex-col items-end gap-10">
+          <div className="flex flex-col items-end gap-2 text-[13px] font-medium text-gray-500">
+            <Link href="/login" className="hover:text-black transition-colors">Log in</Link>
+            <Link href="/pricing" className="hover:text-black transition-colors">Pricing</Link>
+            <Link href="/resources/vs-the-world" className="hover:text-black transition-colors">Vela vs the world</Link>
+            <Link href="/privacy-policy" className="hover:text-black transition-colors">Privacy policy</Link>
+            <Link href="/terms-of-service" className="hover:text-black transition-colors">Terms of service</Link>
           </div>
-          <div className="text-[13px] text-[#1e2a3b]/50 font-medium">
+          <div className="text-[11px] text-gray-400 font-medium tracking-wide">
             © vela email 2026 - based in Canada
           </div>
         </div>
