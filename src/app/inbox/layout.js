@@ -17,7 +17,8 @@ import {
   PencilSimple,
   SignOut,
   Link as LinkIcon,
-  AddressBook
+  AddressBook,
+  Sparkle
 } from "@phosphor-icons/react";
 
 import { getUsageStatus } from "@/lib/usage";
@@ -87,7 +88,89 @@ export default function InboxLayout({ children }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showWelcomeUpgradeModal, setShowWelcomeUpgradeModal] = useState(false);
   const usageStatus = user ? getUsageStatus(user) : null;
+  const [digestStatus, setDigestStatus] = useState("idle");
+  const { session, openCommandPalette } = useAuthStore();
   const shortcuts = useShortcuts();
+
+  useEffect(() => {
+    if (!user || user.prefs?.plan !== 'pro' || !session?.providerAccessToken) return;
+    
+    const checkDigest = async () => {
+      try {
+        const nyString = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'America/New_York',
+          year: 'numeric',
+          month: 'numeric',
+          day: 'numeric'
+        }).format(new Date());
+        const [m, d, y] = nyString.split('/');
+        const today = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+        
+        const lastDigestDate = localStorage.getItem('lastDigestDate');
+        if (lastDigestDate === today) return;
+        
+        localStorage.setItem('lastDigestDate', today);
+        setDigestStatus("generating");
+        
+        const { fetchEmailsForDigest } = await import('@/lib/gmail');
+        const emails = await fetchEmailsForDigest(session.providerAccessToken);
+        
+        if (!emails || emails.length === 0) {
+          setDigestStatus("idle");
+          return;
+        }
+
+        const emailsContent = emails.map(m => {
+          const headers = m.payload?.headers || [];
+          const getHeader = (name) => headers.find(h => h.name.toLowerCase() === name.toLowerCase())?.value || "";
+          return `Message ID: ${m.id}\nDate: ${getHeader("Date")}\nFrom: ${getHeader("From")}\nSubject: ${getHeader("Subject")}\nSnippet: ${m.snippet || ""}`;
+        }).join("\n\n---\n\n");
+
+        const { getValidJWT } = await import('@/lib/appwrite');
+        const jwt = await getValidJWT();
+
+        const res = await fetch('/api/ai/daily-digest', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwt}`
+          },
+          body: JSON.stringify({ emailsContent })
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            setDigestStatus("ready");
+            const chat = {
+              id: data.digestDoc.$id,
+              title: `Your Daily Digest (${today})`,
+              messages: JSON.parse(data.digestDoc.chatData),
+              date: today,
+              isDigest: true
+            };
+            const store = useAuthStore.getState();
+            // Insert the digest chat manually so we can set its ID and title properly
+            import('idb-keyval').then(({ set: idbSet }) => {
+              const newSavedChats = [chat, ...store.savedChats.filter(c => c.id !== chat.id)];
+              useAuthStore.setState({ savedChats: newSavedChats });
+              idbSet('savedChats', newSavedChats);
+            });
+          } else {
+            setDigestStatus("idle");
+          }
+        } else {
+          setDigestStatus("idle");
+          localStorage.removeItem('lastDigestDate');
+        }
+      } catch (err) {
+        console.error("Digest generation failed", err);
+        setDigestStatus("idle");
+        localStorage.removeItem('lastDigestDate');
+      }
+    };
+    checkDigest();
+  }, [user, session]);
 
   useEffect(() => {
     if (!loading && user) {
@@ -301,6 +384,38 @@ export default function InboxLayout({ children }) {
       
       {/* Welcome Upgrade Modal */}
       {showWelcomeUpgradeModal && <WelcomeUpgradeModal onClose={() => setShowWelcomeUpgradeModal(false)} />}
+      {digestStatus === "generating" && (
+        <div className="fixed bottom-6 right-6 bg-[#2b323b] text-white px-4 py-3 rounded-xl shadow-lg border border-gray-700 flex items-center gap-3 z-50 animate-fade-in">
+          <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+          <span className="text-sm font-medium">Generating your daily digest...</span>
+        </div>
+      )}
+      
+      {digestStatus === "ready" && (
+        <div className="fixed bottom-6 right-6 bg-white text-[#2b323b] p-4 rounded-xl shadow-xl border border-gray-200 flex flex-col gap-3 z-50 animate-fade-in max-w-xs">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Sparkle size={18} weight="fill" className="text-blue-500" />
+              <span className="text-sm font-semibold">Daily Digest Ready</span>
+            </div>
+            <button onClick={() => setDigestStatus("idle")} className="text-gray-400 hover:text-gray-600">
+              <span className="sr-only">Close</span>
+              &times;
+            </button>
+          </div>
+          <p className="text-xs text-gray-500">Your personalized AI summary of yesterday's emails is ready.</p>
+          <button 
+            onClick={() => {
+              setDigestStatus("idle");
+              openCommandPalette();
+            }} 
+            className="w-full bg-[#2b323b] text-white rounded-md py-2 text-sm font-medium hover:bg-[#1a1f24] transition-colors"
+          >
+            Open Digest
+          </button>
+        </div>
+      )}
+
     </div>
   );
 }

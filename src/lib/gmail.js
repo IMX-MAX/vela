@@ -155,6 +155,31 @@ export async function searchEmailsQuick(tokens, query, maxResults = 5) {
   return combinedDetails.slice(0, maxResults);
 }
 
+export async function fetchEmailsForDigest(tokenOrConnectionId) {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  let y, m, d;
+  y = yesterday.getFullYear();
+  m = String(yesterday.getMonth() + 1).padStart(2, '0');
+  d = String(yesterday.getDate()).padStart(2, '0');
+  
+  const query = `after:${y}/${m}/${d} -in:trash -in:spam`;
+  const url = `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=40&q=${encodeURIComponent(query)}`;
+  
+  const data = await makeGmailRequest(tokenOrConnectionId, url);
+  if (data?.error || !data || !data.messages) {
+    return [];
+  }
+
+  const detailedMessages = await Promise.all(
+    data.messages.map(async (msg) => {
+      return await makeGmailRequest(tokenOrConnectionId, `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`);
+    })
+  );
+
+  return detailedMessages;
+}
+
 function buildMimeMessage(to, subject, body, htmlBody, attachments, replyToMessageId, references) {
   const boundaryMixed = "mixed_" + Math.random().toString(36).substring(2);
   const boundaryAlt = "alt_" + Math.random().toString(36).substring(2);
