@@ -7,7 +7,7 @@ import MarketingFooter from "@/components/MarketingFooter";
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-[#b9c2c8] text-[#1e2a3b] font-[Inter] selection:bg-[#7f99b0] selection:text-white flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#b9c2c8] text-[#1e2a3b] selection:bg-[#7f99b0] selection:text-white flex flex-col relative overflow-x-hidden">
       
       {/* Background Lighting Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">

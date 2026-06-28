@@ -412,7 +412,7 @@ Gmail is slow and spies on you. Outlook is bloated and ugly. Superhuman is expen
 
 export default function VsTheWorldPage() {
   return (
-    <div className="min-h-screen bg-[#b9c2c8] text-[#1e2a3b] font-[Inter] selection:bg-[#7f99b0] selection:text-white flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#b9c2c8] text-[#1e2a3b] selection:bg-[#7f99b0] selection:text-white flex flex-col relative overflow-x-hidden">
       
       {/* Background Lighting Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
