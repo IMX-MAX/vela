@@ -34,27 +34,27 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-[#2B302F] selection:bg-gray-200 selection:text-black flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen bg-white text-[#2B302F] selection:bg-gray-200 selection:text-black flex flex-col relative overflow-x-hidden z-0">
       
       {/* Background Gradient */}
-      <div className="absolute top-0 left-0 right-0 h-[800px] bg-gradient-to-b from-[#7A8A86] to-white pointer-events-none -z-10"></div>
+      <div className="absolute top-0 left-0 right-0 h-[800px] bg-gradient-to-b from-[#50686C] to-white pointer-events-none -z-10"></div>
 
       <MarketingNavbar />
       
       <main className="w-full flex-1 flex flex-col items-center">
         {/* Hero Section */}
-        <section className="pt-40 md:pt-48 pb-20 md:pb-24 px-6 md:px-12 w-full max-w-[1200px] mx-auto text-center flex flex-col items-center z-10">
+        <section className="pt-40 md:pt-48 pb-20 md:pb-24 px-6 md:px-12 w-full max-w-[1200px] mx-auto text-center flex flex-col items-center">
           <h1 className="text-[2.25rem] sm:text-4xl md:text-[3.5rem] lg:text-[4.2rem] font-semibold tracking-tight leading-[1.2] mb-8 text-white max-w-4xl mx-auto flex flex-wrap justify-center items-center gap-x-2 md:gap-x-3 gap-y-2">
             <span>The</span>
-            <span className="inline-flex items-center justify-center bg-white/20 text-white rounded-[14px] md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle backdrop-blur-sm">
+            <span className="inline-flex items-center justify-center bg-white/20 text-white rounded-[14px] md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] align-middle backdrop-blur-sm">
               <ChatCircleDots weight="fill" className="w-5 h-5 md:w-7 md:h-7" />
             </span>
             <span>next generation</span>
-            <span className="inline-flex items-center justify-center bg-white/20 text-white rounded-[14px] md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle backdrop-blur-sm">
+            <span className="inline-flex items-center justify-center bg-white/20 text-white rounded-[14px] md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] align-middle backdrop-blur-sm">
               <Lightning weight="fill" className="w-5 h-5 md:w-7 md:h-7" />
             </span>
             <span>of email</span>
-            <span className="inline-flex items-center justify-center bg-white/20 text-white rounded-[14px] md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle backdrop-blur-sm">
+            <span className="inline-flex items-center justify-center bg-white/20 text-white rounded-[14px] md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] align-middle backdrop-blur-sm">
               <Atom weight="bold" className="w-5 h-5 md:w-7 md:h-7" />
             </span>
             <span>is here.</span>
