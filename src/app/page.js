@@ -22,15 +22,17 @@ export default function LandingPage() {
     }
   }, [user, router]);
 
-  const [openFaq, setOpenFaq] = useState(null);
+  const [openFaq, setOpenFaq] = useState(0);
 
   const faqs = [
-    { question: "Can I use Vela with my existing email?", answer: "Yes, you can connect your existing Gmail or Outlook account to Vela. Vela acts as a layer on top of your current provider, so you don't have to change your email address." },
+    { question: "Can I connect my existing email?", answer: "Yes, you can securely connect your Gmail, Outlook, or IMAP accounts. We use OAuth for Gmail and Outlook, and securely store your IMAP credentials if you choose to connect a custom provider." },
     { question: "How does the AI work?", answer: "Our AI models are specially trained on email workflows to understand context, draft replies, and summarize long threads, all while keeping your data private and secure." },
     { question: "Is it secure?", answer: "Absolutely. We don't train our AI on your personal data, and all emails are encrypted. Our models are hosted with strict data privacy laws." },
-    { question: "Who is behind Vela?", answer: "Vela is built by a small, dedicated team of engineers and designers who were frustrated with the state of modern email clients." },
+    { question: "What devices is it available on?", answer: "Currently, Vela is available as a web app, optimized for desktop use. Mobile apps are in our roadmap." },
+    { question: "Is it a subscription?", answer: "Yes, Vela operates on a monthly or annual subscription model with a 14-day free trial." },
     { question: "May I join the beta program?", answer: "We are currently rolling out beta access to users on our waitlist. Sign up today to reserve your spot." }
   ];
+
 
   return (
     <div className="min-h-screen bg-white text-[#2B302F] selection:bg-gray-200 selection:text-black flex flex-col relative overflow-x-hidden">
@@ -44,7 +46,7 @@ export default function LandingPage() {
         <section className="pt-40 md:pt-48 pb-20 md:pb-24 px-6 md:px-12 w-full max-w-[1200px] mx-auto text-center flex flex-col items-center z-10">
           <h1 className="text-[2.25rem] sm:text-4xl md:text-[3.5rem] lg:text-[4.2rem] font-semibold tracking-tight leading-[1.2] mb-8 text-white max-w-4xl mx-auto flex flex-wrap justify-center items-center gap-x-2 md:gap-x-3 gap-y-2">
             <span>The</span>
-            <span className="inline-flex items-center justify-center bg-[#5c6d6a] text-white rounded-xl md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle">
+            <span className="inline-flex items-center justify-center bg-[#4a5e5a] text-white rounded-xl md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle">
               <ChatCircle weight="fill" className="w-5 h-5 md:w-7 md:h-7" />
             </span>
             <span>next generation</span>
@@ -52,7 +54,7 @@ export default function LandingPage() {
               <Lightning weight="fill" className="w-5 h-5 md:w-7 md:h-7" />
             </span>
             <span>of email</span>
-            <span className="inline-flex items-center justify-center bg-[#b8c2c0] text-[#414A48] rounded-xl md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle">
+            <span className="inline-flex items-center justify-center bg-[#d3dbd9] text-[#414a48] rounded-xl md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle">
               <Sparkle weight="fill" className="w-5 h-5 md:w-7 md:h-7" />
             </span>
             <span>is here.</span>
@@ -145,8 +147,8 @@ export default function LandingPage() {
         <section className="py-32 px-6 md:px-12 w-full text-center flex flex-col items-center">
           <h2 className="text-[32px] font-semibold tracking-tight text-black mb-4">Give your inbox the love<br />that it deserves</h2>
           <p className="text-gray-500 font-medium text-[15px] mb-10">Try Vela for free today. It takes 10 seconds to create an account.</p>
-          <Link href="/login" className="bg-[#415351] hover:bg-[#2c3837] text-white px-8 py-3 rounded-full font-semibold text-[15px] transition-colors shadow-md">
-            Get started &rarr;
+          <Link href="/login" className="bg-[#4a5e5a] hover:bg-[#3c4e4a] text-white px-8 py-3 rounded-full font-semibold text-[15px] transition-colors shadow-md">
+            Get started
           </Link>
         </section>
       </main>
