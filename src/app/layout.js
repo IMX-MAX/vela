@@ -1,5 +1,10 @@
 import "./app.css";
 import { CSPostHogProvider } from './providers';
+import { Geist } from "next/font/google";
+
+const geist = Geist({
+  subsets: ["latin"],
+});
 
 export const metadata = {
   metadataBase: new URL("https://getvela.email"),
@@ -62,17 +67,14 @@ export default function RootLayout({ children }) {
   };
 
   return (
-    <html lang="en">
+    <html lang="en" className={geist.className}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="bg-[#eceae6] text-[#1e1e1e] antialiased font-[Inter] text-[14px]">
+      <body className="bg-white text-black antialiased text-[14px]">
         <CSPostHogProvider>
           {children}
         </CSPostHogProvider>

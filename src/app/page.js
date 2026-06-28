@@ -33,37 +33,43 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-[#2B302F] font-[Inter] selection:bg-gray-200 selection:text-black flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen bg-white text-[#2B302F] selection:bg-gray-200 selection:text-black flex flex-col relative overflow-x-hidden">
       
       {/* Background Gradient */}
-      <div className="absolute top-0 left-0 right-0 h-[1000px] bg-gradient-to-b from-[#8C9C9A]/40 via-[#8C9C9A]/10 to-transparent pointer-events-none -z-10"></div>
+      <div className="absolute top-0 left-0 right-0 h-[800px] bg-gradient-to-b from-[#6a7c79] via-[#9eb0ad] to-white pointer-events-none -z-10"></div>
 
       <MarketingNavbar />
       
       <main className="w-full flex-1 flex flex-col items-center">
-        {/* Hero Section */}
-        <section className="pt-48 pb-24 px-6 md:px-12 w-full max-w-[1200px] mx-auto text-center flex flex-col items-center z-10">
-          <h1 className="text-4xl md:text-[3.5rem] lg:text-[4.2rem] font-semibold tracking-tight leading-[1.2] mb-8 text-[#414A48] max-w-4xl mx-auto flex flex-wrap justify-center items-center gap-x-3 gap-y-2">
+        <section className="pt-40 md:pt-48 pb-20 md:pb-24 px-6 md:px-12 w-full max-w-[1200px] mx-auto text-center flex flex-col items-center z-10">
+          <h1 className="text-[2.25rem] sm:text-4xl md:text-[3.5rem] lg:text-[4.2rem] font-semibold tracking-tight leading-[1.2] mb-8 text-white max-w-4xl mx-auto flex flex-wrap justify-center items-center gap-x-2 md:gap-x-3 gap-y-2">
             <span>The</span>
-            <span className="inline-flex items-center justify-center bg-[#7B8B88] text-white rounded-2xl w-[60px] h-[48px] shadow-sm align-middle"><ChatCircle size={28} weight="fill" /></span>
+            <span className="inline-flex items-center justify-center bg-[#5c6d6a] text-white rounded-xl md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle">
+              <ChatCircle weight="fill" className="w-5 h-5 md:w-7 md:h-7" />
+            </span>
             <span>next generation</span>
-            <span className="inline-flex items-center justify-center bg-white text-black rounded-2xl w-[60px] h-[48px] shadow-sm border border-gray-100 align-middle"><Lightning size={28} weight="fill" /></span>
+            <span className="inline-flex items-center justify-center bg-white text-black rounded-xl md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle">
+              <Lightning weight="fill" className="w-5 h-5 md:w-7 md:h-7" />
+            </span>
             <span>of email</span>
-            <span className="inline-flex items-center justify-center bg-[#C6CDC9] text-[#414A48] rounded-2xl w-[60px] h-[48px] shadow-sm align-middle"><Sparkle size={28} weight="fill" /></span>
+            <span className="inline-flex items-center justify-center bg-[#b8c2c0] text-[#414A48] rounded-xl md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle">
+              <Sparkle weight="fill" className="w-5 h-5 md:w-7 md:h-7" />
+            </span>
             <span>is here.</span>
           </h1>
-          <p className="text-[#5B6B69] max-w-xl text-lg font-medium mb-10 leading-relaxed">
+          <p className="text-white/90 max-w-xl text-lg font-medium mb-10 leading-relaxed">
             Lightning fast, AI powered, and designed to help you get through your inbox in record time.
           </p>
           <div className="flex items-center justify-center gap-4 mb-6">
-            <Link href="/login" className="bg-white text-black px-6 py-2.5 rounded-full font-semibold text-[14px] shadow-[0_2px_10px_rgba(0,0,0,0.05)] hover:shadow-md transition-shadow">
-              Get started <span className="ml-1 text-gray-400">&rarr;</span>
+            <Link href="/login" className="bg-white text-black px-6 py-2.5 rounded-full font-semibold text-[14px] shadow-[0_2px_10px_rgba(0,0,0,0.1)] hover:shadow-md transition-shadow">
+              Get started
             </Link>
-            <Link href="/resources/vs-the-world" className="bg-transparent text-gray-600 border border-gray-300 px-6 py-2.5 rounded-full font-semibold text-[14px] hover:bg-white/50 transition-colors">
+            <Link href="/resources/vs-the-world" className="bg-transparent text-white border border-white/30 px-6 py-2.5 rounded-full font-semibold text-[14px] hover:bg-white/10 transition-colors">
               Learn more
             </Link>
           </div>
-          <p className="text-[13px] text-gray-500 font-medium">Free to use, no credit card required.</p>
+
+          <p className="text-[13px] text-white/70 font-medium">Free to use, no credit card required.</p>
         </section>
 
         {/* Feature 1 */}
