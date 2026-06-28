@@ -1,0 +1,4 @@
+Contact: mailto:security@getvela.email
+Expires: 2027-12-31T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://getvela.email/.well-known/security.txt

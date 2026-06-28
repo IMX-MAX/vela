@@ -1,5 +1,5 @@
 import "./app.css";
-import { CSPostHogProvider } from './providers';
+import { headers } from "next/headers";
 import { Geist } from "next/font/google";
 
 const geist = Geist({
@@ -46,6 +46,8 @@ export const viewport = {
 };
 
 export default function RootLayout({ children }) {
+  const nonce = headers().get("x-nonce") || "";
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -71,13 +73,12 @@ export default function RootLayout({ children }) {
       <head>
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body className="bg-white text-black antialiased text-[14px]">
-        <CSPostHogProvider>
-          {children}
-        </CSPostHogProvider>
+        {children}
       </body>
     </html>
   );

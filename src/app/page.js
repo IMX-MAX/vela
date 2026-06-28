@@ -63,8 +63,8 @@ export default function LandingPage() {
             Dealing with your cluttered inbox shouldn't feel like a full time<br/>job. Vela actually understands your inbox.
           </p>
           <div className="flex items-center justify-center gap-4 mb-6">
-            <Link href="/login" className="bg-white text-[#414a48] px-5 py-2 rounded-full font-semibold text-[13px] shadow-[0_2px_10px_rgba(0,0,0,0.1)] hover:shadow-md transition-shadow flex items-center gap-1.5">
-              Get started <ArrowRight weight="bold" />
+            <Link href="https://tally.so/r/Meg52p" target="_blank" rel="noopener noreferrer" className="bg-white text-[#414a48] px-5 py-2 rounded-full font-semibold text-[13px] shadow-[0_2px_10px_rgba(0,0,0,0.1)] hover:shadow-md transition-shadow flex items-center gap-1.5">
+              Join the waitlist <ArrowRight weight="bold" />
             </Link>
             <Link href="/resources/vs-the-world" className="bg-transparent text-white border border-white/40 px-5 py-2 rounded-full font-semibold text-[13px] hover:bg-white/10 transition-colors">
               Learn more
@@ -148,8 +148,8 @@ export default function LandingPage() {
         <section className="py-32 px-6 md:px-12 w-full text-center flex flex-col items-center">
           <h2 className="text-[32px] md:text-[36px] font-semibold tracking-tight text-black mb-3">Give your inbox the love<br />that it deserves</h2>
           <p className="text-gray-400 font-medium text-[14px] mb-10">Try vela for free, and fight back against your mountain of emails.</p>
-          <Link href="/login" className="bg-[#5a6c68] hover:bg-[#4a5c58] text-white px-6 py-2.5 rounded-full font-semibold text-[13px] transition-colors shadow-sm flex items-center gap-1.5">
-            Get Started <ArrowRight weight="bold" />
+          <Link href="https://tally.so/r/Meg52p" target="_blank" rel="noopener noreferrer" className="bg-[#5a6c68] hover:bg-[#4a5c58] text-white px-6 py-2.5 rounded-full font-semibold text-[13px] transition-colors shadow-sm flex items-center gap-1.5">
+            Join the waitlist <ArrowRight weight="bold" />
           </Link>
         </section>
       </main>

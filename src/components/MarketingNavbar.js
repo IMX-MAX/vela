@@ -42,9 +42,14 @@ export default function MarketingNavbar() {
             </div>
           </div>
         </div>
-        <Link href="/login" className="bg-white hover:bg-gray-100 text-[#414a48] px-4 py-1.5 rounded-full text-[12px] font-semibold transition-colors shadow-sm ml-2 sm:ml-0">
-          Get started
-        </Link>
+        <div className="flex items-center gap-3 ml-2 sm:ml-0">
+          <Link href="/login" className="hidden sm:block text-[12px] font-semibold text-white hover:text-white/80 transition-colors">
+            Log in
+          </Link>
+          <Link href="https://tally.so/r/Meg52p" target="_blank" rel="noopener noreferrer" className="bg-white hover:bg-gray-100 text-[#414a48] px-4 py-1.5 rounded-full text-[12px] font-semibold transition-colors shadow-sm">
+            Join the waitlist
+          </Link>
+        </div>
       </nav>
     </div>
   );

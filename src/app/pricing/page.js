@@ -22,7 +22,7 @@ export default function PricingPage() {
 
           <h1 className="text-4xl md:text-5xl font-medium tracking-tight text-[#1e2a3b] mb-4">Simple pricing for your AI email client.</h1>
           <p className="text-[#1e2a3b]/60 max-w-xl mx-auto text-lg leading-relaxed">
-            Get started for free during our beta. Upgrade when you need more power for your inbox.
+            Join the waitlist for our beta. Upgrade when you need more power for your inbox.
           </p>
         </div>
 
@@ -52,8 +52,8 @@ export default function PricingPage() {
               </li>
             </ul>
             
-            <Link href="/login" className="w-full text-center py-3 rounded-xl font-medium text-sm bg-white/60 hover:bg-white shadow-sm hover:shadow-md text-[#1e2a3b] transition-all">
-              Get Started for Free
+            <Link href="https://tally.so/r/Meg52p" target="_blank" rel="noopener noreferrer" className="w-full text-center py-3 rounded-xl font-medium text-sm bg-white/60 hover:bg-white shadow-sm hover:shadow-md text-[#1e2a3b] transition-all">
+              Join the waitlist
             </Link>
           </div>
 
@@ -90,8 +90,8 @@ export default function PricingPage() {
               </li>
             </ul>
             
-            <Link href="/login?upgrade=true" className="w-full text-center py-3 rounded-xl font-medium text-sm bg-[#1e2a3b] text-white hover:bg-[#1e2a3b]/90 transition-colors block">
-              Get Pro
+            <Link href="https://tally.so/r/Meg52p" target="_blank" rel="noopener noreferrer" className="w-full text-center py-3 rounded-xl font-medium text-sm bg-[#1e2a3b] text-white hover:bg-[#1e2a3b]/90 transition-colors block">
+              Join the waitlist
             </Link>
           </div>
         </div>
