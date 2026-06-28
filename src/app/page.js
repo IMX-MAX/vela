@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChatCircle, Lightning, Sparkle, CaretDown } from "@phosphor-icons/react";
+import { ChatCircleDots, Lightning, Atom, CaretDown, ArrowRight } from "@phosphor-icons/react";
 import MarketingNavbar from "@/components/MarketingNavbar";
 import MarketingFooter from "@/components/MarketingFooter";
 import { useAuthStore } from "@/lib/store";
@@ -25,59 +25,58 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState(0);
 
   const faqs = [
-    { question: "Can I connect my existing email?", answer: "Yes, you can securely connect your Gmail, Outlook, or IMAP accounts. We use OAuth for Gmail and Outlook, and securely store your IMAP credentials if you choose to connect a custom provider." },
-    { question: "How does the AI work?", answer: "Our AI models are specially trained on email workflows to understand context, draft replies, and summarize long threads, all while keeping your data private and secure." },
-    { question: "Is it secure?", answer: "Absolutely. We don't train our AI on your personal data, and all emails are encrypted. Our models are hosted with strict data privacy laws." },
-    { question: "What devices is it available on?", answer: "Currently, Vela is available as a web app, optimized for desktop use. Mobile apps are in our roadmap." },
-    { question: "Is it a subscription?", answer: "Yes, Vela operates on a monthly or annual subscription model with a 14-day free trial." },
-    { question: "May I join the beta program?", answer: "We are currently rolling out beta access to users on our waitlist. Sign up today to reserve your spot." }
+    { question: "AI is spotty. How do I know this will be different?", answer: "An AI tool is only as good as the models behind it. We've built Vela to support these models best possible. They aren't trained to do everything, and that's what makes them different. General LLMs have to do everything - writing code, essays, etc. Our models have been trained to excel in one thing only: emails. AI is not perfect, and even Vela can sometimes make mistakes, but in our testing, it's been pretty dang good." },
+    { question: "What is your refund policy?", answer: "We offer a 14-day money-back guarantee for all new subscriptions. If you're not satisfied, just let us know." },
+    { question: "Does Vela respect my privacy?", answer: "Yes, we take privacy very seriously. Your emails are encrypted and we do not train our models on your personal data without explicit consent." },
+    { question: "Is Vela free?", answer: "We offer a 7-day free trial on the Pro plan so you can experience the full power of Vela before committing." },
+    { question: "Why command palette?", answer: "A command palette allows you to navigate and perform actions across the entire app without taking your hands off the keyboard, making you incredibly fast." },
+    { question: "Why do I need an AI for my emails?", answer: "Email volume is constantly growing. AI helps you cut through the noise, summarize long threads, and draft replies instantly, saving you hours every week." }
   ];
-
 
   return (
     <div className="min-h-screen bg-white text-[#2B302F] selection:bg-gray-200 selection:text-black flex flex-col relative overflow-x-hidden">
       
       {/* Background Gradient */}
-      <div className="absolute top-0 left-0 right-0 h-[800px] bg-gradient-to-b from-[#6a7c79] via-[#9eb0ad] to-white pointer-events-none -z-10"></div>
+      <div className="absolute top-0 left-0 right-0 h-[800px] bg-gradient-to-b from-[#7A8A86] to-white pointer-events-none -z-10"></div>
 
       <MarketingNavbar />
       
       <main className="w-full flex-1 flex flex-col items-center">
+        {/* Hero Section */}
         <section className="pt-40 md:pt-48 pb-20 md:pb-24 px-6 md:px-12 w-full max-w-[1200px] mx-auto text-center flex flex-col items-center z-10">
           <h1 className="text-[2.25rem] sm:text-4xl md:text-[3.5rem] lg:text-[4.2rem] font-semibold tracking-tight leading-[1.2] mb-8 text-white max-w-4xl mx-auto flex flex-wrap justify-center items-center gap-x-2 md:gap-x-3 gap-y-2">
             <span>The</span>
-            <span className="inline-flex items-center justify-center bg-[#4a5e5a] text-white rounded-xl md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle">
-              <ChatCircle weight="fill" className="w-5 h-5 md:w-7 md:h-7" />
+            <span className="inline-flex items-center justify-center bg-white/20 text-white rounded-[14px] md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle backdrop-blur-sm">
+              <ChatCircleDots weight="fill" className="w-5 h-5 md:w-7 md:h-7" />
             </span>
             <span>next generation</span>
-            <span className="inline-flex items-center justify-center bg-white text-black rounded-xl md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle">
+            <span className="inline-flex items-center justify-center bg-white/20 text-white rounded-[14px] md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle backdrop-blur-sm">
               <Lightning weight="fill" className="w-5 h-5 md:w-7 md:h-7" />
             </span>
             <span>of email</span>
-            <span className="inline-flex items-center justify-center bg-[#d3dbd9] text-[#414a48] rounded-xl md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle">
-              <Sparkle weight="fill" className="w-5 h-5 md:w-7 md:h-7" />
+            <span className="inline-flex items-center justify-center bg-white/20 text-white rounded-[14px] md:rounded-[20px] w-10 h-8 md:w-[60px] md:h-[48px] shadow-sm align-middle backdrop-blur-sm">
+              <Atom weight="bold" className="w-5 h-5 md:w-7 md:h-7" />
             </span>
             <span>is here.</span>
           </h1>
-          <p className="text-white/90 max-w-xl text-lg font-medium mb-10 leading-relaxed">
-            Lightning fast, AI powered, and designed to help you get through your inbox in record time.
+          <p className="text-[#3c4a47] md:text-white/90 max-w-xl text-[15px] font-medium mb-10 leading-relaxed mix-blend-color-burn md:mix-blend-normal">
+            Dealing with your cluttered inbox shouldn't feel like a full time<br/>job. Vela actually understands your inbox.
           </p>
           <div className="flex items-center justify-center gap-4 mb-6">
-            <Link href="/login" className="bg-white text-black px-6 py-2.5 rounded-full font-semibold text-[14px] shadow-[0_2px_10px_rgba(0,0,0,0.1)] hover:shadow-md transition-shadow">
-              Get started
+            <Link href="/login" className="bg-white text-[#414a48] px-5 py-2 rounded-full font-semibold text-[13px] shadow-[0_2px_10px_rgba(0,0,0,0.1)] hover:shadow-md transition-shadow flex items-center gap-1.5">
+              Get started <ArrowRight weight="bold" />
             </Link>
-            <Link href="/resources/vs-the-world" className="bg-transparent text-white border border-white/30 px-6 py-2.5 rounded-full font-semibold text-[14px] hover:bg-white/10 transition-colors">
+            <Link href="/resources/vs-the-world" className="bg-transparent text-white border border-white/40 px-5 py-2 rounded-full font-semibold text-[13px] hover:bg-white/10 transition-colors">
               Learn more
             </Link>
           </div>
-
-          <p className="text-[13px] text-white/70 font-medium">Free to use, no credit card required.</p>
+          <p className="text-[11px] text-[#4a5e5a] md:text-white/60 font-medium mix-blend-color-burn md:mix-blend-normal">Start with a 7-day free trial on the Pro plan. Cancel anytime.</p>
         </section>
 
         {/* Feature 1 */}
         <section className="py-24 px-6 md:px-12 w-full max-w-[1000px] mx-auto text-center flex flex-col items-center">
-          <h2 className="text-[32px] font-semibold tracking-tight text-black mb-4">One place for all your emails</h2>
-          <p className="text-gray-500 font-medium text-[15px] mb-14">Stop juggling 5 different email apps and bring them all into one place for the ultimate inbox.</p>
+          <h2 className="text-[32px] md:text-[36px] font-semibold tracking-tight text-black mb-3">One place for all your emails</h2>
+          <p className="text-gray-400 font-medium text-[14px] mb-14 max-w-2xl mx-auto">Copying and pasting your emails into LLMs is a waste of time. Vela fixes this.</p>
           <div className="w-full rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.06)] border border-gray-200/60 bg-white">
             <img src="/1.png" alt="Mailbox" className="w-full h-auto block" />
           </div>
@@ -85,25 +84,27 @@ export default function LandingPage() {
 
         {/* Feature 2 */}
         <section className="py-24 px-6 md:px-12 w-full max-w-[1000px] mx-auto text-center flex flex-col items-center">
-          <h2 className="text-[32px] font-semibold tracking-tight text-black mb-4">Do the easy things.. really well</h2>
-          <p className="text-gray-500 font-medium text-[15px] mb-14 max-w-2xl mx-auto leading-relaxed">Vela was built around keyboard shortcuts from day one. You'll zip through your inbox faster than ever before. Select 500 emails and mark them all as read in 300 milliseconds.</p>
+          <h2 className="text-[32px] md:text-[36px] font-semibold tracking-tight text-black mb-3">Do the easy things... really well</h2>
+          <p className="text-gray-400 font-medium text-[14px] mb-14 max-w-2xl mx-auto leading-relaxed">Vela can summarize and reply to emails for you. Our agents have been trained to specifically perform in their own fields, allowing our email ai agents to find details others miss.</p>
           <div className="w-full rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.06)] border border-gray-200/60 bg-white">
             <img src="/2.png" alt="Command Palette" className="w-full h-auto block" />
           </div>
-          <p className="text-[13px] text-gray-400 font-medium mt-8 max-w-2xl text-left leading-relaxed">It's not just shortcuts; it's a fluid interface that anticipates what you want to do. Navigate your inbox, manage threads, and organize your life with unprecedented speed.</p>
+          <div className="w-full mt-6 max-w-[700px] text-left self-start">
+            <p className="text-[12px] text-gray-400 font-medium leading-relaxed">Our summarization and reply models are able to do their job exceptionally well because<br/>of the proprietary training and context it has.</p>
+          </div>
         </section>
 
         {/* Feature 3 & 4 (AI) */}
         <section className="py-24 px-6 md:px-12 w-full max-w-[1000px] mx-auto text-center flex flex-col items-center">
-          <h2 className="text-[32px] font-semibold tracking-tight text-black mb-4">AI wherever you are</h2>
-          <p className="text-gray-500 font-medium text-[15px] mb-14 max-w-2xl mx-auto leading-relaxed">Vela is built to bring AI everywhere in your email workflow. Ask it to find emails for you, draft emails, and even summarize threads.</p>
+          <h2 className="text-[32px] md:text-[36px] font-semibold tracking-tight text-black mb-3">AI wherever you are</h2>
+          <p className="text-gray-400 font-medium text-[14px] mb-14 max-w-2xl mx-auto leading-relaxed">Hit ⌘ (ctrl) + k anywhere in the app to bring up the Command Palette. Search anything,<br/>navigate the app, or ask AI. Literally anything.</p>
           
-          <div className="w-full max-w-3xl mx-auto flex flex-col gap-10">
+          <div className="w-full max-w-3xl mx-auto flex flex-col items-center gap-8">
             <div className="w-full rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.06)] border border-gray-200/60 bg-white">
               <img src="/3.png" alt="AI Search Bar" className="w-full h-auto block" />
             </div>
             
-            <div className="text-[13px] text-gray-400 font-semibold tracking-widest uppercase">And then</div>
+            <div className="text-[13px] text-gray-400 font-medium">and then...</div>
 
             <div className="w-full rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.06)] border border-gray-200/60 bg-white">
               <img src="/4.png" alt="AI Search Results" className="w-full h-auto block" />
@@ -113,30 +114,30 @@ export default function LandingPage() {
 
         {/* Feature 5 */}
         <section className="py-24 px-6 md:px-12 w-full max-w-[1000px] mx-auto text-center flex flex-col items-center">
-          <h2 className="text-[32px] font-semibold tracking-tight text-black mb-4">Write beautiful emails</h2>
-          <p className="text-gray-500 font-medium text-[15px] mb-14 max-w-2xl mx-auto leading-relaxed">Our markdown editor allows you to write beautiful, rich emails without ever having to touch a mouse.</p>
+          <h2 className="text-[32px] md:text-[36px] font-semibold tracking-tight text-black mb-3">Write beautiful emails</h2>
+          <p className="text-gray-400 font-medium text-[14px] mb-14 max-w-2xl mx-auto leading-relaxed">By yourself, or using AI. Our email composer supports markdown, and has a native AI tools / menu.</p>
           <div className="w-full max-w-[800px] rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.06)] border border-gray-200/60 bg-white">
             <img src="/5.png" alt="Composer" className="w-full h-auto block" />
           </div>
         </section>
 
         {/* FAQ Section */}
-        <section className="py-32 px-6 md:px-12 w-full max-w-[800px] mx-auto flex flex-col">
-          <h2 className="text-[32px] font-semibold tracking-tight text-black mb-16 text-center">Questions</h2>
-          <div className="flex flex-col gap-0 w-full border-t border-gray-200">
+        <section className="py-32 px-6 md:px-12 w-full max-w-[700px] mx-auto flex flex-col">
+          <h2 className="text-[32px] md:text-[36px] font-semibold tracking-tight text-black mb-16 text-center">Questions</h2>
+          <div className="flex flex-col gap-0 w-full">
             {faqs.map((faq, i) => (
-              <div key={i} className="border-b border-gray-200">
+              <div key={i} className="border-b border-gray-100 last:border-b-0">
                 <button 
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   className="w-full py-6 flex items-center justify-between text-left focus:outline-none group"
                 >
-                  <span className="font-semibold text-black text-[16px] group-hover:text-gray-600 transition-colors">{faq.question}</span>
-                  <CaretDown size={16} weight="bold" className={`text-gray-400 transition-transform duration-300 ${openFaq === i ? 'rotate-180' : ''}`} />
+                  <span className="font-semibold text-black text-[14px] group-hover:text-gray-600 transition-colors">{faq.question}</span>
+                  <CaretDown size={14} weight="bold" className={`text-gray-300 transition-transform duration-300 ${openFaq === i ? 'rotate-180' : ''}`} />
                 </button>
                 <div 
                   className={`overflow-hidden transition-all duration-300 ease-in-out ${openFaq === i ? 'max-h-40 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}
                 >
-                  <p className="text-gray-500 font-medium text-[15px] leading-relaxed pr-8">{faq.answer}</p>
+                  <p className="text-gray-500 font-medium text-[13px] leading-relaxed pr-8">{faq.answer}</p>
                 </div>
               </div>
             ))}
@@ -145,10 +146,10 @@ export default function LandingPage() {
 
         {/* CTA Section */}
         <section className="py-32 px-6 md:px-12 w-full text-center flex flex-col items-center">
-          <h2 className="text-[32px] font-semibold tracking-tight text-black mb-4">Give your inbox the love<br />that it deserves</h2>
-          <p className="text-gray-500 font-medium text-[15px] mb-10">Try Vela for free today. It takes 10 seconds to create an account.</p>
-          <Link href="/login" className="bg-[#4a5e5a] hover:bg-[#3c4e4a] text-white px-8 py-3 rounded-full font-semibold text-[15px] transition-colors shadow-md">
-            Get started
+          <h2 className="text-[32px] md:text-[36px] font-semibold tracking-tight text-black mb-3">Give your inbox the love<br />that it deserves</h2>
+          <p className="text-gray-400 font-medium text-[14px] mb-10">Try vela for free, and fight back against your mountain of emails.</p>
+          <Link href="/login" className="bg-[#5a6c68] hover:bg-[#4a5c58] text-white px-6 py-2.5 rounded-full font-semibold text-[13px] transition-colors shadow-sm flex items-center gap-1.5">
+            Get Started <ArrowRight weight="bold" />
           </Link>
         </section>
       </main>
